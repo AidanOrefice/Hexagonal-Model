@@ -1,0 +1,1 @@
+#Script to initialise the hexagonal lattice
