@@ -21,6 +21,6 @@ class HexagonalLattice():
         self.width = width #Width of hexagonal lattice in units of # of cells.
 
     def CreateLattice(self):
-        self.Hexagon = np.zeros((self.width,self.height)) #Rotate coordinate system by 60 degrees. Still only diamonds
+        self.Hexagon = np.zeros((self.width,self.height), dtype = np.float16) #Rotate coordinate system by 60 degrees. Still only diamonds
         print(self.Hexagon)
 
