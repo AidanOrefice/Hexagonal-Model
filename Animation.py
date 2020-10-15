@@ -1,31 +1,34 @@
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import time
 
 def main():
-    colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'dark grey', 4 : 'light grey'}
-    array = np.zeros((16))
-    array[0] = 1
+    global colors
+    colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'dimgrey', 4 : 'lightgrey'}
+    global F
+    F = np.load('StateData.npy')
+    print(F.shape)
     fig, ax = plt.subplots()
     global lines
-    global F
-    F = []
-    for i in range(2,16):
+    '''F = []
+    for i in range(1,16):
         F.append(list(array))
         array[i-1] = 0
-        array[i] = 1 
+        array[i] = 1'''
     lines = []
-    for i in len(array):
-        x = index_to_xy(i)[0]
-        y = index_to_xy(i)[1]
-        lines.append(ax.plot(x, y, color='green', marker = 'o', ls = '', markersize = 25)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=15)
+    for i in range(F.shape[1]):
+        x = index_to_xy(i,int(np.sqrt(F.shape[1])))[0]
+        y = index_to_xy(i,int(np.sqrt(F.shape[1])))[1]
+        lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
+    anim = FuncAnimation(fig, animate, interval=1000, frames=F.shape[0])
     anim.save('Animation.gif', writer='Dan')
     plt.draw()
     plt.show()
 
 def index_to_xy(index, width):
-    row = int(str(index / width)[0])
+    row = math.floor(index / width)
     y = row
     if_even = row % 2 == 0
     if if_even:
@@ -42,7 +45,7 @@ def animate(i):
     for j,item in enumerate(lines):
         level = x[j]
         color = colors[level]
-        lines.set_color(color)
+        item.set_color(color)
 
 
 if __name__ == "__main__":

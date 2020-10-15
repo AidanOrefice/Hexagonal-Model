@@ -113,7 +113,7 @@ class HexagonalLattice():
         self.t = self.dt
 
     def SigmoidDist(self,charges):
-        return 1/(1+np.exp(-100*(charges-self.threshold)))
+        return 1/(1+np.exp(-10*(charges-self.threshold)))
 
     def ActivationCheck(self):
         index_rest = np.where(self.ref == 0)[0]
@@ -154,7 +154,7 @@ class HexagonalLattice():
 
 
 def main():
-    lattice = HexagonalLattice(4,4,10)
+    lattice = HexagonalLattice(50,50,250)
     lattice.CreateLattice()
     lattice.Initialise()
     lattice.ChargeProp()
