@@ -116,23 +116,17 @@ class HexagonalLattice():
         return 1/(1+np.exp(-100*(charges-self.threshold)))
 
     def ActivationCheck(self):
-        print(self.ref)
-        print(self.hexagon)
         index_rest = np.where(self.ref == 0)[0]
-        print(index_rest)
-        print(self.hexagon[index_rest])
         p = self.SigmoidDist(self.hexagon[index_rest])
-        print(p)
         a= np.random.rand(len(index_rest))
-        print(a)
         b = index_rest[np.where(p>a)[0]]
-        print(b)
         self.ref[b] = -1 #pseudo-state: just activated
-        print(self.ref)
 
 
     def ChargeProp(self):
+        RefHistory = a = np.zeros(shape=(self.runtime,self.width*self.height))
         while self.t <= self.runtime:
+            RefHistory[self.t-1] = self.ref
             index_charged = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
             for key in index_charged:
                 neighbours = self.neighbours[key]
@@ -147,21 +141,20 @@ class HexagonalLattice():
             #Checking which states can be activated.
             self.ActivationCheck()
 
-            #Progress states. Something happeing in activation check is fucking with it 
-            #print(np.where(self.ref >= 1)[0])
-
             self.ref[np.where(self.ref >= 1)[0]] += 1
             self.ref[np.where(self.ref == 5)[0]] = 0
             self.ref[np.where(self.ref == -1)[0]] = 1
 
             print(self.t)
             self.t += self.dt
+        np.save('StateData.npy', RefHistory)
+
 
         
 
 
 def main():
-    lattice = HexagonalLattice(4,4,3)
+    lattice = HexagonalLattice(4,4,10)
     lattice.CreateLattice()
     lattice.Initialise()
     lattice.ChargeProp()
