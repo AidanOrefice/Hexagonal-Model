@@ -55,6 +55,8 @@ def animate(i):
         y2.append(xy[1])
     print(x1, x2)
     print(y1, y2)
+    line1.set_xdata(x1)
+    line2.set_xdata(x2)
     line1.set_ydata(y1)
     line2.set_ydata(y2)
 
