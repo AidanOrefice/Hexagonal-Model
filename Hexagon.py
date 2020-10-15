@@ -23,9 +23,12 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height):
+    def __init__(self,width,height, runtime):
         self.height = height
         self.width = width
+        self.dt = 1 #Discrete time width of lattice.
+        self.threshold = 1
+        self.runtime = runtime #Total time we want to run for.
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -34,6 +37,7 @@ class HexagonalLattice():
     def CreateLattice(self):
         self.hexagon = np.zeros((self.width * self.height), dtype = np.float16) #Hexagonal Lattice in 1d array.
         self.ref = np.zeros((self.width * self.height), dtype = np.float16) #Identical for recording refractoriness.
+        self.Neighbours()
 
     def Neighbours(self):
         """
@@ -102,13 +106,65 @@ class HexagonalLattice():
                             self.neighbours[index] = np.asarray([index + 1, index - 1, index + self.width + 1,
                              index + self.width, index - self.width + 1, index - self.width])
 
+    def Initialise(self):
+        index_init = [i*self.width for i in range(0,self.height)]
+        self.hexagon[index_init] = 3*self.threshold
+        self.ref[index_init] = 1
+        self.t = self.dt
+
+    def SigmoidDist(self,charges):
+        return 1/(1+np.exp(-100*(charges-self.threshold)))
+
+    def ActivationCheck(self):
+        print(self.ref)
+        print(self.hexagon)
+        index_rest = np.where(self.ref == 0)[0]
+        print(index_rest)
+        print(self.hexagon[index_rest])
+        p = self.SigmoidDist(self.hexagon[index_rest])
+        print(p)
+        a= np.random.rand(len(index_rest))
+        print(a)
+        b = index_rest[np.where(p>a)[0]]
+        print(b)
+        self.ref[b] = -1 #pseudo-state: just activated
+        print(self.ref)
+
+
+    def ChargeProp(self):
+        while self.t <= self.runtime:
+            index_charged = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
+            for key in index_charged:
+                neighbours = self.neighbours[key]
+                avail_neighbours = []
+                for i in neighbours:
+                    if self.ref[i] == 0:
+                        avail_neighbours.append(i)  #retrieved their resting neighbours
+                amplitude = self.hexagon[key]/len(avail_neighbours)
+                self.hexagon[avail_neighbours] += amplitude #Spreading out the charge
+                self.hexagon[key] = 0
+
+            #Checking which states can be activated.
+            self.ActivationCheck()
+
+            #Progress states. Something happeing in activation check is fucking with it 
+            #print(np.where(self.ref >= 1)[0])
+
+            self.ref[np.where(self.ref >= 1)[0]] += 1
+            self.ref[np.where(self.ref == 5)[0]] = 0
+            self.ref[np.where(self.ref == -1)[0]] = 1
+
+            print(self.t)
+            self.t += self.dt
+
+        
+
 
 def main():
-    lattice = HexagonalLattice(10,10)
+    lattice = HexagonalLattice(4,4,3)
     lattice.CreateLattice()
-    print(lattice.hexagon)
-    lattice.Neighbours()
-    print(lattice.neighbours)
+    lattice.Initialise()
+    lattice.ChargeProp()
 
 if __name__ == '__main__':
     main()

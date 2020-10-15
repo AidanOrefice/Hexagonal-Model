@@ -16,13 +16,13 @@ def main():
         y.append(xy[1])
     global F
     F = []
-    for i in range(2,16):
+    for i in range(1,16):
         F.append(list(array))
         array[i-1] = 0
         array[i] = 1 
     line1 = ax.plot(x, y, color='green', marker = 'o', ls = '', markersize = 25)[0]
     line2 = ax.plot(x1, y1, color='blue', marker = 'o', ls = '', markersize = 25)[0]
-    anim = FuncAnimation(fig, animate, interval=100, frames=15)
+    anim = FuncAnimation(fig, animate, interval=10000, frames=150000)
     plt.draw()
     plt.show()
 
