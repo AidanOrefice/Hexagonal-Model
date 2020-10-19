@@ -136,6 +136,8 @@ class HexagonalLattice():
         self.t = self.dt
         RefHistory = a = np.zeros(shape=(self.runtime,self.width*self.height))
         while self.t <= self.runtime:
+            if (self.t == self.dt) or (self.t % 10 == 0):
+                self.Initialise()
             RefHistory[self.t-1] = self.ref
             index_charged = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
             for key in index_charged:
@@ -165,7 +167,6 @@ class HexagonalLattice():
 def main():
     lattice = HexagonalLattice(50,50,100,8)
     lattice.CreateLattice()
-    lattice.Initialise()
     lattice.ChargeProp()
 
 if __name__ == '__main__':
