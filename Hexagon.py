@@ -23,12 +23,13 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime):
+    def __init__(self,width,height, runtime, sigmoid_strength):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
         self.threshold = 1
         self.runtime = runtime #Total time we want to run for.
+        self.sig_st = sigmoid_strength
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -60,11 +61,13 @@ class HexagonalLattice():
             if i == 0: #First row always even
                 for j in range(0, self.width):
                     if j == 0: # (0,0) root cell of the hexagonal lattice (bottom left).
-                        self.neighbours[0] = np.asarray([self.width, 1, (self.width * 2) - 1, self.width - 1,
-                         self.width * (self.height -1), self.width * self.height - 1])
+                        self.neighbours[0] = np.asarray([self.width, 1,
+                         self.width * (self.height -1)])
+                         #, (self.width * 2) - 1, self.width - 1, self.width * self.height - 1
                     elif j == self.width - 1: #bottom right corner
-                        self.neighbours[j] = np.asarray([j - 1, j + self.width - 1, j + self.width, 0,
+                        self.neighbours[j] = np.asarray([j - 1, j + self.width - 1, j + self.width,
                          self.width * self.height - 1, self.width * self.height - 2])
+                         #, 0
                     else:
                         self.neighbours[j] = np.asarray([j - 1, j + 1, j + self.width - 1, j + self.width,
                          self.width * (self.height - 1) + j - 1, self.width * (self.height - 1) + j])
@@ -73,10 +76,12 @@ class HexagonalLattice():
                     index = i * self.width + j
                     if j == 0: #top left corner
                         self.neighbours[index] = np.asarray([index - self.width, index - self.width + 1,
-                         index + 1, self.width * self.height - 1, 0, 1])
+                         index + 1, 0, 1])
+                         #, self.width * self.height - 1
                     elif j == self.width - 1: #top right corner
-                        self.neighbours[index] = np.asarray([index - (self.width * 2) + 1, index - self.width,
-                         index - 1, index - self.width + 1, 0, self.width - 1])
+                        self.neighbours[index] = np.asarray([ index - self.width,
+                         index - 1, self.width - 1])
+                         #, index - self.width + 1, 0,index - (self.width * 2) + 1,
                     else:
                         self.neighbours[index] = np.asarray([index - self.width, index - self.width + 1,
                          index - 1, index + 1, j, j + 1])
@@ -86,18 +91,22 @@ class HexagonalLattice():
                     index = i * self.width + j
                     if j == 0: #left-most column
                         if if_even:
-                            self.neighbours[index] = np.asarray([index - 1, index + self.width - 1,
-                             index + self.width, index - self.width, index + 1, index + (self.width * 2) - 1])
+                            self.neighbours[index] = np.asarray([
+                             index + self.width, index - self.width, index + 1])
+                             #index - 1, index + self.width - 1,, index + (self.width * 2) - 1
                         else:
-                            self.neighbours[index] = np.asarray([index + 1, index + self.width - 1,
+                            self.neighbours[index] = np.asarray([index + 1,
                              index + self.width + 1, index + self.width, index - self.width + 1, index - self.width])
+                             # index + self.width - 1,
                     elif j == self.width - 1: #right-most column
                         if if_even:
-                            self.neighbours[index] = np.asarray([index - self.width + 1, index - 1,
+                            self.neighbours[index] = np.asarray([ index - 1,
                              index + self.width - 1, index + self.width, index - self.width - 1, index - self.width])
+                             #index - self.width + 1,
                         else:
-                            self.neighbours[index] = np.asarray([index - 1, index - self.width + 1,
-                             index + self.width, index - self.width, index + 1, index - (self.width * 2) + 1])
+                            self.neighbours[index] = np.asarray([index - 1,
+                             index + self.width, index - self.width])
+                             #, index + 1, index - (self.width * 2) + 1, index - self.width + 1
                     else: #All non-edge sites.
                         if if_even:
                             self.neighbours[index] = np.asarray([index + 1, index - 1, index + self.width - 1,
@@ -110,10 +119,10 @@ class HexagonalLattice():
         index_init = [i*self.width for i in range(0,self.height)]
         self.hexagon[index_init] = 3*self.threshold
         self.ref[index_init] = 1
-        self.t = self.dt
+        
 
     def SigmoidDist(self,charges):
-        return 1/(1+np.exp(-10*(charges-self.threshold)))
+        return 1/(1+np.exp(-self.sig_st*(charges-self.threshold)))
 
     def ActivationCheck(self):
         index_rest = np.where(self.ref == 0)[0]
@@ -124,6 +133,7 @@ class HexagonalLattice():
 
 
     def ChargeProp(self):
+        self.t = self.dt
         RefHistory = a = np.zeros(shape=(self.runtime,self.width*self.height))
         while self.t <= self.runtime:
             RefHistory[self.t-1] = self.ref
@@ -145,7 +155,6 @@ class HexagonalLattice():
             self.ref[np.where(self.ref == 5)[0]] = 0
             self.ref[np.where(self.ref == -1)[0]] = 1
 
-            print(self.t)
             self.t += self.dt
         np.save('StateData.npy', RefHistory)
 
@@ -154,10 +163,11 @@ class HexagonalLattice():
 
 
 def main():
-    lattice = HexagonalLattice(50,50,250)
+    lattice = HexagonalLattice(50,50,100,8)
     lattice.CreateLattice()
     lattice.Initialise()
     lattice.ChargeProp()
 
 if __name__ == '__main__':
     main()
+

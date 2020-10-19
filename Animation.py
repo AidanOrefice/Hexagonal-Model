@@ -23,7 +23,9 @@ def main():
         y = index_to_xy(i,int(np.sqrt(F.shape[1])))[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
     anim = FuncAnimation(fig, animate, interval=1000, frames=F.shape[0])
-    anim.save('Animation.gif', writer='Dan')
+    plt.title(input('Animation title'))
+    name = input("What would you like to call the file? ")
+    anim.save(name, writer='Dan')
     plt.draw()
     plt.show()
 
