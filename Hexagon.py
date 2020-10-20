@@ -7,6 +7,7 @@ Create a simple animation to highlight the basic mechanics of lattice are workin
 """
 
 import numpy as np
+import time
 
 class HexagonalLattice():
     '''
@@ -165,9 +166,12 @@ class HexagonalLattice():
 
 
 def main():
-    lattice = HexagonalLattice(50,50,100,8)
+    t0 = time.time()
+    lattice = HexagonalLattice(50,50,10000,8)
     lattice.CreateLattice()
     lattice.ChargeProp()
+    t1 = time.time()
+    print('Runtime = %f s' % (t1-t0))
 
 if __name__ == '__main__':
     main()
