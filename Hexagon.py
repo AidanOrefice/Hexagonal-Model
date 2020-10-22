@@ -24,11 +24,11 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, sigmoid_strength):
+    def __init__(self,width,height, runtime, threshold, sigmoid_strength):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
-        self.threshold = 1
+        self.threshold = threshold
         self.runtime = runtime #Total time we want to run for.
         self.sig_st = sigmoid_strength
 
@@ -117,59 +117,70 @@ class HexagonalLattice():
                              index + self.width, index - self.width + 1, index - self.width])
 
     def Initialise(self):
-        index_init = [i*self.width for i in range(0,self.height)]
-        self.hexagon[index_init] = 3*self.threshold
+        index_init = [i*self.width for i in range(0,self.height)] #Left hand side
+        #self.hexagon[index_init] = 100 
         self.ref[index_init] = 1
-        
 
     def SigmoidDist(self,charges):
         return 1/(1+np.exp(-self.sig_st*(charges-self.threshold)))
 
     def ActivationCheck(self):
-        index_rest = np.where(self.ref == 0)[0]
-        p = self.SigmoidDist(self.hexagon[index_rest])
-        a= np.random.rand(len(index_rest))
-        b = index_rest[np.where(p>a)[0]]
-        self.ref[b] = -1 #pseudo-state: just activated
-
-
+        index_charged = np.where(self.hexagon > 0)[0]
+        p = self.SigmoidDist(self.hexagon[index_charged])
+        a= np.random.rand(len(index_charged))
+        b = index_charged[np.where(p>a)[0]]
+        self.ref[b] = 1 #Set sites to activated.
+        self.hexagon[index_charged] = 0
+        
+    #Uses sites that have been set to activated and spreads their charge. Resets charge to zero of activated sites.
     def ChargeProp(self):
-        self.t = self.dt
-        RefHistory = a = np.zeros(shape=(self.runtime,self.width*self.height))
-        while self.t <= self.runtime:
-            if (self.t == self.dt) or (self.t % 10 == 0):
-                self.Initialise()
-            RefHistory[self.t-1] = self.ref
-            index_charged = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
-            for key in index_charged:
-                neighbours = self.neighbours[key]
-                avail_neighbours = []
-                for i in neighbours:
-                    if self.ref[i] == 0:
-                        avail_neighbours.append(i)  #retrieved their resting neighbours
-                amplitude = self.hexagon[key]/len(avail_neighbours)
-                self.hexagon[avail_neighbours] += amplitude #Spreading out the charge
-                self.hexagon[key] = 0
+        index_act = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
+        for ind in index_act:
+            neighbours = self.neighbours[ind]
+            avail_neighbours = [i for i in neighbours if self.ref[i] == 0]
+            if len(avail_neighbours) > 0:
+                self.hexagon[avail_neighbours] += 1/len(avail_neighbours)
 
-            #Checking which states can be activated.
-            self.ActivationCheck()
-
+    #Develops the states of each site.
+    def StateDevelop(self):
             self.ref[np.where(self.ref >= 1)[0]] += 1
             self.ref[np.where(self.ref == 5)[0]] = 0
-            self.ref[np.where(self.ref == -1)[0]] = 1
+            #self.ref[np.where(self.ref == -1)[0]] = 1
 
+    def RunIt(self):
+        self.t = 0
+        RefHistory = np.zeros((self.runtime + 1, self.height*self.width))
+        while self.t <= self.runtime:
+            if self.t == 0:
+                self.Initialise()
+                self.ChargeProp()
+                RefHistory[self.t] = self.ref
+                self.StateDevelop()
+                self.t += self.dt
+            elif self.t % 10 == 0:
+                self.Initialise()
+            self.ActivationCheck()
+            self.ChargeProp()
+            RefHistory[self.t] = self.ref
+            self.StateDevelop()
             self.t += self.dt
         np.save('StateData.npy', RefHistory)
 
 
-        
-
 
 def main():
     t0 = time.time()
-    lattice = HexagonalLattice(50,50,10000,8)
+    width = 200
+    height = 50
+    runtime = 100
+    threshold = 0.05
+    sigmoid_strength = 1
+    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength)
+    print("Width is:", str(width) + ", Height is:", str(height))
+    f = open('settings.txt', 'w')
+    f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength))
     lattice.CreateLattice()
-    lattice.ChargeProp()
+    lattice.RunIt()
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 

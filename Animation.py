@@ -17,14 +17,18 @@ def main():
         F.append(list(array))
         array[i-1] = 0
         array[i] = 1'''
+    f = open('settings.txt', 'r')
+    settings = f.read()
+    width = int(str(settings).split(',')[0])
     lines = []
     for i in range(F.shape[1]):
-        x = index_to_xy(i,int(np.sqrt(F.shape[1])))[0]
-        y = index_to_xy(i,int(np.sqrt(F.shape[1])))[1]
-        lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=1000, frames=F.shape[0])
-    plt.title(input('Animation title'))
-    name = input("What would you like to call the file? ")
+        x = index_to_xy(i,width)[0]
+        y = index_to_xy(i,width)[1]
+        lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 1)[0])
+    anim = FuncAnimation(fig, animate, interval=100, frames=F.shape[0])
+    print(settings)
+    plt.title(settings)
+    name = str(settings) + ".gif"
     anim.save(name, writer='Dan')
     plt.draw()
     plt.show()
