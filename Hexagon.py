@@ -8,6 +8,18 @@ Create a simple animation to highlight the basic mechanics of lattice are workin
 
 import numpy as np
 import time
+import random
+
+def choose_numbers(list1, prob):
+    new_list = []
+    deleted_list = []
+    for i in list1:
+        p = random.uniform(0,1)
+        if p < prob:
+            new_list.append(i)
+        else:
+            deleted_list.append(i)
+    return new_list, deleted_list
 
 class HexagonalLattice():
     '''
@@ -24,13 +36,14 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, threshold, sigmoid_strength):
+    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
         self.threshold = threshold
         self.runtime = runtime #Total time we want to run for.
         self.sig_st = sigmoid_strength
+        self.coupling = pow(coupling, 1/2)
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -115,6 +128,38 @@ class HexagonalLattice():
                         else:
                             self.neighbours[index] = np.asarray([index + 1, index - 1, index + self.width + 1,
                              index + self.width, index - self.width + 1, index - self.width])
+    
+    def CoupleDel(self):
+        '''
+        Have dictionary with neighbours. If we take a neighbour away from 1 say 2, need to take 1 from 2 as well
+        '''
+        keys = self.neighbours.keys()
+        x = 0
+        y = 0
+        new_dic = {i : [] for i in range(len(keys))}
+        deleted_dic = {}
+        for i in keys:
+            neighbours = self.neighbours[i]
+            new, deleted =  choose_numbers(neighbours, self.coupling)
+            self.neighbours[i] = new
+            deleted_dic[i] = deleted
+            x += len(deleted)
+        
+        for i in deleted_dic.keys():
+            neighbours = deleted_dic[i]
+            for j in neighbours:
+                neighbours1 = list(self.neighbours[j])
+                if i in neighbours1:
+                    index = neighbours1.index(i)
+                    neighbours2 = np.delete(neighbours1, index)
+                    self.neighbours[j] = neighbours2
+
+        for i in keys:
+            neighbours = self.neighbours[i]
+            for j in neighbours:
+                y += 1
+        return y
+
 
     def Initialise(self):
         index_init = [i*self.width for i in range(0,self.height)] #Left hand side
@@ -157,7 +202,7 @@ class HexagonalLattice():
                 RefHistory[self.t] = self.ref
                 self.StateDevelop()
                 self.t += self.dt
-            elif self.t % 10 == 0:
+            elif self.t % 100 == 0:
                 self.Initialise()
             self.ActivationCheck()
             self.ChargeProp()
@@ -166,24 +211,40 @@ class HexagonalLattice():
             self.t += self.dt
         np.save('StateData.npy', RefHistory)
 
-
+def main_test():
+    t0 = time.time()
+    width = 50
+    height = 50
+    runtime = 5
+    threshold = 0.3
+    sigmoid_strength = 100
+    coupling = 0.5
+    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
+    lattice.CreateLattice()
+    print(coupling, (3*height*(width-2) + 4*height)*coupling, lattice.CoupleDel()/2)
+    lattice.RunIt()
+    t1 = time.time()
+    print('Runtime = %f s' % (t1-t0))
 
 def main():
     t0 = time.time()
-    width = 200
+    seed = np.random.randint(0,100000)
+    np.random.seed(seed)
+    width = 50
     height = 50
-    runtime = 100
-    threshold = 0.05
-    sigmoid_strength = 1
-    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength)
+    runtime = 500
+    threshold = 0.3
+    sigmoid_strength = 100
+    coupling = 0.95
+    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
     print("Width is:", str(width) + ", Height is:", str(height))
     f = open('settings.txt', 'w')
-    f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength))
+    f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed))
     lattice.CreateLattice()
+    lattice.CoupleDel()
     lattice.RunIt()
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 
 if __name__ == '__main__':
     main()
-

@@ -24,7 +24,7 @@ def main():
     for i in range(F.shape[1]):
         x = index_to_xy(i,width)[0]
         y = index_to_xy(i,width)[1]
-        lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 1)[0])
+        lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
     anim = FuncAnimation(fig, animate, interval=100, frames=F.shape[0])
     print(settings)
     plt.title(settings)
