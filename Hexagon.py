@@ -9,6 +9,7 @@ Create a simple animation to highlight the basic mechanics of lattice are workin
 import numpy as np
 import time
 import random
+from line_profiler import LineProfiler
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -36,7 +37,7 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1):
+    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -44,6 +45,7 @@ class HexagonalLattice():
         self.runtime = runtime #Total time we want to run for.
         self.sig_st = sigmoid_strength
         self.coupling = pow(coupling, 1/2)
+        self.ref_per = refractory_period
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -189,53 +191,39 @@ class HexagonalLattice():
     #Develops the states of each site.
     def StateDevelop(self):
             self.ref[np.where(self.ref >= 1)[0]] += 1
-            self.ref[np.where(self.ref == 5)[0]] = 0
+            self.ref[np.where(self.ref == self.ref_per + 2)[0]] = 0
             #self.ref[np.where(self.ref == -1)[0]] = 1
 
     def RunIt(self):
         self.t = 0
-        RefHistory = np.zeros((self.runtime + 1, self.height*self.width))
+        RefHistory = np.zeros((self.runtime + 1)* len(self.ref))
         while self.t <= self.runtime:
             if self.t == 0:
                 self.Initialise()
                 self.ChargeProp()
-                RefHistory[self.t] = self.ref
+                RefHistory[0:len(self.ref)] = self.ref
                 self.StateDevelop()
                 self.t += self.dt
             elif self.t % 100 == 0:
                 self.Initialise()
             self.ActivationCheck()
             self.ChargeProp()
-            RefHistory[self.t] = self.ref
+            RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             self.StateDevelop()
             self.t += self.dt
         np.save('StateData.npy', RefHistory)
 
-def main_test():
-    t0 = time.time()
-    width = 50
-    height = 50
-    runtime = 5
-    threshold = 0.3
-    sigmoid_strength = 100
-    coupling = 0.5
-    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
-    lattice.CreateLattice()
-    print(coupling, (3*height*(width-2) + 4*height)*coupling, lattice.CoupleDel()/2)
-    lattice.RunIt()
-    t1 = time.time()
-    print('Runtime = %f s' % (t1-t0))
 
 def main():
     t0 = time.time()
-    seed = np.random.randint(0,100000)
+    seed = np.random.randint(0,int(1e7))
     np.random.seed(seed)
     width = 50
     height = 50
-    runtime = 500
-    threshold = 0.3
-    sigmoid_strength = 100
-    coupling = 0.95
+    runtime = 5000
+    threshold = 0.2
+    sigmoid_strength = 20
+    coupling = 0.7
     lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
     print("Width is:", str(width) + ", Height is:", str(height))
     f = open('settings.txt', 'w')
@@ -246,5 +234,29 @@ def main():
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
+
+
+
+"""
+seed = int(1e6)
+np.random.seed(seed)
+width = 50
+height = 50
+runtime = 200
+threshold = 0.2
+sigmoid_strength = 20
+coupling = 0.7
+lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
+print("Width is:", str(width) + ", Height is:", str(height))
+f = open('settings.txt', 'w')
+f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed))
+lattice.CreateLattice()
+lattice.CoupleDel()
+
+lp = LineProfiler()
+lp_wrapper = lp(lattice.RunIt)
+lp_wrapper()
+lp.print_stats()
+"""

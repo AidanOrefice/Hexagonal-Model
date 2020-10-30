@@ -6,7 +6,8 @@ import time
 
 def main():
     global colors
-    colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'dimgrey', 4 : 'lightgrey'}
+    colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'black', 4 : 'black',
+     5 : 'black', 6 : 'black', 7 : 'black', 8 : 'black', 9 : 'black', 10 : 'black', 11 : 'black', 12 : 'black'}
     global F
     F = np.load('StateData.npy')
     print(F.shape)
@@ -20,12 +21,16 @@ def main():
     f = open('settings.txt', 'r')
     settings = f.read()
     width = int(str(settings).split(',')[0])
+    height = int(str(settings).split(',')[1])
+    runtime = int(str(settings).split(',')[2])
+    global tot
+    tot = width*height
     lines = []
-    for i in range(F.shape[1]):
+    for i in range(tot):
         x = index_to_xy(i,width)[0]
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=F.shape[0])
+    anim = FuncAnimation(fig, animate, interval=100, frames=runtime)
     print(settings)
     plt.title(settings)
     name = str(settings) + ".gif"
@@ -47,7 +52,8 @@ def animate(i):
     global lines
     global F
     global colors
-    x = F[i]
+    global tot
+    x = F[i*tot:(i+1)*tot]
     for j,item in enumerate(lines):
         level = x[j]
         color = colors[level]
