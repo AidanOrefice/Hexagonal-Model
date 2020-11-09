@@ -30,7 +30,7 @@ def main():
         x = index_to_xy(i,width)[0]
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=runtime)
+    anim = FuncAnimation(fig, animate, interval=100, frames=500)
     print(settings)
     plt.title(settings)
     name = str(settings) + ".gif"

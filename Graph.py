@@ -10,8 +10,9 @@ def Activated_sites():
     #F is a 2D matrix, time in y-axis
     #A site is activated if its 1
     thing = []
+    tot = 2500
     for i in range(F.shape[0]):
-        data = F[i]
+        data = F[i*tot:(i+1)*tot]
         unique, counts = np.unique(data, return_counts=True)
         x = dict(zip(unique, counts))
         if 1 in unique:

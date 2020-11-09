@@ -164,9 +164,9 @@ class HexagonalLattice():
 
 
     def Initialise(self):
-        index_init = [i*self.width for i in range(0,self.height)] #Left hand side
+        self.index_int = [i*self.width for i in range(0,self.height)] #Left hand side
         #self.hexagon[index_init] = 100 
-        self.ref[index_init] = 1
+        self.ref[self.index_int] = 1
 
     def SigmoidDist(self,charges):
         return 1/(1+np.exp(-self.sig_st*(charges-self.threshold)))
@@ -174,15 +174,17 @@ class HexagonalLattice():
     def ActivationCheck(self):
         index_charged = np.where(self.hexagon > 0)[0]
         p = self.SigmoidDist(self.hexagon[index_charged])
-        a= np.random.rand(len(index_charged))
-        b = index_charged[np.where(p>a)[0]]
-        self.ref[b] = 1 #Set sites to activated.
+        a = np.random.rand(len(index_charged))
+        self.index_act = index_charged[np.where(p>a)[0]]
+        self.ref[self.index_act] = 1 #Set sites to activated.
         self.hexagon[index_charged] = 0
+        if self.t % 100 == 0:
+            self.index_act = np.concatenate((self.index_act,self.index_int))
         
     #Uses sites that have been set to activated and spreads their charge. Resets charge to zero of activated sites.
     def ChargeProp(self):
-        index_act = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
-        for ind in index_act:
+        #index_act = np.where(self.ref == 1)[0] #sites that are activated - need to spread their charge
+        for ind in self.index_act:
             neighbours = self.neighbours[ind]
             avail_neighbours = [i for i in neighbours if self.ref[i] == 0]
             if len(avail_neighbours) > 0:
@@ -196,22 +198,32 @@ class HexagonalLattice():
 
     def RunIt(self):
         self.t = 0
-        RefHistory = np.zeros((self.runtime + 1)* len(self.ref))
-        while self.t <= self.runtime:
+        #self.RefHistory = np.zeros((self.runtime)  * len(self.ref), dtype = np.int16)
+        self.RefHistory = np.zeros((500)  * len(self.ref), dtype = np.int16)
+        i = 0
+        while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
+                self.ActivationCheck()
                 self.ChargeProp()
-                RefHistory[0:len(self.ref)] = self.ref
+                self.RefHistory[0:len(self.ref)] = self.ref
+                i += 1
                 self.StateDevelop()
                 self.t += self.dt
             elif self.t % 100 == 0:
                 self.Initialise()
             self.ActivationCheck()
             self.ChargeProp()
-            RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
+            if i < 500:
+                self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
+                i += 1
+            else:
+                self.RefHistory[0:len(self.ref)] = self.ref
+                i = 1
+            #self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             self.StateDevelop()
             self.t += self.dt
-        np.save('StateData.npy', RefHistory)
+        np.save('StateData.npy', self.RefHistory)
 
 
 def main():
@@ -220,7 +232,7 @@ def main():
     np.random.seed(seed)
     width = 50
     height = 50
-    runtime = 5000
+    runtime = 1000
     threshold = 0.2
     sigmoid_strength = 20
     coupling = 0.7
@@ -234,17 +246,18 @@ def main():
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 
-#if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+    #main()
+    pass
 
 
 
-"""
+
 seed = int(1e6)
 np.random.seed(seed)
 width = 50
 height = 50
-runtime = 200
+runtime = 100000
 threshold = 0.2
 sigmoid_strength = 20
 coupling = 0.7
@@ -259,4 +272,3 @@ lp = LineProfiler()
 lp_wrapper = lp(lattice.RunIt)
 lp_wrapper()
 lp.print_stats()
-"""
