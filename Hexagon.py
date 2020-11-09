@@ -10,6 +10,7 @@ import numpy as np
 import time
 import random
 from line_profiler import LineProfiler
+import matplotlib.pyplot as plt
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -37,7 +38,7 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10):
+    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10, graph = True, settings_name = 'hi'):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -46,6 +47,8 @@ class HexagonalLattice():
         self.sig_st = sigmoid_strength
         self.coupling = pow(coupling, 1/2)
         self.ref_per = refractory_period
+        self.graph = graph
+        self.settings = settings_name
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -196,15 +199,24 @@ class HexagonalLattice():
             self.ref[np.where(self.ref == self.ref_per + 2)[0]] = 0
             #self.ref[np.where(self.ref == -1)[0]] = 1
 
+    def in_AF(self):
+        print(len(self.index_act))
+        if len(self.index_act) > self.height * 1.1:
+            return True
+        else:
+            return False
+
     def RunIt(self):
         self.t = 0
         #self.RefHistory = np.zeros((self.runtime)  * len(self.ref), dtype = np.int16)
         self.RefHistory = np.zeros((500)  * len(self.ref), dtype = np.int16)
+        self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
                 self.ActivationCheck()
+                self.AF[0] = len(self.index_act)
                 self.ChargeProp()
                 self.RefHistory[0:len(self.ref)] = self.ref
                 i += 1
@@ -213,6 +225,7 @@ class HexagonalLattice():
             elif self.t % 100 == 0:
                 self.Initialise()
             self.ActivationCheck()
+            self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
             if i < 500:
                 self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
@@ -223,7 +236,16 @@ class HexagonalLattice():
             #self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             self.StateDevelop()
             self.t += self.dt
-        np.save('StateData.npy', self.RefHistory)
+        if self.graph:
+            f, ax = plt.subplots()
+            x = [i for i in range(len(self.AF))]
+            ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
+            ax.set_ylabel("Number of activated cells")
+            ax.set_xlabel("Time")
+            plt.savefig(self.settings + str('.png'))
+        np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
+        np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
+        print(self.AF)
 
 
 def main():
@@ -234,12 +256,14 @@ def main():
     height = 50
     runtime = 1000
     threshold = 0.2
-    sigmoid_strength = 20
+    sigmoid_strength = 5
     coupling = 0.7
-    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
+    graph = True
+    settings_name = str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed)
+    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling, graph = graph, settings_name = settings_name)
     print("Width is:", str(width) + ", Height is:", str(height))
     f = open('settings.txt', 'w')
-    f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed))
+    f.write(settings_name)
     lattice.CreateLattice()
     lattice.CoupleDel()
     lattice.RunIt()
@@ -247,13 +271,12 @@ def main():
     print('Runtime = %f s' % (t1-t0))
 
 if __name__ == '__main__':
-    #main()
-    pass
+    main()
 
 
 
 
-seed = int(1e6)
+'''seed = int(1e6)
 np.random.seed(seed)
 width = 50
 height = 50
@@ -272,3 +295,4 @@ lp = LineProfiler()
 lp_wrapper = lp(lattice.RunIt)
 lp_wrapper()
 lp.print_stats()
+'''
