@@ -33,7 +33,7 @@ def main():
     anim = FuncAnimation(fig, animate, interval=100, frames=500)
     print(settings)
     plt.title(settings)
-    name = str(settings) + ".mp4"
+    name = str(settings) + ".gif"
     anim.save(name)
     plt.draw()
     plt.show()

@@ -38,7 +38,8 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10, graph = True, settings_name = 'hi'):
+    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
+     graph = True, settings_name = 'hi', FullStateSave = False):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -49,6 +50,8 @@ class HexagonalLattice():
         self.ref_per = refractory_period
         self.graph = graph
         self.settings = settings_name
+        self.full_save = FullStateSave
+        self.save_width = 500
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -134,13 +137,21 @@ class HexagonalLattice():
                             self.neighbours[index] = np.asarray([index + 1, index - 1, index + self.width + 1,
                              index + self.width, index - self.width + 1, index - self.width])
     
+    def index_to_xy(self, index):
+        row = np.floor(index / self.width)
+        y = row
+        if_even = row % 2 == 0
+        if if_even:
+            x = index - (row * self.width)
+        else:
+            x = index - (row * self.width) + 0.5
+        return (x,y)
+    
     def CoupleDel(self):
         '''
         Have dictionary with neighbours. If we take a neighbour away from 1 say 2, need to take 1 from 2 as well
         '''
         keys = self.neighbours.keys()
-        x = 0
-        y = 0
         new_dic = {i : [] for i in range(len(keys))}
         deleted_dic = {}
         for i in keys:
@@ -148,7 +159,6 @@ class HexagonalLattice():
             new, deleted =  choose_numbers(neighbours, self.coupling)
             self.neighbours[i] = new
             deleted_dic[i] = deleted
-            x += len(deleted)
         
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
@@ -159,13 +169,31 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
+
+    def GradientMethodCoupling(self, start, end):
+        delta = (end-start)/self.width
+
+        keys = self.neighbours.keys()
+        new_dic = {i : [] for i in range(len(keys))}
+        deleted_dic = {}
         for i in keys:
+            x,y = self.index_to_xy(i)
+            grad_coupling = np.sqrt((delta*x) + start) 
             neighbours = self.neighbours[i]
+            new, deleted =  choose_numbers(neighbours, grad_coupling)
+            self.neighbours[i] = new
+            deleted_dic[i] = deleted
+        
+        for i in deleted_dic.keys():
+            neighbours = deleted_dic[i]
             for j in neighbours:
-                y += 1
-        return y
+                neighbours1 = list(self.neighbours[j])
+                if i in neighbours1:
+                    index = neighbours1.index(i)
+                    neighbours2 = np.delete(neighbours1, index)
+                    self.neighbours[j] = neighbours2
 
-
+    
     def Initialise(self):
         self.index_int = [i*self.width for i in range(0,self.height)] #Left hand side
         #self.hexagon[index_init] = 100 
@@ -200,7 +228,7 @@ class HexagonalLattice():
             #self.ref[np.where(self.ref == -1)[0]] = 1
 
     def in_AF(self):
-        print(len(self.index_act))
+        #print(len(self.index_act))
         if len(self.index_act) > self.height * 1.1:
             return True
         else:
@@ -208,8 +236,8 @@ class HexagonalLattice():
 
     def RunIt(self):
         self.t = 0
-        #self.RefHistory = np.zeros((self.runtime)  * len(self.ref), dtype = np.int16)
-        self.RefHistory = np.zeros((500)  * len(self.ref), dtype = np.int16)
+
+        self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         while self.t < self.runtime:
@@ -218,7 +246,8 @@ class HexagonalLattice():
                 self.ActivationCheck()
                 self.AF[0] = len(self.index_act)
                 self.ChargeProp()
-                self.RefHistory[0:len(self.ref)] = self.ref
+                if self.full_save:
+                    self.RefHistory[0:len(self.ref)] = self.ref
                 i += 1
                 self.StateDevelop()
                 self.t += self.dt
@@ -227,13 +256,13 @@ class HexagonalLattice():
             self.ActivationCheck()
             self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
-            if i < 500:
-                self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
-                i += 1
-            else:
-                self.RefHistory[0:len(self.ref)] = self.ref
-                i = 1
-            #self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
+            if self.full_save:
+                if i < self.save_width:
+                    self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
+                    i += 1
+                else:
+                    self.RefHistory[0:len(self.ref)] = self.ref
+                    i = 1
             self.StateDevelop()
             self.t += self.dt
         if self.graph:
@@ -243,9 +272,9 @@ class HexagonalLattice():
             ax.set_ylabel("Number of activated cells")
             ax.set_xlabel("Time")
             plt.savefig(self.settings + str('.png'))
-        np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
-        np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
-        print(self.AF)
+        if self.full_save:
+            np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
+            np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
 
 
 def main():
@@ -260,12 +289,14 @@ def main():
     coupling = 0.7
     graph = True
     settings_name = str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed)
-    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling, graph = graph, settings_name = settings_name)
+    FullStateSave = True
+    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling, graph = graph,
+     settings_name = settings_name, FullStateSave = FullStateSave )
     print("Width is:", str(width) + ", Height is:", str(height))
     f = open('settings.txt', 'w')
     f.write(settings_name)
     lattice.CreateLattice()
-    lattice.CoupleDel()
+    lattice.GradientMethodCoupling(1,0) #Alter the way we do this width.
     lattice.RunIt()
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
