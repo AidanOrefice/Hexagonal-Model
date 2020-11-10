@@ -39,7 +39,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = True, settings_name = 'hi', FullStateSave = False):
+     graph = False, settings_name = 'hi', FullStateSave = False):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -47,7 +47,7 @@ class HexagonalLattice():
         self.runtime = runtime #Total time we want to run for.
         self.sig_st = sigmoid_strength
         self.coupling = pow(coupling, 1/2)
-        self.ref_per = refractory_period
+        self.ref_per = refractory_period + 2
         self.graph = graph
         self.settings = settings_name
         self.full_save = FullStateSave
@@ -195,7 +195,7 @@ class HexagonalLattice():
 
     
     def Initialise(self):
-        self.index_int = [i*self.width for i in range(0,self.height)] #Left hand side
+        self.index_int = [i*self.width for i in range(self.height)] #Left hand side
         #self.hexagon[index_init] = 100 
         self.ref[self.index_int] = 1
 
@@ -206,7 +206,7 @@ class HexagonalLattice():
         index_charged = np.where(self.hexagon > 0)[0]
         p = self.SigmoidDist(self.hexagon[index_charged])
         a = np.random.rand(len(index_charged))
-        self.index_act = index_charged[np.where(p>a)[0]]
+        self.index_act = index_charged[p>a]
         self.ref[self.index_act] = 1 #Set sites to activated.
         self.hexagon[index_charged] = 0
         if self.t % 100 == 0:
@@ -223,9 +223,8 @@ class HexagonalLattice():
 
     #Develops the states of each site.
     def StateDevelop(self):
-            self.ref[np.where(self.ref >= 1)[0]] += 1
-            self.ref[np.where(self.ref == self.ref_per + 2)[0]] = 0
-            #self.ref[np.where(self.ref == -1)[0]] = 1
+        self.ref[self.ref >= 1] += 1
+        self.ref[self.ref == self.ref_per] = 0
 
     def in_AF(self):
         #print(len(self.index_act))
@@ -311,7 +310,7 @@ if __name__ == '__main__':
 np.random.seed(seed)
 width = 50
 height = 50
-runtime = 100000
+runtime = 1000
 threshold = 0.2
 sigmoid_strength = 20
 coupling = 0.7
@@ -325,5 +324,4 @@ lattice.CoupleDel()
 lp = LineProfiler()
 lp_wrapper = lp(lattice.RunIt)
 lp_wrapper()
-lp.print_stats()
-'''
+lp.print_stats()'''
