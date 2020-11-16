@@ -11,6 +11,7 @@ import time
 import random
 from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
+import random
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -61,6 +62,10 @@ class HexagonalLattice():
         self.hexagon = np.zeros((self.width * self.height), dtype = np.float16) #Hexagonal Lattice in 1d array.
         self.ref = np.zeros((self.width * self.height), dtype = np.float16) #Identical for recording refractoriness.
         self.Neighbours()
+
+    def CreateLatticeNoNeighbours(self):
+        self.hexagon = np.zeros((self.width * self.height), dtype = np.float16) #Hexagonal Lattice in 1d array.
+        self.ref = np.zeros((self.width * self.height), dtype = np.float16) #Identical for recording refractoriness.
 
     def Neighbours(self):
         """
@@ -146,6 +151,16 @@ class HexagonalLattice():
         else:
             x = index - (row * self.width) + 0.5
         return (x,y)
+
+    def Remove_random_bonds(self, n):
+        for i in range(n):
+            key = random.choice(list(self.neighbours))
+            while len(self.neighbours[key]) == 0:
+                key = random.choice(list(self.neighbours))
+            else:
+                neighbour = np.array([random.choice(list(self.neighbours[key]))])
+                self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
+                self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)
     
     def CoupleDel(self):
         '''
@@ -235,7 +250,6 @@ class HexagonalLattice():
 
     def RunIt(self):
         self.t = 0
-
         self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
@@ -250,7 +264,7 @@ class HexagonalLattice():
                 i += 1
                 self.StateDevelop()
                 self.t += self.dt
-            elif self.t % 100 == 0:
+            elif self.t % 75 == 0:
                 self.Initialise()
             self.ActivationCheck()
             self.AF[self.t] = len(self.index_act)
@@ -274,7 +288,6 @@ class HexagonalLattice():
         if self.full_save:
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
             np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
-
 
 def main():
     t0 = time.time()
