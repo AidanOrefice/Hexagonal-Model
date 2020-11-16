@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
+from configuration import title
 
 def main():
     global colors
@@ -18,11 +19,9 @@ def main():
         F.append(list(array))
         array[i-1] = 0
         array[i] = 1'''
-    f = open('settings.txt', 'r')
-    settings = f.read()
-    width = int(str(settings).split(',')[0])
-    height = int(str(settings).split(',')[1])
-    runtime = int(str(settings).split(',')[2])
+    width = int(title.split(',')[0])
+    height = int(title.split(',')[1])
+    #runtime = int(title.split(',')[2])
     global tot
     tot = width*height
     lines = []
@@ -31,9 +30,9 @@ def main():
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
     anim = FuncAnimation(fig, animate, interval=100, frames=500)
-    print(settings)
-    plt.title(settings)
-    name = str(settings) + ".gif"
+    print(title)
+    plt.title(title)
+    name = title + ".gif"
     anim.save(name)
     plt.draw()
     plt.show()

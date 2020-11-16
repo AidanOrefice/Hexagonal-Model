@@ -12,6 +12,7 @@ import random
 from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 import random
+from configuration import config, title
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -39,8 +40,8 @@ class HexagonalLattice():
     ref - hexagonal lattice unrolled into 1d array - used for keeping track of state of cell.
     neighbours - dictionary of the neighbours of each lattice site.
     '''
-    def __init__(self,width,height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, settings_name = 'hi', FullStateSave = False):
+    def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
+     graph = False, FullStateSave = False, settings_name = 'hi'):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -53,6 +54,7 @@ class HexagonalLattice():
         self.settings = settings_name
         self.full_save = FullStateSave
         self.save_width = 500
+        self.pacing_period = 75
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -144,7 +146,7 @@ class HexagonalLattice():
     
     def index_to_xy(self, index):
         row = np.floor(index / self.width)
-        y = row
+        y = row - row*(1-(np.sqrt(3)/2)) #fix.
         if_even = row % 2 == 0
         if if_even:
             x = index - (row * self.width)
@@ -162,6 +164,13 @@ class HexagonalLattice():
                 self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
                 self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)
     
+    def sinusoid2D(self, x, y, A1=1, A2=1, B1=0.25, B2=0.25, C1=0, C2=0, alpha = 0.01, beta = 0.7):
+        #A - set max value of function
+        #B - more/less peaks- stretches or compresses the peaks
+        #C - phase shift everything 
+        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin(B2 * y + C1)) + beta
+    
+    """  
     def CoupleDel(self):
         '''
         Have dictionary with neighbours. If we take a neighbour away from 1 say 2, need to take 1 from 2 as well
@@ -207,8 +216,60 @@ class HexagonalLattice():
                     index = neighbours1.index(i)
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
-
+    """
     
+
+
+    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, start = 0.9 , end = 0.7):
+        if constant + gradient + norm_modes != 1:
+            raise ValueError('Cannot decouple using two different methods.')
+
+        keys = self.neighbours.keys()
+        #new_dic = {i : [] for i in range(len(keys))}
+        deleted_dic = {}
+
+        if constant:
+            for i in keys:
+                neighbours = self.neighbours[i]
+                new, deleted =  choose_numbers(neighbours, self.coupling)
+                self.neighbours[i] = new
+                deleted_dic[i] = deleted           
+        
+        elif gradient:
+            delta = (end-start)/self.width
+            for i in keys:
+                x,y = self.index_to_xy(i)
+                grad_coupling = np.sqrt((delta*x) + start) 
+                neighbours = self.neighbours[i]
+                new, deleted =  choose_numbers(neighbours, grad_coupling)
+                self.neighbours[i] = new
+                deleted_dic[i] = deleted
+
+        elif norm_modes:
+            for i in keys:
+                x,y = self.index_to_xy(i)
+                grad_coupling = np.sqrt(self.sinusoid2D(x,y))
+                neighbours = self.neighbours[i]
+                new, deleted =  choose_numbers(neighbours, grad_coupling)
+                self.neighbours[i] = new
+                deleted_dic[i] = deleted            
+            pass
+
+        for i in deleted_dic.keys():
+            neighbours = deleted_dic[i]
+            for j in neighbours:
+                neighbours1 = list(self.neighbours[j])
+                if i in neighbours1:
+                    index = neighbours1.index(i)
+                    neighbours2 = np.delete(neighbours1, index)
+                    self.neighbours[j] = neighbours2
+
+        
+        
+        
+
+
+
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
         #self.hexagon[index_init] = 100 
@@ -224,7 +285,7 @@ class HexagonalLattice():
         self.index_act = index_charged[p>a]
         self.ref[self.index_act] = 1 #Set sites to activated.
         self.hexagon[index_charged] = 0
-        if self.t % 100 == 0:
+        if self.t % self.pacing_period == 0:
             self.index_act = np.concatenate((self.index_act,self.index_int))
         
     #Uses sites that have been set to activated and spreads their charge. Resets charge to zero of activated sites.
@@ -264,7 +325,7 @@ class HexagonalLattice():
                 i += 1
                 self.StateDevelop()
                 self.t += self.dt
-            elif self.t % 75 == 0:
+            elif self.t % self.pacing_period == 0:
                 self.Initialise()
             self.ActivationCheck()
             self.AF[self.t] = len(self.index_act)
@@ -291,24 +352,23 @@ class HexagonalLattice():
 
 def main():
     t0 = time.time()
-    seed = np.random.randint(0,int(1e7))
-    np.random.seed(seed)
-    width = 50
-    height = 50
-    runtime = 1000
-    threshold = 0.2
-    sigmoid_strength = 5
-    coupling = 0.7
-    graph = True
-    settings_name = str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed)
-    FullStateSave = True
-    lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling, graph = graph,
-     settings_name = settings_name, FullStateSave = FullStateSave )
-    print("Width is:", str(width) + ", Height is:", str(height))
-    f = open('settings.txt', 'w')
-    f.write(settings_name)
+
+    np.random.seed(config['seed'])
+
+    lattice = HexagonalLattice(config['width'],
+        config['height'],
+        config['runtime'],
+        config['threshold'],
+        config['sigmoid_strength'],
+        config['coupling'],
+        config['refractory_period'],
+        config['graph'],
+        config['FullStateSave'],
+        title)
+    
     lattice.CreateLattice()
-    lattice.GradientMethodCoupling(1,0) #Alter the way we do this width.
+    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'],
+     config['grad_start'], config['grad_end'] )
     lattice.RunIt()
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
