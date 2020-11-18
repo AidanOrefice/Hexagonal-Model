@@ -1,18 +1,19 @@
 import numpy as np
 
-config = dict(width = 50,
+config = dict(
+    width = 50,
     height = 50,
-    runtime = 200,
+    runtime = 1000,
     threshold = 0.2,
-    sigmoid_strength = 5,
+    sigmoid_strength = 25,
     coupling = 0.7,
     refractory_period = 10,
     seed = 0,
     set_seed = False,
     constant = False,
     gradient = True,
-    grad_start = 0.9,
-    grad_end = 0.1,
+    grad_start = 0.7,
+    grad_end = 0.3,
     normal_modes = False,
     graph = False ,
     FullStateSave = True

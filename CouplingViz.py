@@ -10,11 +10,11 @@ Script that visualises the coupling in the lattice.
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
 
-def sinusoid2D(x, y, A1=1, A2=1, B1=0.25, B2=0.25, C1=0, C2=0, alpha = 0.01, beta = 0.7):
+def sinusoid2D(x, y, A1=1, A2=1, B1=0.25, B2=0.5, C1=0, C2=0, alpha = 0.01, beta = 0.7):
 #A - set max value of function
 #B - more/less peaks- stretches or compresses the peaks
 #C - phase shift everything 
-    return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin(B2 * y + C1)) + beta
+    return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin(((B2 * y)*(2*np.pi)/ index_to_xy(2499)[1]) + C2)) + beta
 
 def gradient(x,start=0.8,end = 0.6):
     delta = (end-start)/50
@@ -38,7 +38,7 @@ y = [i[1] for i in hex_centers]
 
 sin_z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
 grad_z = [gradient(i) for i in x]
-a = ax.scatter(x,y,marker = 'h', s=17, c = grad_z)
+a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
 fig.colorbar(a,shrink=0.75)
 
 plt.savefig('viz_test.png')

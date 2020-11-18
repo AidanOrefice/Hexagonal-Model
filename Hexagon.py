@@ -168,7 +168,8 @@ class HexagonalLattice():
         #A - set max value of function
         #B - more/less peaks- stretches or compresses the peaks
         #C - phase shift everything 
-        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin(B2 * y + C1)) + beta
+        #applied BCs.
+        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin((B2 * y)*(2*np.pi)/ self.index_to_xy(self.height* self.width -1)  + C2)) + beta
     
     """  
     def CoupleDel(self):
