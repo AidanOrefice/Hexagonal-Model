@@ -55,13 +55,13 @@ def Main_set_seed():
     df = pd.DataFrame(columns = ['settings', 'in_AF', 'coupling', '%_time_AF'])
     #thresholds = range(0.1,0.5,0.1)
     thresholds = [0.3]
-    lattice = HexagonalLattice(50,50,10000,j,25)
-    lattice.CreateLattice()
     for j in thresholds:
+        lattice = HexagonalLattice(50,50,1000,j,25)
+        lattice.CreateLattice()
         for i in range(6000):
             coupling_per = 1 - ((i + 1) / 7400)
             lattice.Remove_random_bonds(1)
-            lattice.RunIt()
+            lattice.RunIt(seed)
             index = np.where(lattice.AF > 55)[0]
             thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
             thing = [i for i in thing if len(i) > 10]
@@ -76,7 +76,7 @@ def Main_set_seed():
             df1 = pd.DataFrame([[[50,50,1000,j,25], in_AF, coupling_per, len_thing/10000]], columns = ['settings', 'in_AF', 'coupling', '%_time_AF'])
             df = df.append(df1, ignore_index = True)
             lattice.CreateLatticeNoNeighbours()
-        df.to_csv('One_bond_{}.csv'.format(j))
+        df.to_csv('One_bond_re_{}.csv'.format(j))
         t2 = time()
         print(t2-t1)
 
@@ -113,7 +113,8 @@ def plot_PER(file):
 
     
 if __name__ == '__main__':
-    for i in ['One_bond_0.1.csv','One_bond_0.2.csv','One_bond_0.3.csv','One_bond_0.4.csv','One_bond_0.5.csv']:
+    #'One_bond_0.1.csv','One_bond_0.2.csv','One_bond_0.3.csv','One_bond_0.4.csv','One_bond_0.5.csv',
+    for i in ['One_bond_re_0.3.csv']:
         plot(i)
         plot_PER(i)
 
