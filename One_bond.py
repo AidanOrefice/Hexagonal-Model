@@ -61,7 +61,7 @@ def Main_set_seed():
         for i in range(6000):
             coupling_per = 1 - ((i + 1) / 7400)
             lattice.Remove_random_bonds(1)
-            lattice.RunIt(seed)
+            lattice.RunIt()
             index = np.where(lattice.AF > 55)[0]
             thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
             thing = [i for i in thing if len(i) > 10]

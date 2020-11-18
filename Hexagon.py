@@ -53,7 +53,7 @@ class HexagonalLattice():
         self.graph = graph
         self.settings = settings_name
         self.full_save = FullStateSave
-        self.save_width = 500
+        self.save_width = 300
         self.pacing_period = 75
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
@@ -315,6 +315,8 @@ class HexagonalLattice():
         self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
+        j = 0
+        done = True
         while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
@@ -330,6 +332,18 @@ class HexagonalLattice():
                 self.Initialise()
             self.ActivationCheck()
             self.AF[self.t] = len(self.index_act)
+            count_last_100 = np.sum(self.AF[self.t-100:self.t])
+            print(count_last_100)
+            if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and done):
+                print('yassss')
+                j = 1
+                done = False
+            if j == (self.save_width - 150):
+                print('saving', self.t, i)
+                np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
+                j += 1
+            elif j > 0:
+                j += 1
             self.ChargeProp()
             if self.full_save:
                 if i < self.save_width:
@@ -346,7 +360,7 @@ class HexagonalLattice():
             ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
             ax.set_ylabel("Number of activated cells")
             ax.set_xlabel("Time")
-            plt.savefig(self.settings + str('.png'))
+            plt.savefig(self.settings + '.png')
         if self.full_save:
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
             np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
