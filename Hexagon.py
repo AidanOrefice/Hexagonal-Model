@@ -41,7 +41,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, FullStateSave = False, settings_name = 'hi'):
+     graph = False, FullStateMethod = 'full', settings_name = 'hi', stats = False):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -52,9 +52,16 @@ class HexagonalLattice():
         self.ref_per = refractory_period + 2
         self.graph = graph
         self.settings = settings_name
-        self.full_save = FullStateSave
-        self.save_width = 300
+        self.full_save = FullStateMethod #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
         self.pacing_period = 75
+        self.stats = stats
+
+        if self.full_save == 'full':
+            self.save_width = self.runtime
+        elif self.full_save == 'trans':
+            self.save_width = 300
+        else:
+            self.save_width = self.full_save
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -309,11 +316,44 @@ class HexagonalLattice():
             return True
         else:
             return False
+    
+    def trans_save(self,i,j):
+        count_last_100 = np.sum(self.AF[self.t-100:self.t])
+        print(count_last_100)
+        thign  = 'yasssss'
+        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and done):
+            print(thign)
+            j = 1
+            done = False
+        if j == (self.save_width - 150):
+            print('saving', self.t, i)
+            np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
+            j += 1
+        elif j > 0:
+            j += 1
+        if i < self.save_width:
+            self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
+            i += 1
+        else:
+            self.RefHistory[0:len(self.ref)] = self.ref
+            i = 1
+        return i,j
+
+    def length_save(self, i):
+        if i < self.save_width:
+            self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
+            i += 1
+        else:
+            self.RefHistory[0:len(self.ref)] = self.ref
+            i = 1
+        return i
 
     def RunIt(self):
         self.t = 0
-        self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
-        self.AF = np.zeros(self.runtime, dtype = np.int16)
+        if self.full_save != False:
+            self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
+        if self.stats:
+            self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         j = 0
         done = True
@@ -323,7 +363,7 @@ class HexagonalLattice():
                 self.ActivationCheck()
                 self.AF[0] = len(self.index_act)
                 self.ChargeProp()
-                if self.full_save:
+                if self.full_save != False:
                     self.RefHistory[0:len(self.ref)] = self.ref
                 i += 1
                 self.StateDevelop()
@@ -331,28 +371,16 @@ class HexagonalLattice():
             elif self.t % self.pacing_period == 0:
                 self.Initialise()
             self.ActivationCheck()
-            self.AF[self.t] = len(self.index_act)
-            count_last_100 = np.sum(self.AF[self.t-100:self.t])
-            print(count_last_100)
-            if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and done):
-                print('yassss')
-                j = 1
-                done = False
-            if j == (self.save_width - 150):
-                print('saving', self.t, i)
-                np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
-                j += 1
-            elif j > 0:
-                j += 1
             self.ChargeProp()
-            if self.full_save:
-                if i < self.save_width:
-                    self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
-                    i += 1
-                else:
-                    self.RefHistory[0:len(self.ref)] = self.ref
-                    i = 1
             self.StateDevelop()
+            if self.full_save == 'full':
+                self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
+            elif self.full_save == 'trans':
+                i,j = self.trans_save(i,j)
+            else:
+                i = self.length_save(i)
+            if self.stats:
+                self.AF[self.t] = len(self.index_act)
             self.t += self.dt
         if self.graph:
             f, ax = plt.subplots()
@@ -361,7 +389,7 @@ class HexagonalLattice():
             ax.set_ylabel("Number of activated cells")
             ax.set_xlabel("Time")
             plt.savefig(self.settings + '.png')
-        if self.full_save:
+        if self.full_save == 'full':
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
             np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
 
