@@ -13,6 +13,7 @@ from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 import random
 from configuration import config, title
+from hexalattice.hexalattice import *
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -171,61 +172,12 @@ class HexagonalLattice():
                 self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
                 self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)
     
-    def sinusoid2D(self, x, y, A1=1, A2=1, B1=0.25, B2=0.25, C1=0, C2=0, alpha = 0.01, beta = 0.7):
+    def sinusoid2D(self, x, y, A1=1, A2=1, B1=0.25, B2=1, C1=0, C2=0, alpha = -0.1, beta = 0.7 ):
         #A - set max value of function
         #B - more/less peaks- stretches or compresses the peaks
         #C - phase shift everything 
         #applied BCs.
-        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin((B2 * y)*(2*np.pi)/ self.index_to_xy(self.height* self.width -1)  + C2)) + beta
-    
-    """  
-    def CoupleDel(self):
-        '''
-        Have dictionary with neighbours. If we take a neighbour away from 1 say 2, need to take 1 from 2 as well
-        '''
-        keys = self.neighbours.keys()
-        new_dic = {i : [] for i in range(len(keys))}
-        deleted_dic = {}
-        for i in keys:
-            neighbours = self.neighbours[i]
-            new, deleted =  choose_numbers(neighbours, self.coupling)
-            self.neighbours[i] = new
-            deleted_dic[i] = deleted
-        
-        for i in deleted_dic.keys():
-            neighbours = deleted_dic[i]
-            for j in neighbours:
-                neighbours1 = list(self.neighbours[j])
-                if i in neighbours1:
-                    index = neighbours1.index(i)
-                    neighbours2 = np.delete(neighbours1, index)
-                    self.neighbours[j] = neighbours2
-
-
-    def GradientMethodCoupling(self, start, end):
-        delta = (end-start)/self.width
-
-        keys = self.neighbours.keys()
-        new_dic = {i : [] for i in range(len(keys))}
-        deleted_dic = {}
-        for i in keys:
-            x,y = self.index_to_xy(i)
-            grad_coupling = np.sqrt((delta*x) + start) 
-            neighbours = self.neighbours[i]
-            new, deleted =  choose_numbers(neighbours, grad_coupling)
-            self.neighbours[i] = new
-            deleted_dic[i] = deleted
-        
-        for i in deleted_dic.keys():
-            neighbours = deleted_dic[i]
-            for j in neighbours:
-                neighbours1 = list(self.neighbours[j])
-                if i in neighbours1:
-                    index = neighbours1.index(i)
-                    neighbours2 = np.delete(neighbours1, index)
-                    self.neighbours[j] = neighbours2
-    """
-    
+        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin((B2 * y)*(2*np.pi)/ self.index_to_xy(self.height* self.width -1)[1]  + C2)) + beta
 
 
     def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, start = 0.9 , end = 0.7):
@@ -261,7 +213,7 @@ class HexagonalLattice():
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
                 deleted_dic[i] = deleted            
-            pass
+            self.coupling_sample = [len(self.neighbours[i])/6 for i in self.neighbours.keys()]
 
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
@@ -361,7 +313,8 @@ class HexagonalLattice():
             if self.t == 0:
                 self.Initialise()
                 self.ActivationCheck()
-                self.AF[0] = len(self.index_act)
+                if self.stats:
+                    self.AF[0] = len(self.index_act)
                 self.ChargeProp()
                 if self.full_save != False:
                     self.RefHistory[0:len(self.ref)] = self.ref
@@ -371,8 +324,6 @@ class HexagonalLattice():
             elif self.t % self.pacing_period == 0:
                 self.Initialise()
             self.ActivationCheck()
-            self.ChargeProp()
-            self.StateDevelop()
             if self.full_save == 'full':
                 self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             elif self.full_save == 'trans':
@@ -381,6 +332,8 @@ class HexagonalLattice():
                 i = self.length_save(i)
             if self.stats:
                 self.AF[self.t] = len(self.index_act)
+            self.ChargeProp()
+            self.StateDevelop()
             self.t += self.dt
         if self.graph:
             f, ax = plt.subplots()
@@ -391,6 +344,8 @@ class HexagonalLattice():
             plt.savefig(self.settings + '.png')
         if self.full_save == 'full':
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
+
+        if self.stats:
             np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
 
 def main():
@@ -413,6 +368,16 @@ def main():
     lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'],
      config['grad_start'], config['grad_end'] )
     lattice.RunIt()
+
+
+
+    fig,ax = plt.subplots()
+    x = [lattice.index_to_xy(i)[0] for i in range(2500)]
+    y = [lattice.index_to_xy(i)[1] for i in range(2500)]
+    a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample)
+    fig.colorbar(a,shrink=0.75)
+    plt.savefig('CouplingShow.png')
+
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 

@@ -3,25 +3,33 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 1000,
-    threshold = 0.2,
+    runtime = 5000,
+    threshold = 0.3,
     sigmoid_strength = 25,
     coupling = 0.55,
     refractory_period = 10,
     seed = 0,
     set_seed = False,
-    constant = True,
+    constant = False,
     gradient = False,
     grad_start = 0.7,
     grad_end = 0.3,
-    normal_modes = False,
+    normal_modes = True,
     graph = False ,
-    FullStateSave = True
+    FullStateSave = 'full'      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
  )
 
 if not config['set_seed']:
     config['seed'] = np.random.randint(0,int(1e7))
 
-#Do more conditional titles i.e. for different coupling mechs
-
-title = str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) + "," + str(config['sigmoid_strength']) + "," + str(config['coupling']) + "," + str(config['refractory_period']) + ","+ str(config['seed'])
+if config['gradient']:
+    title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +
+     "," + str(config['sigmoid_strength']) + "," + "Gradient" + "," + str(config['grad_start'])+ "," + str(config['grad_end']) +
+      "," + str(config['refractory_period']) + ","+ str(config['seed']))
+elif config['normal_modes']:
+    title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +
+     "," + str(config['sigmoid_strength']) + "," + "Normal Modes" + "," + "," + str(config['refractory_period']) + ","+ str(config['seed']))
+else:
+    title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +
+     "," + str(config['sigmoid_strength']) + "," + "Isotropic" + str(config['coupling']) + "," + str(config['refractory_period']) +
+      ","+ str(config['seed']))

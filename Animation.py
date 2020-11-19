@@ -12,9 +12,10 @@ def main():
     global F
     global index
     #user_input = input('Data filename:')
-    user_input = ('50,50,1000,0.2,25,0.55,10,4236274i_159.npy')
-    F = np.load(user_input)
-    index = int(user_input.split('i_')[1].split('.')[0])
+    #user_input = ('50,50,1000,0.2,25,0.55,10,4236274i_159.npy')
+    F = np.load('StateData.npy')
+    #index = int(user_input.split('i_')[1].split('.')[0])
+    index = 0
     print(F.shape)
     fig, ax = plt.subplots()
     global lines
@@ -34,9 +35,11 @@ def main():
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
     anim = FuncAnimation(fig, animate, interval=100, frames=300)
-    print(user_input)
-    plt.title(user_input)
-    name = user_input.split('.')[0] + ".gif"
+    #print(user_input)
+    #plt.title(user_input)
+    #name = user_input.split('.')[0] + ".gif"
+    plt.title(title)
+    name = title + ".gif"
     anim.save(name)
     plt.draw()
     plt.show()
@@ -57,12 +60,12 @@ def animate(i):
     global colors
     global tot
     global index
-    j = index + i
+    '''j = index + i
     if j > (len(F)/tot - 1):
         j = j % 300
     print(j)
-    print(len(F))
-    x = F[j*tot:(j+1)*tot]
+    print(len(F))'''
+    x = F[i*tot:(i+1)*tot]
     for k,item in enumerate(lines):
         level = x[k]
         color = colors[level]
