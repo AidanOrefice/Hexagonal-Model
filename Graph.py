@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
+from configuration import title
 
 def Activated_sites():
     global F
@@ -23,9 +24,9 @@ def Activated_sites():
     ax.plot(x, thing, ls = '-', label = 'Number of activated sites')
     ax.set_ylabel("Number of activated cells")
     ax.set_xlabel("Time")
-    f = open('settings.txt', 'r')
-    settings = f.read()
-    plt.savefig(settings + str('.png'))
+    #f = open('settings.txt', 'r')
+    #settings = f.read()
+    plt.savefig(title + str('.png'))
 
 
 if __name__ == "__main__":
