@@ -3,21 +3,21 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 5000,
+    runtime = 500,
     threshold = 0.3,
     sigmoid_strength = 25,
     coupling = 0.55,
     refractory_period = 10,
     seed = 0,
     set_seed = False,
-    constant = False,
+    constant = True,
     gradient = False,
     grad_start = 0.7,
     grad_end = 0.3,
-    normal_modes = True,  #A1, A2,  B1,  B2, C1, C2,  alph,  beta
+    normal_modes = False,  #A1, A2,  B1,  B2, C1, C2,  alph,  beta
     normal_modes_config = [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.7], 
     graph = False ,
-    FullStateSave = 'full'      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
+    FullStateSave = 'transition'      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
  )
 
 if not config['set_seed']:

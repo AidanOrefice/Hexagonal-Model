@@ -45,14 +45,48 @@ def main():
     plt.show()
 
 def index_to_xy(index, width):
-    row = math.floor(index / width)
-    y = row
+    row = np.floor(index / width)
+    y = row - row * (1 - (np.sqrt(3) / 2)) #fix.
     if_even = row % 2 == 0
     if if_even:
         x = index - (row * width)
     else:
         x = index - (row * width) + 0.5
     return (x,y)
+
+def Where_reentry(time_data):
+    activated_sites = np.where(time_data == 1)[0]
+    sites = []
+    if len(activated_sites) > 0:
+        width = 50
+        mean_x = np.mean([index_to_xy(i, width)[0] for i in activated_sites]) #width = 50
+        check = 6
+        for i in activated_sites:
+            x = index_to_xy(i, width)[0]
+            if x > mean_x + 3:
+                check = 10
+
+        for i in activated_sites:
+            x,y = index_to_xy(i, width)
+            if x < mean_x - check:
+                sites.append((x,y,i))
+        return sites
+    else:
+        return []
+
+def Where_reentry_whole(F):
+    found = 0
+    i = 0
+    tot = 2500 #width * height
+    sites_found = {}
+    while found < 3 and i < len(F)/tot:
+        time_data = F[i * tot: (i+1) * tot]
+        sites = Where_reentry(time_data)
+        if len(sites) > 0 :
+            sites_found[i] = sites
+            found += 1
+        i += 1
+    return sites_found
 
 def animate(i):
     global lines
@@ -73,4 +107,6 @@ def animate(i):
 
 
 if __name__ == "__main__":
+    F = np.load('StateData.npy')
+    Where_reentry_whole(F)
     main()

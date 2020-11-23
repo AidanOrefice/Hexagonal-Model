@@ -13,7 +13,9 @@ from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 import random
 from configuration import config, title
+from Animation import Where_reentry_whole
 from hexalattice.hexalattice import *
+import pandas as pd
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -59,7 +61,7 @@ class HexagonalLattice():
 
         if self.full_save == 'full':
             self.save_width = self.runtime
-        elif self.full_save == 'trans':
+        elif self.full_save == 'transition':
             self.save_width = 300
         else:
             self.save_width = self.full_save
@@ -268,18 +270,19 @@ class HexagonalLattice():
             return True
         else:
             return False
+
+    def save_df(self):
+        columns = np.asarray(config.keys())
     
     def trans_save(self,i,j):
         count_last_100 = np.sum(self.AF[self.t-100:self.t])
-        print(count_last_100)
-        thign  = 'yasssss'
-        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and done):
-            print(thign)
+        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and self.done):
             j = 1
-            done = False
+            self.done = False
         if j == (self.save_width - 150):
             print('saving', self.t, i)
             np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
+            self.save_df(Where_reentry_whole(self.RefHistory))
             j += 1
         elif j > 0:
             j += 1
@@ -302,10 +305,10 @@ class HexagonalLattice():
 
     def RunIt(self):
         self.t = 0
+        self.done = True
         if self.full_save != False:
-            self.RefHistory = np.zeros((self.save_width)  * len(self.ref), dtype = np.int16)
-        if self.stats:
-            self.AF = np.zeros(self.runtime, dtype = np.int16)
+            self.RefHistory = np.zeros(((self.save_width)  * len(self.ref)), dtype = np.int16)
+        self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         j = 0
         done = True
@@ -313,8 +316,7 @@ class HexagonalLattice():
             if self.t == 0:
                 self.Initialise()
                 self.ActivationCheck()
-                if self.stats:
-                    self.AF[0] = len(self.index_act)
+                self.AF[0] = len(self.index_act)
                 self.ChargeProp()
                 if self.full_save != False:
                     self.RefHistory[0:len(self.ref)] = self.ref
@@ -326,12 +328,11 @@ class HexagonalLattice():
             self.ActivationCheck()
             if self.full_save == 'full':
                 self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
-            elif self.full_save == 'trans':
+            elif self.full_save == 'transition':
                 i,j = self.trans_save(i,j)
             else:
                 i = self.length_save(i)
-            if self.stats:
-                self.AF[self.t] = len(self.index_act)
+            self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
             self.StateDevelop()
             self.t += self.dt
@@ -344,9 +345,7 @@ class HexagonalLattice():
             plt.savefig(self.settings + '.png')
         if self.full_save == 'full':
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
-
-        if self.stats:
-            np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
+        np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
 
 def main():
     t0 = time.time()
@@ -371,12 +370,12 @@ def main():
 
 
 
-    fig,ax = plt.subplots()
+    '''fig,ax = plt.subplots()
     x = [lattice.index_to_xy(i)[0] for i in range(2500)]
     y = [lattice.index_to_xy(i)[1] for i in range(2500)]
     a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample)
     fig.colorbar(a,shrink=0.75)
-    plt.savefig('CouplingShow.png')
+    plt.savefig('CouplingShow.png')'''
 
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
