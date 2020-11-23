@@ -14,7 +14,8 @@ config = dict(
     gradient = False,
     grad_start = 0.7,
     grad_end = 0.3,
-    normal_modes = True,
+    normal_modes = True,  #A1, A2,  B1,  B2, C1, C2,  alph,  beta
+    normal_modes_config = [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.7], 
     graph = False ,
     FullStateSave = 'full'      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
  )

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from hexalattice.hexalattice import *
+from configuration import config
 
 
 """
@@ -36,7 +37,7 @@ hex_centers, ax = create_hex_grid(nx=50,ny=50, do_plot=True, align_to_origin = F
 x = [i[0] for i in hex_centers]
 y = [i[1] for i in hex_centers] 
 
-sin_z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
+sin_z = [sinusoid2D(x[i], y[i], *config['normal_modes_config']) for i in range(len(x))]
 grad_z = [gradient(i) for i in x]
 a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
 fig.colorbar(a,shrink=0.75)

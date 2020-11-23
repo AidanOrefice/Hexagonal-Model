@@ -208,7 +208,7 @@ class HexagonalLattice():
         elif norm_modes:
             for i in keys:
                 x,y = self.index_to_xy(i)
-                grad_coupling = np.sqrt(self.sinusoid2D(x,y))
+                grad_coupling = np.sqrt(self.sinusoid2D(x, y, *config['normal_modes_config']))
                 neighbours = self.neighbours[i]
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
