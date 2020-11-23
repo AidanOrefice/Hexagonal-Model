@@ -12,10 +12,12 @@ import random
 from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 import random
-from configuration import config, title
+from configuration import *
 from Animation import Where_reentry_whole
 from hexalattice.hexalattice import *
 import pandas as pd
+from itertools import groupby
+from operator import itemgetter
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -44,7 +46,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, FullStateMethod = 'full', settings_name = 'hi', stats = False):
+     graph = False, FullStateMethod = 'full', stats = False, seed = 0):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -54,10 +56,15 @@ class HexagonalLattice():
         self.coupling = pow(coupling, 1/2)
         self.ref_per = refractory_period + 2
         self.graph = graph
-        self.settings = settings_name
         self.full_save = FullStateMethod #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
         self.pacing_period = 75
         self.stats = stats
+        
+        if seed == 0:
+            self.seed = np.random.randint(0,int(1e7))
+        else:
+            self.seed = seed
+        np.random.seed(self.seed)
 
         if self.full_save == 'full':
             self.save_width = self.runtime
@@ -65,6 +72,11 @@ class HexagonalLattice():
             self.save_width = 300
         else:
             self.save_width = self.full_save
+
+        '''#Initialise dataframe to save each run
+        columns = list(config.keys())
+        columns.append('seed')
+        self.df = pd.DataFrame(columns = columns)'''
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -182,7 +194,8 @@ class HexagonalLattice():
         return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin((B2 * y)*(2*np.pi)/ self.index_to_xy(self.height* self.width -1)[1]  + C2)) + beta
 
 
-    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, start = 0.9 , end = 0.7):
+    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.85], 
+    start = 0.9 , end = 0.7):
         if constant + gradient + norm_modes != 1:
             raise ValueError('Cannot decouple using two different methods.')
 
@@ -210,7 +223,7 @@ class HexagonalLattice():
         elif norm_modes:
             for i in keys:
                 x,y = self.index_to_xy(i)
-                grad_coupling = np.sqrt(self.sinusoid2D(x, y, *config['normal_modes_config']))
+                grad_coupling = np.sqrt(self.sinusoid2D(x, y, *sinusoid_params))
                 neighbours = self.neighbours[i]
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
@@ -271,8 +284,9 @@ class HexagonalLattice():
         else:
             return False
 
-    def save_df(self):
-        columns = np.asarray(config.keys())
+    '''def save_df(self):
+        return run
+        self.df.loc[len(self.df)] = run'''
     
     def trans_save(self,i,j):
         count_last_100 = np.sum(self.AF[self.t-100:self.t])
@@ -282,7 +296,7 @@ class HexagonalLattice():
         if j == (self.save_width - 150):
             print('saving', self.t, i)
             np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
-            self.save_df(Where_reentry_whole(self.RefHistory))
+            #self.save_df(Where_reentry_whole(self.RefHistory))
             j += 1
         elif j > 0:
             j += 1
@@ -330,6 +344,8 @@ class HexagonalLattice():
                 self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             elif self.full_save == 'transition':
                 i,j = self.trans_save(i,j)
+            elif self.full_save == False:
+                pass
             else:
                 i = self.length_save(i)
             self.AF[self.t] = len(self.index_act)
@@ -342,17 +358,77 @@ class HexagonalLattice():
             ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
             ax.set_ylabel("Number of activated cells")
             ax.set_xlabel("Time")
-            plt.savefig(self.settings + '.png')
+            plt.savefig('SetThisAsTheSettings' + '.png')  #################################
         if self.full_save == 'full':
             np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
-        np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
+            #np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
+
+        # return the settings of each run
+        run = list(config.values())
+        run.append(self.seed)
+        return run
+
+
+
+def InitialDF():
+    columns = list(config.keys())
+    columns.append('seed')
+    columns.append('in AF?')
+    columns.append('%time in AF')
+    df = pd.DataFrame(columns=columns)
+    return df
+
+def NormalModes():
+    df = InitialDF()
+    for i in config_vary:
+        print(i)
+        for j in range(1000):
+            
+            lattice = HexagonalLattice(config['width'],
+                config['height'],
+                config['runtime'],
+                config['threshold'],
+                config['sigmoid_strength'],
+                config['coupling'],
+                config['refractory_period'],
+                config['graph'],
+                config['FullStateSave'],
+                config['stats'],
+                config['set_seed'])
+            
+            lattice.CreateLattice()
+            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], i,
+            config['grad_start'], config['grad_end'] )
+            run = lattice.RunIt()
+
+            index = np.where(lattice.AF > 55)[0]
+            thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
+            thing = [i for i in thing if len(i) > 10]
+            len_thing = 0
+            if len(thing) > 0:
+                in_AF = True
+                for x in thing:
+                    len_thing += len(x)
+            else:
+                in_AF = False
+
+            fraction_in_AF = len_thing/config['runtime']
+
+            #add in_Af to run  
+            run.append(in_AF)
+            run.append(fraction_in_AF) 
+            df.loc[len(df)] = run
+    df.to_csv('Runs.csv')
+                    
+
 
 def main():
     t0 = time.time()
+    NormalModes()
+    t1 = time.time()
+    print('Runtime = %f s' % (t1-t0))
 
-    np.random.seed(config['seed'])
-
-    lattice = HexagonalLattice(config['width'],
+'''    lattice = HexagonalLattice(config['width'],
         config['height'],
         config['runtime'],
         config['threshold'],
@@ -361,24 +437,26 @@ def main():
         config['refractory_period'],
         config['graph'],
         config['FullStateSave'],
-        title)
+        config['stats'],
+        config['set_seed'])
     
     lattice.CreateLattice()
     lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'],
      config['grad_start'], config['grad_end'] )
     lattice.RunIt()
+    lattice.save_df()
+
+    lattice.df.to_csv('Runs.csv')
 
 
 
-    '''fig,ax = plt.subplots()
+    fig,ax = plt.subplots()
     x = [lattice.index_to_xy(i)[0] for i in range(2500)]
     y = [lattice.index_to_xy(i)[1] for i in range(2500)]
     a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample)
     fig.colorbar(a,shrink=0.75)
-    plt.savefig('CouplingShow.png')'''
-
-    t1 = time.time()
-    print('Runtime = %f s' % (t1-t0))
+    plt.savefig('CouplingShow.png')
+'''
 
 if __name__ == '__main__':
     main()
