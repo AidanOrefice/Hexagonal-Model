@@ -1,6 +1,7 @@
 from time import time
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 Runs = pd.read_csv('Runs.csv')
 
@@ -27,7 +28,13 @@ for index, row in Runs.iterrows():
 
 print(freq_table)
 print(freq_table_true)
-
+x = [-0.1, -0.13, -0.16, -0.19, -0.22, -0.25]
+y = [float(i)/1000 for i in list(freq_table_true.values())]
+f, ax = plt.subplots()
+plt.bar(x,y, width = 0.01)
+plt.ylabel('% of simulations that entered AF')
+plt.xlabel('Alpha, (bigger values = bigger ranges)')
+plt.savefig('bar' + '.png')
 '''data = np.random.randint(2,size = 10000)
 start = time()
 for i in range(100000):
