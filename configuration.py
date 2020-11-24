@@ -4,7 +4,7 @@ config = dict(
     width = 50,
     height = 50,
     runtime = 1000,
-    threshold = 0.3,
+    threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
     refractory_period = 10,
@@ -13,14 +13,13 @@ config = dict(
     gradient = False,
     grad_start = 0.7,
     grad_end = 0.3,
-    normal_modes = True,  #A1, A2,  B1,  B2, C1, C2,  alph,  beta
-    normal_modes_config = [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.85], 
+    normal_modes = True,  #A1,  A2, amp, mean
+    normal_modes_config = [0.25, 1, 0.1  ,0.5],
     graph = False ,
     FullStateSave = False,      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
     stats = False
  )
 
-config_vary = [[1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.85],[1  ,1  ,0.25  ,1  ,0  ,0  ,-0.13  ,0.85], [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.16  ,0.85],[1  ,1  ,0.25  ,1  ,0  ,0  ,-0.19  ,0.85],[1  ,1  ,0.25  ,1  ,0  ,0  ,-0.22  ,0.85], [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.25  ,0.85]]
 
 if config['gradient']:
     title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +

@@ -186,15 +186,15 @@ class HexagonalLattice():
                 self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
                 self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)
     
-    def sinusoid2D(self, x, y, A1=1, A2=1, B1=0.25, B2=1, C1=0, C2=0, alpha = -0.1, beta = 0.7 ):
-        #A - set max value of function
-        #B - more/less peaks- stretches or compresses the peaks
-        #C - phase shift everything 
-        #applied BCs.
-        return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin((B2 * y)*(2*np.pi)/ self.index_to_xy(self.height* self.width -1)[1]  + C2)) + beta
+    def sinusoid2D(self, x, y,  amp, mean, A1 = 0.25, A2 = 0.25):
+        #Amplitude - directly sets the amplitude of the function
+        #Mean - directly sets the offset/mean of the function.
+        # 0 < (Mean +/- amp) < 1 
+        #A1/A2 stretch out the modes.
+        #A2 must be an integer value to ensure periodicity.
+        return (amp/2)*(np.sin(A1*x)+np.sin(A2*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
-
-    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1  ,1  ,0.25  ,1  ,0  ,0  ,-0.1  ,0.85], 
+    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [0.1,0.6], 
     start = 0.9 , end = 0.7):
         if constant + gradient + norm_modes != 1:
             raise ValueError('Cannot decouple using two different methods.')
@@ -238,11 +238,6 @@ class HexagonalLattice():
                     index = neighbours1.index(i)
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
-
-        
-        
-        
-
 
 
     def Initialise(self):
@@ -368,20 +363,18 @@ class HexagonalLattice():
         run.append(self.seed)
         return run
 
-
-
 def InitialDF():
     columns = list(config.keys())
-    columns.append('seed')
-    columns.append('in AF?')
-    columns.append('%time in AF')
+    columns.extend(['seed', 'in AF?', '%time in AF'])
     df = pd.DataFrame(columns=columns)
     return df
 
 def NormalModes():
+    t0 = time.time()
     df = InitialDF()
-    for i in config_vary:
-        print(i)
+    amps = [0,0.05,0.1,0.15,0.2,0.25,0.3]
+    mean = 0.6
+    for i in amps:
         for j in range(1000):
             
             lattice = HexagonalLattice(config['width'],
@@ -397,10 +390,10 @@ def NormalModes():
                 config['set_seed'])
             
             lattice.CreateLattice()
-            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], i,
+            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,mean],
             config['grad_start'], config['grad_end'] )
             run = lattice.RunIt()
-            run[13] = i
+            run[13] = [0.25,1,i,mean]
 
             index = np.where(lattice.AF > 55)[0]
             thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
@@ -415,21 +408,19 @@ def NormalModes():
 
             fraction_in_AF = len_thing/config['runtime']
 
-            #add in_Af to run  
-            run.append(in_AF)
-            run.append(fraction_in_AF) 
-            df.loc[len(df)] = run
-    df.to_csv('Runs.csv')
-                    
+            run.extend([in_AF, fraction_in_AF]) 
 
+            df.loc[len(df)] = run
+    df.to_csv('Trial_Varying_Variance.csv')
+
+    t1 = time.time()
+    print('Runtime = %f s' % (t1-t0))
+    
 
 def main():
     t0 = time.time()
-    NormalModes()
-    t1 = time.time()
-    print('Runtime = %f s' % (t1-t0))
-
-'''    lattice = HexagonalLattice(config['width'],
+    print(config['normal_modes_config'])
+    lattice = HexagonalLattice(config['width'],
         config['height'],
         config['runtime'],
         config['threshold'],
@@ -442,25 +433,23 @@ def main():
         config['set_seed'])
     
     lattice.CreateLattice()
-    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'],
+    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'],
      config['grad_start'], config['grad_end'] )
     lattice.RunIt()
-    lattice.save_df()
-
-    lattice.df.to_csv('Runs.csv')
-
-
 
     fig,ax = plt.subplots()
     x = [lattice.index_to_xy(i)[0] for i in range(2500)]
     y = [lattice.index_to_xy(i)[1] for i in range(2500)]
     a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample)
     fig.colorbar(a,shrink=0.75)
+    plt.title('Sample of -0.25*[sin(0.25x) + sin(2pi*y/50)]+0.85')
     plt.savefig('CouplingShow.png')
-'''
+
+    t1 = time.time()
+    print('Runtime = %f s' % (t1-t0))
 
 if __name__ == '__main__':
-    main()
+    NormalModes()
 
 
 

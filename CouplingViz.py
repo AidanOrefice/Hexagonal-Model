@@ -10,12 +10,18 @@ Script that visualises the coupling in the lattice.
 
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
+amp = 0.1
+mean = 0.5
+A1 = 0.25
+A2 = 2
 
-def sinusoid2D(x, y, A1=1, A2=1, B1=0.25, B2=1, C1=0, C2=0, alpha = -0.25, beta = 0.85 ):
-#A - set max value of function
-#B - more/less peaks- stretches or compresses the peaks
-#C - phase shift everything 
-    return alpha * abs(A1 * np.sin(B1 * x + C1) + A2 * np.sin(((B2 * y)*(2*np.pi)/ index_to_xy(2499)[1]) + C2)) + beta
+def sinusoid2D(x, y, A1=A1, A2=A2,  amp = amp, mean = mean):
+    #Amplitude - directly sets the amplitude of the function
+    #Mean - directly sets the offset/mean of the function.
+    # 0 < (Mean +/- amp) < 1 
+    #A1/A2 stretch out the modes.
+    #A2 must be an integer value to ensure periodicity.
+    return (amp/2)*(np.sin(A1*x)+np.sin(A2*y*(2*np.pi/index_to_xy(2499)[1]))) + mean
 
 def gradient(x,start=0.8,end = 0.6):
     delta = (end-start)/50
@@ -45,6 +51,8 @@ fig.colorbar(a,shrink=0.75)
 print(np.mean(sin_z))
 print(np.var(sin_z))
 print(np.std(sin_z))
+
+#plt.title('%.2f*[sin(%.2f x) \n + sin(%.2f * 2*pi*y/height)] + %.2f' %(amp,A1,A2,mean))
 
 plt.savefig('viz_test.png')
 
