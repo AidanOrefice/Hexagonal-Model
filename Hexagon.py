@@ -13,7 +13,7 @@ from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 import random
 from configuration import *
-from Animation import Where_reentry_whole
+from Animation import Where_reentry
 from hexalattice.hexalattice import *
 import pandas as pd
 from itertools import groupby
@@ -319,13 +319,13 @@ class HexagonalLattice():
 
     def RunIt(self):
         self.t = 0
-        self.done = True
+        self.sites_found = {}
         if self.full_save != False:
             self.RefHistory = np.zeros(((self.save_width)  * len(self.ref)), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         j = 0
-        done = True
+        found = 0
         while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
@@ -400,6 +400,7 @@ def NormalModes():
             lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], i,
             config['grad_start'], config['grad_end'] )
             run = lattice.RunIt()
+            run[13] = i
 
             index = np.where(lattice.AF > 55)[0]
             thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
