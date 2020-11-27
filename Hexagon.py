@@ -372,46 +372,50 @@ def InitialDF():
 def NormalModes():
     t0 = time.time()
     df = InitialDF()
-    amps = [0,0.05,0.1,0.15,0.2,0.25,0.3]
-    mean = 0.6
-    for i in amps:
-        for j in range(1000):
-            
-            lattice = HexagonalLattice(config['width'],
-                config['height'],
-                config['runtime'],
-                config['threshold'],
-                config['sigmoid_strength'],
-                config['coupling'],
-                config['refractory_period'],
-                config['graph'],
-                config['FullStateSave'],
-                config['stats'],
-                config['set_seed'])
-            
-            lattice.CreateLattice()
-            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,mean],
-            config['grad_start'], config['grad_end'] )
-            run = lattice.RunIt()
-            run[13] = [0.25,1,i,mean]
+    amps = np.linspace(0,0.3,11)
+    means = np.linspace(0.3,0.7,9)
+    print(means)
+    print(amps)
+    for k in means:
+        for i in amps:
+            print(i)
+            for j in range(51):
+                
+                lattice = HexagonalLattice(config['width'],
+                    config['height'],
+                    config['runtime'],
+                    config['threshold'],
+                    config['sigmoid_strength'],
+                    config['coupling'],
+                    config['refractory_period'],
+                    config['graph'],
+                    config['FullStateSave'],
+                    config['stats'],
+                    config['set_seed'])
+                
+                lattice.CreateLattice()
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,k],
+                config['grad_start'], config['grad_end'] )
+                run = lattice.RunIt()
+                run[13] = [0.25,1,i,k]
 
-            index = np.where(lattice.AF > 55)[0]
-            thing = [list(map(itemgetter(1), g)) for k, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
-            thing = [i for i in thing if len(i) > 10]
-            len_thing = 0
-            if len(thing) > 0:
-                in_AF = True
-                for x in thing:
-                    len_thing += len(x)
-            else:
-                in_AF = False
+                index = np.where(lattice.AF > 55)[0]
+                thing = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
+                thing = [i for i in thing if len(i) > 10]
+                len_thing = 0
+                if len(thing) > 0:
+                    in_AF = True
+                    for x in thing:
+                        len_thing += len(x)
+                else:
+                    in_AF = False
 
-            fraction_in_AF = len_thing/config['runtime']
+                fraction_in_AF = len_thing/config['runtime']
 
-            run.extend([in_AF, fraction_in_AF]) 
+                run.extend([in_AF, fraction_in_AF]) 
 
-            df.loc[len(df)] = run
-    df.to_csv('Trial_Varying_Variance.csv')
+                df.loc[len(df)] = run
+    df.to_csv('Trial_Varying_Variance_PS_0.25.csv')
 
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))

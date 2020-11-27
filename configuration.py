@@ -3,7 +3,7 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 1000,
+    runtime = 5000,
     threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
