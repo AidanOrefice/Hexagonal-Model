@@ -5,12 +5,10 @@ from matplotlib.animation import FuncAnimation
 import time
 from configuration import title
 
-def main():
+def Animate_F(F, index, name):
     global colors
     colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'black', 4 : 'black',
      5 : 'black', 6 : 'black', 7 : 'black', 8 : 'black', 9 : 'black', 10 : 'black', 11 : 'black', 12 : 'black'}
-    global F
-    global index
     #user_input = input('Data filename:')
     #user_input = ('50,50,1000,0.2,25,0.55,10,4236274i_159.npy')
     F = np.load('StateData.npy')
@@ -34,12 +32,12 @@ def main():
         x = index_to_xy(i,width)[0]
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=300)
+    anim = FuncAnimation(fig, animate, interval=100, frames=300, fargs = (F, index))
     #print(user_input)
     #plt.title(user_input)
     #name = user_input.split('.')[0] + ".gif"
-    plt.title(title)
-    name = title + ".gif"
+    plt.title(name)
+    name = name + ".gif"
     anim.save(name)
     plt.draw()
     plt.show()
@@ -88,17 +86,13 @@ def Where_reentry_whole(F):
         i += 1
     return sites_found
 
-def animate(i):
+def animate(i, F, index):
     global lines
-    global F
     global colors
     global tot
-    global index
-    '''j = index + i
+    j = index + i
     if j > (len(F)/tot - 1):
         j = j % 300
-    print(j)
-    print(len(F))'''
     x = F[i*tot:(i+1)*tot]
     for k,item in enumerate(lines):
         level = x[k]

@@ -3,15 +3,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from Animation import Animate_F
+from Hexagon import HexagonalLattice
 
 Runs = pd.read_csv('Trial_Varying_Variance_PS_0.25.csv')
 
-for index, row in Runs.iterrows():
+'''for index, row in Runs.iterrows():
     list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
     Runs.loc[index, 'normal_beta'] = float(list_[3].strip())
     Runs.loc[index, 'normal_alpha'] = float(list_[2].strip())
 
-map_alpha = {j:i for i,j in enumerate(np.unique(Runs['normal_alpha']))}
+map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
 map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
 
 print(map_alpha)
@@ -39,7 +41,7 @@ ax.tick_params(axis='y', rotation=0)
 ax.set_xlabel('Mean')
 ax.set_ylabel('Amplitude')
 ax.set_title('% time simulation entered AF')
-plt.savefig('PS_25_colourmap')
+plt.savefig('PS_25_large_colourmap')
 
 df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
@@ -50,7 +52,32 @@ ax.tick_params(axis='y', rotation=0)
 ax.set_xlabel('Mean')
 ax.set_ylabel('Amplitude')
 ax.set_title('Average % time simulations in spent AF')
-plt.savefig('PS_25_colourmap_time')
+plt.savefig('PS_25_large_colourmap_time')
+'''
+def run_and_animate_random(row):
+    lattice = HexagonalLattice(row['width'],
+        row['height'],
+        row['runtime'],
+        row['threshold'],
+        row['sigmoid_strength'],
+        row['coupling'],
+        row['refractory_period'],
+        True,
+        'transition',
+        row['stats'],
+        seed = row['seed'])
+    
+    lattice.CreateLattice()
+    input_config = row['normal_modes_config'].split('[')[1].split(']')[0].split(',')
+    lattice.CouplingMethod(row['constant'], row['gradient'], row['normal_modes'], input_config,
+     row['grad_start'], row['grad_end'] )
+    Ref_His, bool_in, i = lattice.RunIt()
+    name = (str(row['width']) + "," + str(row['height']) + "," + str(row['runtime']) + "," + str(row['threshold']) +
+     "," + str(row['sigmoid_strength']) + "," + "Normal Modes" + "," + "," + str(row['refractory_period']) + "," )
+    if bool_in:
+        Animate_F(Ref_His, i, name)
+print(Runs.iloc[4970])
+run_and_animate_random(Runs.iloc[4970])
 
 '''freq_table = {}
 freq_table_true = {}

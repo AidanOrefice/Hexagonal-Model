@@ -11,7 +11,6 @@ import time
 import random
 from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
-import random
 from configuration import *
 from Animation import Where_reentry
 from hexalattice.hexalattice import *
@@ -23,12 +22,22 @@ def choose_numbers(list1, prob):
     new_list = []
     deleted_list = []
     for i in list1:
-        p = random.uniform(0,1)
+        p = np.random.uniform(0,1)
         if p < prob:
             new_list.append(i)
         else:
             deleted_list.append(i)
     return new_list, deleted_list
+
+'''def Remove_random_bonds(self, n):
+    for i in range(n):
+        key = random.choice(list(self.neighbours))
+        while len(self.neighbours[key]) == 0:
+            key = random.choice(list(self.neighbours))
+        else:
+            neighbour = np.array([random.choice(list(self.neighbours[key]))])
+            self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
+            self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)'''
 
 class HexagonalLattice():
     '''
@@ -175,16 +184,6 @@ class HexagonalLattice():
         else:
             x = index - (row * self.width) + 0.5
         return (x,y)
-
-    def Remove_random_bonds(self, n):
-        for i in range(n):
-            key = random.choice(list(self.neighbours))
-            while len(self.neighbours[key]) == 0:
-                key = random.choice(list(self.neighbours))
-            else:
-                neighbour = np.array([random.choice(list(self.neighbours[key]))])
-                self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
-                self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)
     
     def sinusoid2D(self, x, y,  amp, mean, A1 = 0.25, A2 = 0.25):
         #Amplitude - directly sets the amplitude of the function
@@ -192,6 +191,10 @@ class HexagonalLattice():
         # 0 < (Mean +/- amp) < 1 
         #A1/A2 stretch out the modes.
         #A2 must be an integer value to ensure periodicity.
+        amp = float(amp)
+        mean = float(mean)
+        A1 = float(A1)
+        A2 = float(A2)
         return (amp/2)*(np.sin(A1*x)+np.sin(A2*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
     def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [0.1,0.6], 
@@ -285,15 +288,15 @@ class HexagonalLattice():
     
     def trans_save(self,i,j):
         count_last_100 = np.sum(self.AF[self.t-100:self.t])
-        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and self.done):
+        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t])):
             j = 1
-            self.done = False
         if j == (self.save_width - 150):
             print('saving', self.t, i)
-            np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
+            #np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
             #self.save_df(Where_reentry_whole(self.RefHistory))
-            j += 1
+            j = 999
         elif j > 0:
+            print('hi')
             j += 1
         if i < self.save_width:
             self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
@@ -319,8 +322,9 @@ class HexagonalLattice():
             self.RefHistory = np.zeros(((self.save_width)  * len(self.ref)), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
-        j = 0
+        joke = 0
         found = 0
+        print(self.seed)
         while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
@@ -338,7 +342,10 @@ class HexagonalLattice():
             if self.full_save == 'full':
                 self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             elif self.full_save == 'transition':
-                i,j = self.trans_save(i,j)
+                i,joke = self.trans_save(i,joke)
+                if joke == 999:
+                    print('done')
+                    return self.RefHistory, True, i
             elif self.full_save == False:
                 pass
             else:
@@ -372,8 +379,8 @@ def InitialDF():
 def NormalModes():
     t0 = time.time()
     df = InitialDF()
-    amps = np.linspace(0,0.3,11)
-    means = np.linspace(0.3,0.7,9)
+    amps = np.linspace(0,0.5,21)
+    means = np.linspace(0,1,21)
     print(means)
     print(amps)
     for k in means:
