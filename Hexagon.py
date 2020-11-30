@@ -17,6 +17,7 @@ from hexalattice.hexalattice import *
 import pandas as pd
 from itertools import groupby
 from operator import itemgetter
+from matplotlib.lines import Line2D
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -203,6 +204,7 @@ class HexagonalLattice():
             raise ValueError('Cannot decouple using two different methods.')
 
         keys = self.neighbours.keys()
+        copy = self.neighbours.copy()
         #new_dic = {i : [] for i in range(len(keys))}
         deleted_dic = {}
 
@@ -231,7 +233,7 @@ class HexagonalLattice():
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
                 deleted_dic[i] = deleted            
-            self.coupling_sample = [len(self.neighbours[i])/6 for i in self.neighbours.keys()]
+            self.coupling_sample = [len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()]
 
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
@@ -444,23 +446,32 @@ def main():
         config['set_seed'])
     
     lattice.CreateLattice()
-    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'],
+    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],
      config['grad_start'], config['grad_end'] )
     lattice.RunIt()
 
     fig,ax = plt.subplots()
     x = [lattice.index_to_xy(i)[0] for i in range(2500)]
     y = [lattice.index_to_xy(i)[1] for i in range(2500)]
-    a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample)
-    fig.colorbar(a,shrink=0.75)
-    plt.title('Sample of -0.25*[sin(0.25x) + sin(2pi*y/50)]+0.85')
+    a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample, cmap=plt.cm.get_cmap('viridis', 7))
+    cbar = plt.colorbar(a, ticks=np.arange(1/14,15/14,1/7), shrink = 0.75)
+    cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
+    #plt.clim(0, 1)
+
+    #fig.colorbar(a,shrink=0.75)
+
+    legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.7', markerfacecolor='white', markersize=0),
+            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.3', markerfacecolor='white', markersize=0)]
+    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
+    plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
+    
     plt.savefig('CouplingShow.png')
 
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 
 if __name__ == '__main__':
-    NormalModes()
+    main()
 
 
 

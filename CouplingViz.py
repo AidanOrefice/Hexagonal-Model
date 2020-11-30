@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.lines import Line2D
 import numpy as np
 from hexalattice.hexalattice import *
 from configuration import config
@@ -10,8 +10,8 @@ Script that visualises the coupling in the lattice.
 
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
-amp = 0.1
-mean = 0.5
+amp = 0.3
+mean = 0.7
 A1 = 0.25
 A2 = 2
 
@@ -52,7 +52,15 @@ print(np.mean(sin_z))
 print(np.var(sin_z))
 print(np.std(sin_z))
 
-#plt.title('%.2f*[sin(%.2f x) \n + sin(%.2f * 2*pi*y/height)] + %.2f' %(amp,A1,A2,mean))
+
+legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.7', markerfacecolor='white', markersize=0),
+            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.3', markerfacecolor='white', markersize=0)]
+
+
+
+plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
+
+plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
 
 plt.savefig('viz_test.png')
 
