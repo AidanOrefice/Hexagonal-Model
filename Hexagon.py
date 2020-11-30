@@ -83,6 +83,8 @@ class HexagonalLattice():
         else:
             self.save_width = self.full_save
 
+        self.title = title + str(self.seed)  + ',' 
+
         '''#Initialise dataframe to save each run
         columns = list(config.keys())
         columns.append('seed')
@@ -290,15 +292,14 @@ class HexagonalLattice():
     
     def trans_save(self,i,j):
         count_last_100 = np.sum(self.AF[self.t-100:self.t])
-        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t])):
+        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and self.done):
             j = 1
+            self.done = False
         if j == (self.save_width - 150):
             print('saving', self.t, i)
-            #np.save(title + 'i_{}'.format(i) + '.npy', self.RefHistory)
-            #self.save_df(Where_reentry_whole(self.RefHistory))
+            np.save(self.title + 'i_{}'.format(i) + '.npy', self.RefHistory)
             j = 999
         elif j > 0:
-            print('hi')
             j += 1
         if i < self.save_width:
             self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
@@ -325,7 +326,7 @@ class HexagonalLattice():
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         i = 0
         joke = 0
-        found = 0
+        self.done = True
         print(self.seed)
         while self.t < self.runtime:
             if self.t == 0:
@@ -345,9 +346,6 @@ class HexagonalLattice():
                 self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             elif self.full_save == 'transition':
                 i,joke = self.trans_save(i,joke)
-                if joke == 999:
-                    print('done')
-                    return self.RefHistory, True, i
             elif self.full_save == False:
                 pass
             else:
@@ -362,9 +360,10 @@ class HexagonalLattice():
             ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
             ax.set_ylabel("Number of activated cells")
             ax.set_xlabel("Time")
-            plt.savefig('SetThisAsTheSettings' + '.png')  #################################
+            plt.savefig('Graphed' + '.png')  #################################
         if self.full_save == 'full':
-            np.save('StateData.npy', self.RefHistory)#Basically the same as below, only save interesting bits
+            np.save(self.title + '.npy', self.RefHistory)
+            #Basically the same as below, only save interesting bits
             #np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
 
         # return the settings of each run
@@ -454,14 +453,16 @@ def main():
     x = [lattice.index_to_xy(i)[0] for i in range(2500)]
     y = [lattice.index_to_xy(i)[1] for i in range(2500)]
     a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample, cmap=plt.cm.get_cmap('viridis', 7))
-    cbar = plt.colorbar(a, ticks=np.arange(1/14,15/14,1/7), shrink = 0.75)
+    cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
     cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
     #plt.clim(0, 1)
 
     #fig.colorbar(a,shrink=0.75)
+    label_mean = 'Mean = ' + str(config['normal_modes_config'][3])
+    label_amp = 'Amplitude = ' + str(config['normal_modes_config'][2])
 
-    legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.7', markerfacecolor='white', markersize=0),
-            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.3', markerfacecolor='white', markersize=0)]
+    legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+            Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
     plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
     plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
     

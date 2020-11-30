@@ -3,18 +3,18 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 5000,
+    runtime = 500,
     threshold = 0.25,
     sigmoid_strength = 25,
-    coupling = 0.55,
+    coupling = 0.66,
     refractory_period = 10,
     set_seed = 0, #0 if not setting, put number if you want to call a seed.
-    constant = False,
+    constant = True,
     gradient = False,
-    grad_start = 0.7,
-    grad_end = 0.3,
-    normal_modes = True,  #A1,  A2, amp, mean
-    normal_modes_config = [0.25, 1, 0.3  ,0.7],
+    grad_start = 0.3,
+    grad_end = 0.4,
+    normal_modes = False,  #A1,  A2, amp, mean
+    normal_modes_config = [0.25, 1, 0.1  ,0.9],
     graph = False ,
     FullStateSave = False,      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
     stats = False
@@ -27,7 +27,7 @@ if config['gradient']:
       "," + str(config['refractory_period']) + ",")
 elif config['normal_modes']:
     title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +
-     "," + str(config['sigmoid_strength']) + "," + "Normal Modes" + "," + "," + str(config['refractory_period']) + "," )
+     "," + str(config['sigmoid_strength']) + "," + "Normal Modes" + "," + str(config['refractory_period']) + "," )
 else:
     title = (str(config['width']) + "," + str(config['height']) + "," + str(config['runtime']) + "," + str(config['threshold']) +
      "," + str(config['sigmoid_strength']) + "," + "Isotropic" + str(config['coupling']) + "," + str(config['refractory_period']) +

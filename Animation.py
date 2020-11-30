@@ -3,16 +3,17 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
-from configuration import title
 
-def Animate_F(F, index, name):
+def Animate_F():
     global colors
+    global F
+    global index
     colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'black', 4 : 'black',
      5 : 'black', 6 : 'black', 7 : 'black', 8 : 'black', 9 : 'black', 10 : 'black', 11 : 'black', 12 : 'black'}
     #user_input = input('Data filename:')
-    #user_input = ('50,50,1000,0.2,25,0.55,10,4236274i_159.npy')
-    F = np.load('StateData.npy')
+    user_input = '50,50,500,0.25,25,Normal Modes,10,3192278,.npy'
     #index = int(user_input.split('i_')[1].split('.')[0])
+    F = np.load(user_input)
     index = 0
     print(F.shape)
     fig, ax = plt.subplots()
@@ -22,9 +23,9 @@ def Animate_F(F, index, name):
         F.append(list(array))
         array[i-1] = 0
         array[i] = 1'''
-    width = int(title.split(',')[0])
-    height = int(title.split(',')[1])
-    #runtime = int(title.split(',')[2])
+    width = int(user_input.split(',')[0])
+    height = int(user_input.split(',')[1])
+    runtime = int(user_input.split(',')[2])
     global tot
     tot = width*height
     lines = []
@@ -32,10 +33,10 @@ def Animate_F(F, index, name):
         x = index_to_xy(i,width)[0]
         y = index_to_xy(i,width)[1]
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=300, fargs = (F, index))
+    anim = FuncAnimation(fig, animate, interval=100, frames=runtime, fargs = (F, index))
     #print(user_input)
     #plt.title(user_input)
-    #name = user_input.split('.')[0] + ".gif"
+    name = user_input.split('.gi')[0]
     plt.title(name)
     name = name + ".gif"
     anim.save(name)
@@ -90,9 +91,9 @@ def animate(i, F, index):
     global lines
     global colors
     global tot
-    j = index + i
+    '''j = index + i
     if j > (len(F)/tot - 1):
-        j = j % 300
+        j = j % 300'''
     x = F[i*tot:(i+1)*tot]
     for k,item in enumerate(lines):
         level = x[k]
@@ -101,6 +102,4 @@ def animate(i, F, index):
 
 
 if __name__ == "__main__":
-    F = np.load('StateData.npy')
-    Where_reentry_whole(F)
-    main()
+    Animate_F()
