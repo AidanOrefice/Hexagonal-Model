@@ -4,41 +4,48 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
 
-def Animate_F():
-    global colors
-    global F
-    global index
+#For each run - there will be some boolean value that says whether to animate
+#If this is true - column fname will contain the filename for that run.
+#Use this filename to access the correct .npy file and animate accordingly.
+
+#Needs to be generalised for a full run and for a transition.
+
+def Animate(fname, type):
+    #data_file - filename of the .npy file 
+    #type - type of animation to run e.g. full or transition.
+
+    #global colors
+    #global F
+    #global tot
+    #global lines
     colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'black', 4 : 'black',
      5 : 'black', 6 : 'black', 7 : 'black', 8 : 'black', 9 : 'black', 10 : 'black', 11 : 'black', 12 : 'black'}
-    #user_input = input('Data filename:')
-    user_input = '50,50,500,0.25,25,Normal Modes,10,3192278,.npy'
-    #index = int(user_input.split('i_')[1].split('.')[0])
-    F = np.load(user_input)
-    index = 0
+
+    data_file = fname + '.npy' #Loading in data
+    F = np.load(data_file)
     print(F.shape)
     fig, ax = plt.subplots()
-    global lines
-    '''F = []
-    for i in range(1,16):
-        F.append(list(array))
-        array[i-1] = 0
-        array[i] = 1'''
-    width = int(user_input.split(',')[0])
-    height = int(user_input.split(',')[1])
-    runtime = int(user_input.split(',')[2])
-    global tot
-    tot = width*height
+    
+    width = int(data_file.split(',')[0]) # First three inputs
+    height = int(data_file.split(',')[1])
+    runtime = int(data_file.split(',')[2])
+    
+
+    tot = width*height #Length of 1D array 
+    if type == 'transition': #Setting the runtime
+        runtime = len(F)//(tot)  
+        print(runtime)                                                         
+    else:
+        pass
+
     lines = []
     for i in range(tot):
-        x = index_to_xy(i,width)[0]
-        y = index_to_xy(i,width)[1]
+        x,y = index_to_xy(i,width) #Getting the real space coordinates.
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate, interval=100, frames=runtime, fargs = (F, index))
-    #print(user_input)
-    #plt.title(user_input)
-    name = user_input.split('.gi')[0]
-    plt.title(name)
-    name = name + ".gif"
+    anim = FuncAnimation(fig, animate_func, interval=100, frames=runtime, fargs = (F, lines, colors, tot))
+
+    plt.title(fname)
+    name = fname + ".gif"
     anim.save(name)
     plt.draw()
     plt.show()
@@ -53,53 +60,14 @@ def index_to_xy(index, width):
         x = index - (row * width) + 0.5
     return (x,y)
 
-def Where_reentry(time_data):
-    activated_sites = np.where(time_data == 1)[0]
-    sites = []
-    if len(activated_sites) > 0:
-        width = 50
-        mean_x = np.mean([index_to_xy(i, width)[0] for i in activated_sites]) #width = 50
-        check = 6
-        for i in activated_sites:
-            x = index_to_xy(i, width)[0]
-            if x > mean_x + 3:
-                check = 10
 
-        for i in activated_sites:
-            x,y = index_to_xy(i, width)
-            if x < mean_x - check:
-                sites.append((x,y,i))
-        return sites
-    else:
-        return []
+def animate_func(i, F, lines, colors, tot):
+    #global lines
+    #global colors
+    #global tot
 
-def Where_reentry_whole(F):
-    found = 0
-    i = 0
-    tot = 2500 #width * height
-    sites_found = {}
-    while found < 3 and i < len(F)/tot:
-        time_data = F[i * tot: (i+1) * tot]
-        sites = Where_reentry(time_data)
-        if len(sites) > 0 :
-            sites_found[i] = sites
-            found += 1
-        i += 1
-    return sites_found
-
-def animate(i, F, index):
-    global lines
-    global colors
-    global tot
-    '''j = index + i
-    if j > (len(F)/tot - 1):
-        j = j % 300'''
-    x = F[i*tot:(i+1)*tot]
+    x = F[i*tot:(i+1)*tot] #data for each time step.
     for k,item in enumerate(lines):
         level = x[k]
         color = colors[level]
         item.set_color(color)
-
-
-if __name__ == "__main__":
-    Animate_F()
