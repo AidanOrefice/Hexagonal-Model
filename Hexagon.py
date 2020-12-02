@@ -8,12 +8,8 @@ Create a simple animation to highlight the basic mechanics of lattice are workin
 
 import numpy as np
 import time
-import random
-from line_profiler import LineProfiler
 import matplotlib.pyplot as plt
 from configuration import *
-from Animation import Where_reentry
-from hexalattice.hexalattice import *
 import pandas as pd
 from itertools import groupby
 from operator import itemgetter
@@ -29,16 +25,6 @@ def choose_numbers(list1, prob):
         else:
             deleted_list.append(i)
     return new_list, deleted_list
-
-'''def Remove_random_bonds(self, n):
-    for i in range(n):
-        key = random.choice(list(self.neighbours))
-        while len(self.neighbours[key]) == 0:
-            key = random.choice(list(self.neighbours))
-        else:
-            neighbour = np.array([random.choice(list(self.neighbours[key]))])
-            self.neighbours[key] = np.setdiff1d(self.neighbours[key],neighbour)
-            self.neighbours[neighbour[0]] = np.setdiff1d(self.neighbours[neighbour[0]],key)'''
 
 class HexagonalLattice():
     '''
@@ -84,11 +70,6 @@ class HexagonalLattice():
             self.save_width = self.full_save
 
         self.title = title + str(self.seed)  + ',' 
-
-        '''#Initialise dataframe to save each run
-        columns = list(config.keys())
-        columns.append('seed')
-        self.df = pd.DataFrame(columns = columns)'''
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -429,7 +410,7 @@ def NormalModes():
     print('Runtime = %f s' % (t1-t0))
     
 
-def main():
+def main_no():
     t0 = time.time()
     print(config['normal_modes_config'])
     lattice = HexagonalLattice(config['width'],
@@ -471,8 +452,7 @@ def main():
     t1 = time.time()
     print('Runtime = %f s' % (t1-t0))
 
-if __name__ == '__main__':
-    main()
+
 
 
 
