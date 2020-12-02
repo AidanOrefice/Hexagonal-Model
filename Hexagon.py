@@ -225,6 +225,22 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
+    def Coupling_Sample(self):
+        fig,ax = plt.subplots()
+        x = [self.index_to_xy(i)[0] for i in range(2500)]
+        y = [self.index_to_xy(i)[1] for i in range(2500)]
+        a = ax.scatter(x,y,marker = 'h', s=17, c = self.coupling_sample, cmap=plt.cm.get_cmap('viridis', 7))
+        cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
+        cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
+
+        label_mean = 'Mean = ' + str(config['normal_modes_config'][3])
+        label_amp = 'Amplitude = ' + str(config['normal_modes_config'][2])
+        legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
+        plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
+        plt.savefig('CouplingSpaceSample.png')
+    
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
         self.ref[self.index_int] = 1
@@ -331,127 +347,7 @@ class HexagonalLattice():
         run.append(self.seed)
         return run
 
-def InitialDF():
-    columns = list(config.keys())
-    columns.extend(['seed', 'in AF?', '%time in AF'])
-    df = pd.DataFrame(columns=columns)
-    return df
-
-def NormalModes():
-    t0 = time.time()
-    df = InitialDF()
-    amps = np.linspace(0,0.5,21)
-    means = np.linspace(0,1,21)
-    print(means)
-    print(amps)
-    for k in means:
-        for i in amps:
-            print(i)
-            for j in range(51):
-                
-                lattice = HexagonalLattice(config['width'],
-                    config['height'],
-                    config['runtime'],
-                    config['threshold'],
-                    config['sigmoid_strength'],
-                    config['coupling'],
-                    config['refractory_period'],
-                    config['graph'],
-                    config['FullStateSave'],
-                    config['stats'],
-                    config['set_seed'])
-                
-                lattice.CreateLattice()
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,k],
-                config['grad_start'], config['grad_end'] )
-                run = lattice.RunIt()
-                run[13] = [0.25,1,i,k]
-
-                index = np.where(lattice.AF > 55)[0]
-                thing = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
-                thing = [i for i in thing if len(i) > 10]
-                len_thing = 0
-                if len(thing) > 0:
-                    in_AF = True
-                    for x in thing:
-                        len_thing += len(x)
-                else:
-                    in_AF = False
-
-                fraction_in_AF = len_thing/config['runtime']
-
-                run.extend([in_AF, fraction_in_AF]) 
-
-                df.loc[len(df)] = run
-    df.to_csv('Trial_Varying_Variance_PS_0.25.csv')
-
-    t1 = time.time()
-    print('Runtime = %f s' % (t1-t0))
-    
-
-def main_no():
-    t0 = time.time()
-    print(config['normal_modes_config'])
-    lattice = HexagonalLattice(config['width'],
-        config['height'],
-        config['runtime'],
-        config['threshold'],
-        config['sigmoid_strength'],
-        config['coupling'],
-        config['refractory_period'],
-        config['graph'],
-        config['FullStateSave'],
-        config['stats'],
-        config['set_seed'])
-    
-    lattice.CreateLattice()
-    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],
-     config['grad_start'], config['grad_end'] )
-    lattice.RunIt()
-
-    fig,ax = plt.subplots()
-    x = [lattice.index_to_xy(i)[0] for i in range(2500)]
-    y = [lattice.index_to_xy(i)[1] for i in range(2500)]
-    a = ax.scatter(x,y,marker = 'h', s=17, c = lattice.coupling_sample, cmap=plt.cm.get_cmap('viridis', 7))
-    cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
-    cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
-    #plt.clim(0, 1)
-
-    #fig.colorbar(a,shrink=0.75)
-    label_mean = 'Mean = ' + str(config['normal_modes_config'][3])
-    label_amp = 'Amplitude = ' + str(config['normal_modes_config'][2])
-
-    legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
-            Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
-    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
-    plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
-    
-    plt.savefig('CouplingShow.png')
-
-    t1 = time.time()
-    print('Runtime = %f s' % (t1-t0))
 
 
 
 
-
-
-'''seed = int(1e6)
-np.random.seed(seed)
-width = 50
-height = 50
-runtime = 1000
-threshold = 0.2
-sigmoid_strength = 20
-coupling = 0.7
-lattice = HexagonalLattice(width,height,runtime,threshold,sigmoid_strength, coupling)
-print("Width is:", str(width) + ", Height is:", str(height))
-f = open('settings.txt', 'w')
-f.write(str(width) + "," + str(height) + "," + str(runtime) + "," + str(threshold) + "," + str(sigmoid_strength) + "," + str(coupling) + "," + str(seed))
-lattice.CreateLattice()
-lattice.CoupleDel()
-
-lp = LineProfiler()
-lp_wrapper = lp(lattice.RunIt)
-lp_wrapper()
-lp.print_stats()'''
