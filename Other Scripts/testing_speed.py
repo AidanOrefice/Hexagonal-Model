@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from Animation import Animate_F
+from Animation import Animate
 from Hexagon import HexagonalLattice
 
 Runs = pd.read_csv('Trial_Varying_Variance_PS_0.25.csv')
@@ -75,7 +75,7 @@ def run_and_animate_random(row):
     name = (str(row['width']) + "," + str(row['height']) + "," + str(row['runtime']) + "," + str(row['threshold']) +
      "," + str(row['sigmoid_strength']) + "," + "Normal Modes" + "," + "," + str(row['refractory_period']) + "," )
     if bool_in:
-        Animate_F(Ref_His, i, name)
+        Animate(Ref_His, i, name)
 print(Runs.iloc[4970])
 run_and_animate_random(Runs.iloc[4970])
 

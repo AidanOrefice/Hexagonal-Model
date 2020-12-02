@@ -14,10 +14,6 @@ def Animate(fname, type):
     #data_file - filename of the .npy file 
     #type - type of animation to run e.g. full or transition.
 
-    #global colors
-    #global F
-    #global tot
-    #global lines
     colors = {0 : 'blue', 1 : 'red', 2 : 'black', 3 : 'black', 4 : 'black',
      5 : 'black', 6 : 'black', 7 : 'black', 8 : 'black', 9 : 'black', 10 : 'black', 11 : 'black', 12 : 'black'}
 
@@ -62,10 +58,6 @@ def index_to_xy(index, width):
 
 
 def animate_func(i, F, lines, colors, tot):
-    #global lines
-    #global colors
-    #global tot
-
     x = F[i*tot:(i+1)*tot] #data for each time step.
     for k,item in enumerate(lines):
         level = x[k]
