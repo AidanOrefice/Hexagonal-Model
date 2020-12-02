@@ -79,9 +79,7 @@ class HexagonalLattice():
         if self.full_save == 'full':
             self.save_width = self.runtime
         elif self.full_save == 'transition':
-            self.save_width = 300
-        else:
-            self.save_width = self.full_save
+            self.save_width = 150
 
         self.title = title + str(self.seed)  + ',' 
 
@@ -246,10 +244,8 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
-        #self.hexagon[index_init] = 100 
         self.ref[self.index_int] = 1
 
     def SigmoidDist(self,charges):
@@ -279,55 +275,42 @@ class HexagonalLattice():
         self.ref[self.ref >= 1] += 1
         self.ref[self.ref == self.ref_per] = 0
 
-    def in_AF(self):
-        #print(len(self.index_act))
-        if len(self.index_act) > self.height * 1.1:
-            return True
-        else:
-            return False
+    def Per_check(self, per):
+        indi = [(i*self.width) - 1 for i in range(self.height)]
+        pre_length = len(indi)
+        for i in range(self.width - int(self.width/5), self.pacing_period):
+            data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
+            indi = [i for i in indi if data[i] != 1]
+            if len(indi) < pre_length / 4
+                return [per[0] + 1, per[1] + 1]
+        return [per[0], per[1] + 1]
 
-    '''def save_df(self):
-        return run
-        self.df.loc[len(self.df)] = run'''
-    
-    def trans_save(self,i,j):
-        count_last_100 = np.sum(self.AF[self.t-100:self.t])
-        if (count_last_100 > 1.1 * self.height * len(self.AF[self.t-100:self.t]) and self.done):
-            j = 1
-            self.done = False
-        if j == (self.save_width - 150):
-            print('saving', self.t, i)
-            np.save(self.title + 'i_{}'.format(i) + '.npy', self.RefHistory)
-            j = 999
-        elif j > 0:
-            j += 1
-        if i < self.save_width:
-            self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
-            i += 1
+    def Stats_check(self):
+        if self.in_AF == False:
+            self.percolating = self.Per_check(self.percolating)
+            if self.AF_check():
+                self.in_AF = True
+                self.AF_time = (self.t - self.pacing_period, self.t + self.pacing_period)
+                self.AF_search()
         else:
-            self.RefHistory[0:len(self.ref)] = self.ref
-            i = 1
-        return i,j
+            if self.AF_check():
+                self.in_AF = True
+                self.AF_time = (self.t - self.pacing_period, self.t + self.pacing_period)
+                self.AF_search()
 
-    def length_save(self, i):
-        if i < self.save_width:
-            self.RefHistory[i*len(self.ref):(i+1)*len(self.ref)] = self.ref
-            i += 1
-        else:
-            self.RefHistory[0:len(self.ref)] = self.ref
-            i = 1
-        return i
+    def AF_check(self):
+        
+        pass
 
     def RunIt(self):
         self.t = 0
         self.sites_found = {}
-        if self.full_save != False:
-            self.RefHistory = np.zeros(((self.save_width)  * len(self.ref)), dtype = np.int16)
+        self.RefHistory = np.zeros(((self.runtime)  * len(self.ref)), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
-        i = 0
-        joke = 0
         self.done = True
+        self.in_AF = False
         print(self.seed)
+        self.percolating = [0,0]
         while self.t < self.runtime:
             if self.t == 0:
                 self.Initialise()
@@ -336,20 +319,13 @@ class HexagonalLattice():
                 self.ChargeProp()
                 if self.full_save != False:
                     self.RefHistory[0:len(self.ref)] = self.ref
-                i += 1
                 self.StateDevelop()
                 self.t += self.dt
             elif self.t % self.pacing_period == 0:
+                self.Stats_check()
                 self.Initialise()
             self.ActivationCheck()
-            if self.full_save == 'full':
-                self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
-            elif self.full_save == 'transition':
-                i,joke = self.trans_save(i,joke)
-            elif self.full_save == False:
-                pass
-            else:
-                i = self.length_save(i)
+            self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
             self.StateDevelop()
@@ -365,7 +341,8 @@ class HexagonalLattice():
             np.save(self.title + '.npy', self.RefHistory)
             #Basically the same as below, only save interesting bits
             #np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
-
+        elif self.full_save == 'transition' and AF:
+            np.save(self.title + '.npy', self.RefHistory[AF_time[0] * len(self.ref):AF_time[1] * len(self.ref)])
         # return the settings of each run
         run = list(config.values())
         run.append(self.seed)

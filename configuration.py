@@ -16,7 +16,7 @@ config = dict(
     normal_modes = False,  #A1,  A2, amp, mean
     normal_modes_config = [0.25, 1, 0.1  ,0.9],
     graph = False ,
-    FullStateSave = False,      #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
+    FullStateSave = False,      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
     stats = False
  )
 
