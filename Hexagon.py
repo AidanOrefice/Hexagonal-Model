@@ -262,7 +262,7 @@ class HexagonalLattice():
         for i in range(self.width - int(self.width/5), self.pacing_period):
             data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
             indi = [i for i in indi if data[i] != 1]
-            if len(indi) < pre_length / 4
+            if len(indi) < pre_length / 4:
                 return [per[0] + 1, per[1] + 1]
         return [per[0], per[1] + 1]
 
@@ -283,9 +283,19 @@ class HexagonalLattice():
         
         pass
 
+    def AF_search(self):
+        
+
+    def Graph(self):
+        f, ax = plt.subplots()
+        x = [i for i in range(len(self.AF))]
+        ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
+        ax.set_ylabel("Number of activated cells")
+        ax.set_xlabel("Time")
+        plt.savefig('Graphed' + '.png')  #################################
+
     def RunIt(self):
         self.t = 0
-        self.sites_found = {}
         self.RefHistory = np.zeros(((self.runtime)  * len(self.ref)), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         self.done = True
@@ -312,19 +322,11 @@ class HexagonalLattice():
             self.StateDevelop()
             self.t += self.dt
         if self.graph:
-            f, ax = plt.subplots()
-            x = [i for i in range(len(self.AF))]
-            ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
-            ax.set_ylabel("Number of activated cells")
-            ax.set_xlabel("Time")
-            plt.savefig('Graphed' + '.png')  #################################
+            self.Graph()
         if self.full_save == 'full':
             np.save(self.title + '.npy', self.RefHistory)
-            #Basically the same as below, only save interesting bits
-            #np.save('AF_timeline.npy', self.AF)#We won't save this, run statistics off this or maybe in code, good first spot
-        elif self.full_save == 'transition' and AF:
-            np.save(self.title + '.npy', self.RefHistory[AF_time[0] * len(self.ref):AF_time[1] * len(self.ref)])
-        # return the settings of each run
+        elif self.full_save == 'transition' and self.in_AF:
+            np.save(self.title + '.npy', self.RefHistory[self.AF_time[0] * len(self.ref):self.AF_time[1] * len(self.ref)])
         run = list(config.values())
         run.append(self.seed)
         return run
