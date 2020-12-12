@@ -349,7 +349,7 @@ class HexagonalLattice():
                 AF_time = int(self.result2[1])
             else:
                AF_time = min(self.result2[1], self.result3[1])
-        self.AF_time = (min(AF_time - 30,0), min(AF_time + 30,self.runtime))
+        self.AF_time = (max(AF_time - 30,0), min(AF_time + 30,self.runtime))
 
     def Graph(self):
         f, ax = plt.subplots()
