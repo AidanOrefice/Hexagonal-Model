@@ -43,8 +43,8 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = [1]#np.linspace(0,0.5,21)
-    means = [0.5]#np.linspace(0,1,21)
+    amps = [0.15]#np.linspace(0,0.5,21)
+    means = [0.3]#np.linspace(0,1,21)
     print(means)
     print(amps)
     for k in means:
