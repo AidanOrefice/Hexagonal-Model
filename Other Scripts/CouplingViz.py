@@ -10,10 +10,10 @@ Script that visualises the coupling in the lattice.
 
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
-amp = 0.3
-mean = 0.7
+amp = 0.2
+mean = 0.6
 A1 = 0.25
-A2 = 2
+A2 = 1
 
 def sinusoid2D(x, y, A1=A1, A2=A2,  amp = amp, mean = mean):
     #Amplitude - directly sets the amplitude of the function
@@ -53,8 +53,8 @@ print(np.var(sin_z))
 print(np.std(sin_z))
 
 
-legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.7', markerfacecolor='white', markersize=0),
-            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.3', markerfacecolor='white', markersize=0)]
+legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.6', markerfacecolor='white', markersize=0),
+            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.2', markerfacecolor='white', markersize=0)]
 
 
 
