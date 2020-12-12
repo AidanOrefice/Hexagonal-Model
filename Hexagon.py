@@ -289,16 +289,23 @@ class HexagonalLattice():
             if self.AF_check():
                 self.in_AF = True
                 self.AF_search()
+        else:
+            if self.AF_check():
+                self.in_AF = True
+                self.AF_search()
+            else:
+                self.in_AF = False
+        self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
 
     def AF_check(self):
         if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
-            print('hi'+ str(self.t))
+            #print('hi'+ str(self.t))
             return True
         width_dif = int((self.pacing_period - self.width) / 2)
         avg_over_dif = sum(self.AF[self.t - width_dif:self.t]) / width_dif
         avg_over_norm = sum(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2]) / len(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2])
-        if avg_over_dif > avg_over_norm / 8:
-            print('hi;' + str(self.t))
+        if avg_over_dif > avg_over_norm / 6:
+            #print('hi;' + str(self.t))
             return True
         else:
             return False
@@ -313,6 +320,7 @@ class HexagonalLattice():
                     return (i,j)
                 else:
                     sites[i] = 1
+        return False
 
     def Search_Meth3(self):
         for j in range(self.t + 1 - self.pacing_period, self.t):
@@ -323,12 +331,22 @@ class HexagonalLattice():
             for i in activated_sites:
                 if self.index_to_xy(i)[0] < min_ref_sites_x:
                     return (i,j)
+        return False
 
     def AF_search(self):
         self.result2 = self.Search_Meth2()#In form (index, time)
         self.result3 = self.Search_Meth3()#In form (index, time)
-        AF_time = int((self.result2[1] + self.result3[1]) / 2)
-        self.AF_time = (AF_time - 15, AF_time + 15)
+        if self.result2 == False:
+            if self.result3 == False:
+                pass
+            else:
+               AF_time = int(self.result3[1])
+        else:
+            if self.result3 == False:
+                AF_time = int(self.result2[1])
+            else:
+               AF_time = min(self.result2[1], self.result3[1])
+        self.AF_time = (AF_time - 30, AF_time + 30)
 
     def Graph(self):
         f, ax = plt.subplots()
@@ -338,12 +356,27 @@ class HexagonalLattice():
         ax.set_xlabel("Time")
         plt.savefig('Graphed' + '.png')  #################################
 
+    def save_choice(self):
+        #AF Start time and location
+        beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
+        consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
+        consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
+        AF_beat = consec_AF_beats_3[0][0] * 100
+        data = [i for i in self.AF_bool if i[0] == AF_beat]#Beat, AF?, AF_time top be saved, method2 location/time, method 3 location/time
+        print(data)
+        print('Location of search method 2, 3')
+        print(self.index_to_xy(data[0][3][1]), str(" , "),  self.index_to_xy(data[0][4][1]))
+        self.AF_time = data[0][2]
+        self.result2 = data[0][3]
+        self.result3 = data[0][4]
+
     def RunIt(self):
         self.t = 0
         self.RefHistory = np.zeros(((self.runtime)  * len(self.ref)), dtype = np.int16)
         self.AF = np.zeros(self.runtime, dtype = np.int16)
         self.done = True
         self.in_AF = False
+        self.AF_bool = []
         print(self.seed)
         self.percolating = [0,0]
         while self.t < self.runtime:
@@ -358,7 +391,6 @@ class HexagonalLattice():
                 self.t += self.dt
             elif self.t % self.pacing_period == 0:
                 self.Stats_check()
-                print(self.percolating)
                 self.Initialise()
             self.ActivationCheck()
             self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
@@ -366,6 +398,7 @@ class HexagonalLattice():
             self.ChargeProp()
             self.StateDevelop()
             self.t += self.dt
+        self.save_choice()
         if self.graph:
             self.Graph()
         if self.full_save == 'full':

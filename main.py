@@ -49,7 +49,6 @@ def NormalModesPS():
     print(amps)
     for k in means:
         for i in amps:
-            print(i)
             for _ in range(1):
                 lattice = InitialLattice()
 
@@ -63,6 +62,7 @@ def NormalModesPS():
 
                 run.extend([in_AF, fraction_in_AF]) 
                 df.loc[len(df)] = run
+                print([i[0] for i in lattice.AF_bool if i[1] == True])
     df.to_csv('Prelim.csv')
     return df
 

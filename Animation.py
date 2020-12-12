@@ -38,7 +38,7 @@ def Animate(fname, type, loc1, loc2):
     for i in range(tot):
         x,y = index_to_xy(i,width) #Getting the real space coordinates.
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate_func_loc, interval=1000, frames=runtime, fargs = (F, lines, colors, tot, loc1, loc2))
+    anim = FuncAnimation(fig, animate_func_loc, interval=500, frames=runtime, fargs = (F, lines, colors, tot, loc1, loc2))
 
     plt.title(fname)
     name = fname + ".gif"
