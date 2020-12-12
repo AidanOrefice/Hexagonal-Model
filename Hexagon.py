@@ -289,13 +289,16 @@ class HexagonalLattice():
             if self.AF_check():
                 self.in_AF = True
                 self.AF_search()
+                self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
+            else:
+                self.AF_bool.append((self.t, self.in_AF, (0,0), (0,0), (0,0)))
         else:
             if self.AF_check():
                 self.in_AF = True
                 self.AF_search()
             else:
                 self.in_AF = False
-        self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
+            self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
 
     def AF_check(self):
         if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
@@ -398,7 +401,8 @@ class HexagonalLattice():
             self.ChargeProp()
             self.StateDevelop()
             self.t += self.dt
-        self.save_choice()
+        if self.in_AF:
+            self.save_choice()
         if self.graph:
             self.Graph()
         if self.full_save == 'full':
