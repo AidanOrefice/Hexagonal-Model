@@ -368,7 +368,7 @@ class HexagonalLattice():
         data = [i for i in self.AF_bool if i[0] == AF_beat]#Beat, AF?, AF_time top be saved, method2 location/time, method 3 location/time
         print(data)
         print('Location of search method 2, 3')
-        print(self.index_to_xy(data[0][3][1]), str(" , "),  self.index_to_xy(data[0][4][1]))
+        print(self.index_to_xy(data[0][3][0]), str(" , "),  self.index_to_xy(data[0][4][0]))
         self.AF_time = data[0][2]
         self.result2 = data[0][3]
         self.result3 = data[0][4]
