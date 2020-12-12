@@ -53,11 +53,11 @@ class HexagonalLattice():
         self.ref_per = refractory_period + 2
         self.graph = graph
         self.full_save = FullStateMethod #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
-        self.pacing_period = 75
+        self.pacing_period = width * 2
         self.stats = stats
         
         if seed == 0:
-            self.seed = np.random.randint(0,int(1e7))
+            self.seed = np.random.randint(0,int(2**32 - 1))
         else:
             self.seed = seed
         np.random.seed(self.seed)
@@ -67,7 +67,7 @@ class HexagonalLattice():
         elif self.full_save == 'transition':
             self.save_width = 150
 
-        self.title = title + str(self.seed)  + ',' 
+        self.title = title + str(self.seed)
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
         if not(self.width % 2 == 0) or not(self.height % 2 == 0):
@@ -273,12 +273,13 @@ class HexagonalLattice():
         self.ref[self.ref == self.ref_per] = 0
 
     def Per_check(self, per):
-        indi = [(i*self.width) - 1 for i in range(self.height)]
+        indi = [(i*self.width) - 1 for i in range(1,self.height + 1)]
         pre_length = len(indi)
         for i in range(self.width - int(self.width/5), self.pacing_period):
             data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
-            indi = [i for i in indi if data[i] != 1]
+            indi = [i for i in indi if data[i] != 0]
             if len(indi) < pre_length / 4:
+                self.per = True
                 return [per[0] + 1, per[1] + 1]
         return [per[0], per[1] + 1]
 
@@ -287,20 +288,47 @@ class HexagonalLattice():
             self.percolating = self.Per_check(self.percolating)
             if self.AF_check():
                 self.in_AF = True
-                self.AF_time = (self.t - self.pacing_period, self.t + self.pacing_period)
-                self.AF_search()
-        else:
-            if self.AF_check():
-                self.in_AF = True
-                self.AF_time = (self.t - self.pacing_period, self.t + self.pacing_period)
                 self.AF_search()
 
     def AF_check(self):
-        
-        pass
+        if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
+            print('hi'+ str(self.t))
+            return True
+        width_dif = int((self.pacing_period - self.width) / 2)
+        avg_over_dif = sum(self.AF[self.t - width_dif:self.t]) / width_dif
+        avg_over_norm = sum(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2]) / len(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2])
+        if avg_over_dif > avg_over_norm / 8:
+            print('hi;' + str(self.t))
+            return True
+        else:
+            return False
+
+    def Search_Meth2(self):
+        sites = {}
+        for j in range(self.t + 1 - self.pacing_period, self.t):
+            time_data = self.RefHistory[j*len(self.ref):(j+1)*len(self.ref)]
+            activated_sites = np.where(time_data == 1)[0]
+            for i in activated_sites:
+                if i in list(sites.keys()):
+                    return (i,j)
+                else:
+                    sites[i] = 1
+
+    def Search_Meth3(self):
+        for j in range(self.t + 1 - self.pacing_period, self.t):
+            time_data = self.RefHistory[j*len(self.ref):(j+1)*len(self.ref)]
+            ref_sites = np.where(time_data > 1)[0]
+            min_ref_sites_x = min([self.index_to_xy(i)[0] for i in ref_sites])
+            activated_sites = np.where(time_data == 1)[0]
+            for i in activated_sites:
+                if self.index_to_xy(i)[0] < min_ref_sites_x:
+                    return (i,j)
 
     def AF_search(self):
-        
+        self.result2 = self.Search_Meth2()#In form (index, time)
+        self.result3 = self.Search_Meth3()#In form (index, time)
+        AF_time = int((self.result2[1] + self.result3[1]) / 2)
+        self.AF_time = (AF_time - 15, AF_time + 15)
 
     def Graph(self):
         f, ax = plt.subplots()
@@ -330,6 +358,7 @@ class HexagonalLattice():
                 self.t += self.dt
             elif self.t % self.pacing_period == 0:
                 self.Stats_check()
+                print(self.percolating)
                 self.Initialise()
             self.ActivationCheck()
             self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
@@ -345,6 +374,18 @@ class HexagonalLattice():
             np.save(self.title + '.npy', self.RefHistory[self.AF_time[0] * len(self.ref):self.AF_time[1] * len(self.ref)])
         run = list(config.values())
         run.append(self.seed)
+        if self.in_AF:
+            run.append(self.result2[0])#Location_method2
+            run.append(self.result2[1])#Time_method1
+            run.append(self.result3[0])#Location_method3
+            run.append(self.result3[1])#Time_method1
+        else:
+            run.append(None)#Location_method2
+            run.append(None)#Time_method1
+            run.append(None)#Location_method3
+            run.append(None)#Time_method1
+        run.append(self.percolating[0] / self.percolating[1])
+        run.append(self.title)
         return run
 
 

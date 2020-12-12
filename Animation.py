@@ -10,7 +10,7 @@ import time
 
 #Needs to be generalised for a full run and for a transition.
 
-def Animate(fname, type):
+def Animate(fname, type, loc1, loc2):
     #data_file - filename of the .npy file 
     #type - type of animation to run e.g. full or transition.
 
@@ -38,13 +38,11 @@ def Animate(fname, type):
     for i in range(tot):
         x,y = index_to_xy(i,width) #Getting the real space coordinates.
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
-    anim = FuncAnimation(fig, animate_func, interval=100, frames=runtime, fargs = (F, lines, colors, tot))
+    anim = FuncAnimation(fig, animate_func_loc, interval=1000, frames=runtime, fargs = (F, lines, colors, tot, loc1, loc2))
 
     plt.title(fname)
     name = fname + ".gif"
     anim.save(name)
-    plt.draw()
-    plt.show()
 
 def index_to_xy(index, width):
     row = np.floor(index / width)
@@ -63,3 +61,12 @@ def animate_func(i, F, lines, colors, tot):
         level = x[k]
         color = colors[level]
         item.set_color(color)
+
+def animate_func_loc(i, F, lines, colors, tot, loc1, loc2):
+    x = F[i*tot:(i+1)*tot] #data for each time step.
+    for k,item in enumerate(lines):
+        level = x[k]
+        color = colors[level]
+        item.set_color(color)
+    lines[loc1].set_color('green')
+    lines[loc2].set_color('yellow')

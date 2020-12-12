@@ -3,20 +3,20 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 500,
+    runtime = 1500,
     threshold = 0.25,
     sigmoid_strength = 25,
-    coupling = 0.66,
+    coupling = 0.55,
     refractory_period = 10,
     set_seed = 0, #0 if not setting, put number if you want to call a seed.
-    constant = True,
+    constant = False,
     gradient = False,
     grad_start = 0.3,
     grad_end = 0.4,
-    normal_modes = False,  #A1,  A2, amp, mean
+    normal_modes = True,  #A1,  A2, amp, mean
     normal_modes_config = [0.25, 1, 0.1  ,0.9],
-    graph = False ,
-    FullStateSave = False,      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
+    graph = True ,
+    FullStateSave = 'transition',      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
     stats = False
  )
 

@@ -21,7 +21,7 @@ def InitialLattice():
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed', 'in AF?', '%time in AF']) #Other columns - need animate? and fname
+    columns.extend(['seed','Location_1','Time_1','Location_2','Time_2', 'Per_%', 'title', 'in AF?', '%time in AF',]) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -43,15 +43,14 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = np.linspace(0,0.5,21)
-    means = np.linspace(0,1,21)
+    amps = [0.5]#np.linspace(0,0.5,21)
+    means = [0.3]#np.linspace(0,1,21)
     print(means)
     print(amps)
     for k in means:
         for i in amps:
             print(i)
-            for _ in range(51):
-                
+            for _ in range(1):
                 lattice = InitialLattice()
 
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,k],
@@ -65,6 +64,7 @@ def NormalModesPS():
                 run.extend([in_AF, fraction_in_AF]) 
                 df.loc[len(df)] = run
     df.to_csv('Prelim.csv')
+    return df
 
 def main():
     t0 = time.time()
@@ -78,7 +78,8 @@ def main():
     print(t1-t0)
 
 if __name__ == '__main__':
-    main()
+    df = NormalModesPS()
+    Animate(df.loc[0,'title'], 'transition', int(df.loc[0,'Location_1']), int(df.loc[0,'Location_2']))
 
 
 
