@@ -21,7 +21,7 @@ def InitialLattice():
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','Location_1','Time_1','Location_2','Time_2', 'Per_%', 'title', 'in AF?', '%time in AF',]) #Other columns - need animate? and fname
+    columns.extend(['seed', 'location_2', 'location_3', 'location_4', 'AF_time', 'per_%', 'title', 'in AF?', '%time in AF',]) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -43,8 +43,8 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = [0.15]#np.linspace(0,0.5,21)
-    means = [0.3]#np.linspace(0,1,21)
+    amps = [0]#np.linspace(0,0.5,21)
+    means = [0.8]#np.linspace(0,1,21)
     print(means)
     print(amps)
     for k in means:
@@ -79,7 +79,9 @@ def main():
 
 if __name__ == '__main__':
     df = NormalModesPS()
-    Animate(df.loc[0,'title'], 'transition', int(df.loc[0,'Location_1']), int(df.loc[0,'Location_2']))
+    print('hi')
+    print(df.loc[0,'location_4'])
+    Animate(df.loc[0,'title'], 'transition', df.loc[0,'location_2'], df.loc[0,'location_3'], df.loc[0,'location_4'])
 
 
 

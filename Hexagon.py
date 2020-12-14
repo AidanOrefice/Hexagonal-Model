@@ -273,7 +273,7 @@ class HexagonalLattice():
         self.ref[self.ref == self.ref_per] = 0
 
     def Per_check(self, per):
-        indi = [(i*self.width) - 1 for i in range(1,self.height + 1)]
+        indi = [(i*self.width) - 1 for i in range(1,self.height + 1)]#Indexs of right hand side
         pre_length = len(indi)
         for i in range(self.width - int(self.width/5), self.pacing_period):
             data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
@@ -288,17 +288,15 @@ class HexagonalLattice():
             self.percolating = self.Per_check(self.percolating)
             if self.AF_check():
                 self.in_AF = True
-                self.AF_search()
-                self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
+                self.AF_bool.append((self.t, self.in_AF))
             else:
-                self.AF_bool.append((self.t, self.in_AF, (0,0), (0,0), (0,0)))
+                self.AF_bool.append((self.t, self.in_AF))
         else:
             if self.AF_check():
                 self.in_AF = True
-                self.AF_search()
             else:
                 self.in_AF = False
-            self.AF_bool.append((self.t, self.in_AF, self.AF_time, self.result2, self.result3))
+            self.AF_bool.append((self.t, self.in_AF))
 
     def AF_check(self):
         if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
@@ -315,41 +313,28 @@ class HexagonalLattice():
 
     def Search_Meth2(self):
         sites = {}
-        for j in range(self.t + 1 - self.pacing_period, self.t):
+        re_sites = {2:True, 3:True, 4:True}
+        for j in range(self.AF_first_beat - self.pacing_period + 1, self.AF_last_beat):
             time_data = self.RefHistory[j*len(self.ref):(j+1)*len(self.ref)]
             activated_sites = np.where(time_data == 1)[0]
             for i in activated_sites:
                 if i in list(sites.keys()):
-                    return (i,j)
+                    sites[i] += 1
+                    if re_sites[2] == True:
+                        if sites[i] == 2:
+                            re_sites[2] = i
+                            self.AF_time = (max(j-30,1), j+30)
+                            print(self.AF_time)
+                    if re_sites[3] == True:
+                        if sites[i] == 3:
+                            re_sites[3] = i
+                    if re_sites[4] == True:
+                        if sites[i] == 4:
+                            re_sites[4] = i
+                            return re_sites
                 else:
                     sites[i] = 1
-        return False
-
-    def Search_Meth3(self):
-        for j in range(self.t + 1 - self.pacing_period, self.t):
-            time_data = self.RefHistory[j*len(self.ref):(j+1)*len(self.ref)]
-            ref_sites = np.where(time_data > 1)[0]
-            min_ref_sites_x = min([self.index_to_xy(i)[0] for i in ref_sites])
-            activated_sites = np.where(time_data == 1)[0]
-            for i in activated_sites:
-                if self.index_to_xy(i)[0] < min_ref_sites_x:
-                    return (i,j)
-        return False
-
-    def AF_search(self):
-        self.result2 = self.Search_Meth2()#In form (index, time)
-        self.result3 = self.Search_Meth3()#In form (index, time)
-        if self.result2 == False:
-            if self.result3 == False:
-                pass
-            else:
-               AF_time = int(self.result3[1])
-        else:
-            if self.result3 == False:
-                AF_time = int(self.result2[1])
-            else:
-               AF_time = min(self.result2[1], self.result3[1])
-        self.AF_time = (max(AF_time - 30,0), min(AF_time + 30,self.runtime))
+        return re_sites
 
     def Graph(self):
         f, ax = plt.subplots()
@@ -364,14 +349,12 @@ class HexagonalLattice():
         beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
         consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
         consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
-        AF_beat = consec_AF_beats_3[0][0] * 100
-        data = [i for i in self.AF_bool if i[0] == AF_beat]#Beat, AF?, AF_time top be saved, method2 location/time, method 3 location/time
-        print(data)
-        print('Location of search method 2, 3')
-        print(self.index_to_xy(data[0][3][0]), str(" , "),  self.index_to_xy(data[0][4][0]))
-        self.AF_time = data[0][2]
-        self.result2 = data[0][3]
-        self.result3 = data[0][4]
+        print(consec_AF_beats_3)
+        self.AF_first_beat = consec_AF_beats_3[0][0] * 100
+        self.AF_last_beat = consec_AF_beats_3[0][-1] * 100
+        print(self.AF_first_beat, self.AF_last_beat)
+        self.re_sites = self.Search_Meth2()
+        print(self.re_sites)
 
     def RunIt(self):
         self.t = 0
@@ -403,23 +386,25 @@ class HexagonalLattice():
             self.t += self.dt
         if self.graph:
             self.Graph()
-        self.save_choice()
+        if self.in_AF:
+            self.save_choice()
         if self.full_save == 'full':
             np.save(self.title + '.npy', self.RefHistory)
         elif self.full_save == 'transition' and self.in_AF:
             np.save(self.title + '.npy', self.RefHistory[self.AF_time[0] * len(self.ref):self.AF_time[1] * len(self.ref)])
         run = list(config.values())
         run.append(self.seed)
+        #'location_2', 'location_3', 'location_4', 'AF_time',
         if self.in_AF:
-            run.append(self.result2[0])#Location_method2
-            run.append(self.result2[1])#Time_method1
-            run.append(self.result3[0])#Location_method3
-            run.append(self.result3[1])#Time_method1
+            run.append(self.re_sites[2])
+            run.append(self.re_sites[3])
+            run.append(self.re_sites[4])
+            run.append(self.AF_time)
         else:
-            run.append(None)#Location_method2
-            run.append(None)#Time_method1
-            run.append(None)#Location_method3
-            run.append(None)#Time_method1
+            run.append(False)
+            run.append(False)
+            run.append(False)
+            run.append(False)
         run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run
