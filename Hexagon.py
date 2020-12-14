@@ -278,7 +278,7 @@ class HexagonalLattice():
         for i in range(self.width - int(self.width/5), self.pacing_period):
             data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
             indi = [i for i in indi if data[i] != 0]
-            if len(indi) < pre_length / 4:
+            if len(indi) < pre_length / 4: #Arbitrary fraction
                 self.per = True
                 return [per[0] + 1, per[1] + 1]
         return [per[0], per[1] + 1]
@@ -300,18 +300,16 @@ class HexagonalLattice():
 
     def AF_check(self):
         if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
-            #print('hi'+ str(self.t))
-            return True
-        width_dif = int((self.pacing_period - self.width) / 2)
+            return True #If sum of activ. sites over pacing period > 1.1 * expected number of activate --> FIBRILLATION.
+        width_dif = int((self.pacing_period - self.width) / 2)  #Checking if sites are activated at end of beat - trying to catch special cases
         avg_over_dif = sum(self.AF[self.t - width_dif:self.t]) / width_dif
         avg_over_norm = sum(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2]) / len(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2])
-        if avg_over_dif > avg_over_norm / 6:
-            #print('hi;' + str(self.t))
+        if avg_over_dif > avg_over_norm / 6: #6 is an arbitrary fraction
             return True
         else:
             return False
 
-    def Search_Meth2(self):
+    def Search_Meth2(self): #Searches for the 2nd, 3rd and 4th re-excited sites. Returns time of 2nd re-excitation.
         sites = {}
         re_sites = {2:True, 3:True, 4:True}
         for j in range(self.AF_first_beat - self.pacing_period + 1, self.AF_last_beat):
@@ -324,7 +322,7 @@ class HexagonalLattice():
                         if sites[i] == 2:
                             re_sites[2] = i
                             self.AF_time = (max(j-30,1), j+30)
-                            print(self.AF_time)
+                            print(self.AF_time)  #Transition time range
                     if re_sites[3] == True:
                         if sites[i] == 3:
                             re_sites[3] = i
@@ -344,16 +342,15 @@ class HexagonalLattice():
         ax.set_xlabel("Time")
         plt.savefig('Graphed' + '.png')  #################################
 
-    def save_choice(self):
+    def save_choice(self): #Run once at end
         #AF Start time and location
         beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
         consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
         consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
-        print(consec_AF_beats_3)
-        self.AF_first_beat = consec_AF_beats_3[0][0] * 100
-        self.AF_last_beat = consec_AF_beats_3[0][-1] * 100
+        self.AF_first_beat = consec_AF_beats_3[0][0] * 100  #first beat after fib starts
+        self.AF_last_beat = consec_AF_beats_3[0][-1] * 100  #last beat after fib starts
         print(self.AF_first_beat, self.AF_last_beat)
-        self.re_sites = self.Search_Meth2()
+        self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites.
         print(self.re_sites)
 
     def RunIt(self):
