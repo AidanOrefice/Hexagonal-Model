@@ -3,12 +3,12 @@ import numpy as np
 config = dict(
     width = 50,
     height = 50,
-    runtime = 2000,
+    runtime = 20000,
     threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
     refractory_period = 10,
-    set_seed = 0, #0 if not setting, put number if you want to call a seed.
+    set_seed = 238207504, #0 if not setting, put number if you want to call a seed.
     constant = False,
     gradient = False,
     grad_start = 0.3,

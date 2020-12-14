@@ -167,7 +167,7 @@ class HexagonalLattice():
             x = index - (row * self.width) + 0.5
         return (x,y)
     
-    def sinusoid2D(self, x, y,  amp, mean, A1 = 0.25, A2 = 0.25):
+    def sinusoid2D(self, x, y,  amp, mean, A1 = 0.25, A2 =1):
         #Amplitude - directly sets the amplitude of the function
         #Mean - directly sets the offset/mean of the function.
         # 0 < (Mean +/- amp) < 1 
@@ -214,7 +214,7 @@ class HexagonalLattice():
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
                 deleted_dic[i] = deleted            
-            self.coupling_sample = [len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()]
+            self.coupling_samp = [len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()]
 
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
@@ -225,16 +225,16 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-    def Coupling_Sample(self):
+    def Coupling_Sample(self, mean, amp):
         fig,ax = plt.subplots()
         x = [self.index_to_xy(i)[0] for i in range(2500)]
         y = [self.index_to_xy(i)[1] for i in range(2500)]
-        a = ax.scatter(x,y,marker = 'h', s=17, c = self.coupling_sample, cmap=plt.cm.get_cmap('viridis', 7))
+        a = ax.scatter(x,y,marker = 'h', s=17, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
         cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
         cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
 
-        label_mean = 'Mean = ' + str(config['normal_modes_config'][3])
-        label_amp = 'Amplitude = ' + str(config['normal_modes_config'][2])
+        label_mean = 'Mean = ' + str(mean)
+        label_amp = 'Amplitude = ' + str(amp)
         legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
                 Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)

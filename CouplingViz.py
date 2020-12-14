@@ -10,8 +10,8 @@ Script that visualises the coupling in the lattice.
 
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
-amp = 0.2
-mean = 0.6
+amp = 0.5
+mean = 0.2
 A1 = 0.25
 A2 = 1
 
@@ -52,9 +52,11 @@ print(np.mean(sin_z))
 print(np.var(sin_z))
 print(np.std(sin_z))
 
+label_mean = 'Mean = ' + str(mean)
+label_amp = 'Amplitdue = ' + str(amp)
 
-legend_elements = [Line2D([0], [0], marker='o', color='white', label='Mean = 0.6', markerfacecolor='white', markersize=0),
-            Line2D([0], [0], marker='o', color='white', label='Amplitude = 0.2', markerfacecolor='white', markersize=0)]
+legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+            Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
 
 
 

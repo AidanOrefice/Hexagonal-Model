@@ -43,8 +43,8 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = [0]#np.linspace(0,0.5,21)
-    means = [0.5]#np.linspace(0,1,21)
+    amps = [99999]#np.linspace(0,0.5,21)
+    means = [0.50]#np.linspace(0,1,21)
     for k in means:
         print('Offset:', k)
         for i in amps:
@@ -63,6 +63,7 @@ def NormalModesPS():
                 run.extend([in_AF, fraction_in_AF]) 
                 df.loc[len(df)] = run
                 print([i[0] for i in lattice.AF_bool if i[1] == True])
+                #lattice.Coupling_Sample(k,i)
     df.to_csv('Prelim.csv')
     return df
 
