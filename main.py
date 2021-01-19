@@ -43,9 +43,10 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = [99999]#np.linspace(0,0.5,21)
-    means = [0.50]#np.linspace(0,1,21)
-    for k in means:
+    amps = np.linspace(0,0.5,25)
+    amps = np.append(amps, [0.75,1,2,5,10])
+    offs = np.linspace(0.2,0.8,30)  #Same width in each direction.
+    for k in offs:
         print('Offset:', k)
         for i in amps:
             print('Amplitude:', i)
@@ -63,24 +64,25 @@ def NormalModesPS():
                 run.extend([in_AF, fraction_in_AF]) 
                 df.loc[len(df)] = run
                 print([i[0] for i in lattice.AF_bool if i[1] == True])
-                #lattice.Coupling_Sample(k,i)
+                lattice.Coupling_Sample(k,i)
     df.to_csv('Prelim.csv')
     return df
 
 def main():
     t0 = time.time()
 
+    df = NormalModesPS()
+    """
     lattice = InitialLattice()
     lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],
      config['grad_start'], config['grad_end'] )
-    lattice.RunIt()
+    lattice.RunIt()"""
     
     t1 = time.time()
     print(t1-t0)
 
 if __name__ == '__main__':
-    df = NormalModesPS()
-    Animate(df.loc[0,'title'], 'transition', df.loc[0,'location_2'], df.loc[0,'location_3'], df.loc[0,'location_4'])
+    main()
 
 
 
