@@ -6,9 +6,9 @@ import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
 
-Runs = pd.read_csv('Trial_Varying_Variance_PS_0.25.csv')
+Runs = pd.read_csv('Prelim.csv')
 
-'''for index, row in Runs.iterrows():
+for index, row in Runs.iterrows():
     list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
     Runs.loc[index, 'normal_beta'] = float(list_[3].strip())
     Runs.loc[index, 'normal_alpha'] = float(list_[2].strip())
@@ -22,16 +22,16 @@ print(map_beta)
 tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
 print(tot_count)
 PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+#PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
 print(PS.shape)
 for index, row in Runs.iterrows():
     if row['in AF?']:
         x = map_beta[row['normal_beta']]
         y = map_alpha[row['normal_alpha']]
         PS[y][x] += 1
-        PS_time[y][x] += row['%time in AF']
+        #PS_time[y][x] += row['%time in AF']
 PS_per = PS / tot_count
-PS_time = PS_time / tot_count
+#PS_time = PS_time / tot_count
 df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
 df.columns = np.round(df.columns*100)/100
@@ -40,10 +40,10 @@ sns.heatmap(df, ax = ax)
 ax.tick_params(axis='y', rotation=0)
 ax.set_xlabel('Mean')
 ax.set_ylabel('Amplitude')
-ax.set_title('% time simulation entered AF')
+ax.set_title('Fraction of simulations that entered fibrillation')
 plt.savefig('PS_25_large_colourmap')
 
-df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
+'''df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
 df.columns = np.round(df.columns*100)/100
 f, ax = plt.subplots()
@@ -52,7 +52,7 @@ ax.tick_params(axis='y', rotation=0)
 ax.set_xlabel('Mean')
 ax.set_ylabel('Amplitude')
 ax.set_title('Average % time simulations in spent AF')
-plt.savefig('PS_25_large_colourmap_time')
+plt.savefig('PS_25_large_colourmap_time')'''
 '''
 def run_and_animate_random(row):
     lattice = HexagonalLattice(row['width'],
@@ -77,7 +77,7 @@ def run_and_animate_random(row):
     if bool_in:
         Animate(Ref_His, i, name)
 print(Runs.iloc[4970])
-run_and_animate_random(Runs.iloc[4970])
+run_and_animate_random(Runs.iloc[4970])'''
 
 '''freq_table = {}
 freq_table_true = {}
@@ -121,17 +121,3 @@ plt.bar(x,y, width = 0.01)
 plt.ylabel('% time spent in AF')
 plt.xlabel('Alpha, (bigger values = bigger ranges)')
 plt.savefig('bar_5_1' + '.png')'''
-'''data = np.random.randint(2,size = 10000)
-start = time()
-for i in range(100000):
-    np.where(data == 1)[0]
-end = time()
-print(start-end)
-
-start = time()
-for i in range(100000):
-    data == 1
-end = time()
-print(start-end)
-string = 'hi_{}'.format('sjkhdfgjkshldgfjkhsd')
-print(string)'''

@@ -42,7 +42,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, FullStateMethod = 'full', stats = False, seed = 0):
+     graph = False, FullStateMethod = False, stats = False, seed = 0):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -225,7 +225,7 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-    def Coupling_Sample(self, mean, amp):
+    '''def Coupling_Sample(self, mean, amp):
         fig,ax = plt.subplots()
         x = [self.index_to_xy(i)[0] for i in range(2500)]
         y = [self.index_to_xy(i)[1] for i in range(2500)]
@@ -239,7 +239,7 @@ class HexagonalLattice():
                 Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
-        plt.savefig('CouplingSpaceSample.png')
+        plt.savefig('CouplingSpaceSample.png')'''
     
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
@@ -347,11 +347,11 @@ class HexagonalLattice():
         beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
         consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
         consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
-        self.AF_first_beat = consec_AF_beats_3[0][0] * 100  #first beat after fib starts
-        self.AF_last_beat = consec_AF_beats_3[0][-1] * 100  #last beat after fib starts
-        print(self.AF_first_beat, self.AF_last_beat)
-        self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites.
-        print(self.re_sites)
+        if len(consec_AF_beats_3) > 0:
+            self.AF_first_beat = consec_AF_beats_3[0][0] * self.pacing_period * 2  #first beat after fib starts
+            self.AF_last_beat = consec_AF_beats_3[0][-1] * self.pacing_period * 2  #last beat after fib starts
+            #self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites. Uncomment when doing location stuff
+            self.kill = True
 
     def RunIt(self):
         self.t = 0
@@ -360,7 +360,7 @@ class HexagonalLattice():
         self.done = True
         self.in_AF = False
         self.AF_bool = []
-        print(self.seed)
+        self.kill = False
         self.percolating = [0,0]
         while self.t < self.runtime:
             if self.t == 0:
@@ -375,12 +375,15 @@ class HexagonalLattice():
             elif self.t % self.pacing_period == 0:
                 self.Stats_check()
                 self.Initialise()
+                self.save_choice()
             self.ActivationCheck()
             self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
             self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
             self.StateDevelop()
             self.t += self.dt
+            if self.kill:
+                self.t = self.runtime + 1 #To kill when AF starts
         if self.graph:
             self.Graph()
         if self.in_AF:
@@ -393,16 +396,18 @@ class HexagonalLattice():
         run.append(self.seed)
         #'location_2', 'location_3', 'location_4', 'AF_time',
         if self.in_AF:
-            run.append(self.re_sites[2])
-            run.append(self.re_sites[3])
-            run.append(self.re_sites[4])
-            run.append(self.AF_time)
+            pass
+            #run.append(self.re_sites[2])
+            #run.append(self.re_sites[3])
+            #run.append(self.re_sites[4]) un comment when doing location stuff
+            #run.append(self.AF_time)
         else:
-            run.append(False)
-            run.append(False)
-            run.append(False)
-            run.append(False)
-        run.append(self.percolating[0] / self.percolating[1])
+            pass
+            #run.append(False)
+            #run.append(False)
+            #run.append(False)
+            #run.append(False)
+        #run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run
 
