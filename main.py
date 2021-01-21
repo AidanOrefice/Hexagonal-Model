@@ -63,7 +63,7 @@ def NormalModesPS():
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                lattice.Coupling_Sample(A1,A2,a,o)
+                #lattice.Coupling_Sample(A1,A2,a,o)
                 run[13] = [A1,A2,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF

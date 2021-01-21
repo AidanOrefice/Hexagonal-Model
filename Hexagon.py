@@ -62,11 +62,6 @@ class HexagonalLattice():
             self.seed = seed
         np.random.seed(self.seed)
 
-        if self.full_save == 'full':
-            self.save_width = self.runtime
-        elif self.full_save == 'transition':
-            self.save_width = 150
-
         self.title = title + str(self.seed)
 
         #Ensuring lattice is of the correct dimensions - for toroidal geometry lattice must be even int x even int
@@ -351,9 +346,11 @@ class HexagonalLattice():
         beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
         consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
         consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
+        print(consec_AF_beats_3)
         if len(consec_AF_beats_3) > 0:
-            self.AF_first_beat = consec_AF_beats_3[0][0] * self.pacing_period * 2  #first beat after fib starts
-            self.AF_last_beat = consec_AF_beats_3[0][-1] * self.pacing_period * 2  #last beat after fib starts
+            self.AF_first_beat = (consec_AF_beats_3[0][0] - 1) * self.pacing_period  #first beat after fib starts
+            self.AF_last_beat = consec_AF_beats_3[0][-1] * self.pacing_period  #last beat after fib starts
+            print(self.AF_first_beat, self.AF_last_beat)
             self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites. Uncomment when doing location stuff
             self.kill = True
 
@@ -390,8 +387,6 @@ class HexagonalLattice():
                 self.t = self.runtime + 1 #To kill when AF starts
         if self.graph:
             self.Graph()
-        if self.in_AF:
-            self.save_choice()
         if self.full_save == 'full':
             np.save(self.title + '.npy', self.RefHistory)
         elif self.full_save == 'transition' and self.in_AF:

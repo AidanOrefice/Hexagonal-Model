@@ -15,7 +15,7 @@ config = dict(
     grad_end = 0.4,
     normal_modes = True,  #A1,  A2, amp, mean
     normal_modes_config = [0.25, 1, 0.1  ,0.9],
-    graph = False ,
+    graph = True ,
     FullStateSave = 'transition',      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
     stats = False
  )
