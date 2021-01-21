@@ -72,11 +72,13 @@ def NormalModesPS():
 
 def Periodicity():
     df = InitialDF()
-    amp = 0.2
-    off = 0.75
-    Ax = [1,3,5,8,10,20]
-    Ay = [1,3,5,8,10]
-    runs = 10
+    amp = 0.4
+    off = 0.5
+    Ax = [3]
+    Ay = [3]
+    #Ax = [1,3,5,8,10,20]
+    #Ay = [1,3,5,8,10]
+    runs = 1
     for i1 in Ax:
         print('Ax:', i1)
         for i2 in Ay:
@@ -86,9 +88,8 @@ def Periodicity():
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i1,i2,amp,off],
                 config['grad_start'], config['grad_end'] )
                 run = lattice.RunIt()
-                if _ == 1:
-                    lattice.Coupling_Sample(i1,i2,amp,off)
-                    VizTest(i1,i2,amp,off,80,140)
+                lattice.Coupling_Sample(i1,i2,amp,off)
+                VizTest(i1,i2,amp,off,80,140)
 
                 run[13] = [i1,i2,amp,off]
 

@@ -16,8 +16,8 @@ mean = 0.75
 Ax = 5
 Ay = 1
 
-rows = 80
-columns = 140 
+rows = 100
+columns = 100 
 
 def sinusoid2D(x, y, Ax=Ax, Ay=Ay,  amp = amp, mean = mean):
     #Amplitude - directly sets the amplitude of the function
@@ -59,17 +59,21 @@ def VizTest(Ax,Ay,amp,mean,rows,columns):
 
     label_mean = 'Offset = ' + str(mean)
     label_amp = 'Amplitude = ' + str(amp)
+    label_ax = r'$A_{x}$ = ' + str(Ax)
+    label_ay = r'$A_{y}$ = ' + str(Ay)
 
     legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_ax, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_ay, markerfacecolor='white', markersize=0)]
 
 
 
-    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, fontsize = 20)
+    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), ncol=5, fontsize = 20)
 
-    plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Offset$" %(Ax,Ay), fontsize = 20)
+    plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(A_{x}\frac{2\pi x}{length}) + \sin(A_{y}\frac{2\pi y}{height}) \right) + Offset$", fontsize = 20)
     title = 'CouplingViz_%i,%i,%i,%i,%i,%i.png' %(amp*100,mean*100,Ax,Ay,rows,columns)
     plt.savefig(title)
     plt.close()
 
-VizTest(Ax,Ay,amp,mean,rows,columns)
+#VizTest(Ax,Ay,amp,mean,rows,columns)

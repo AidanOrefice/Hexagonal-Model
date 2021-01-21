@@ -226,19 +226,26 @@ class HexagonalLattice():
         #print(amp)
         x = [self.index_to_xy(i)[0] for i in range(self.width*self.height)]
         y = [self.index_to_xy(i)[1] for i in range(self.width*self.height)]
-        a = ax.scatter(x,y,marker = 'h', s=12, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
-        cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
+        plt.scatter(x,y,marker = 'h', s=15, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
+        cbar = plt.colorbar(ticks=np.arange(1/14,17/14,1/7), shrink = 1)
+        cbar.set_ticklabels(["0", "1/6", "1/3", "1/2", "2/3", "5/6", "1"])
+        plt.clim(0,1)
         
-        cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
         
         label_mean = 'Offset = ' + str(mean)
         label_amp = 'Amplitude = ' + str(amp)
+        label_ax = r'$A_{x}$ = ' + str(Ax)
+        label_ay = r'$A_{y}$ = ' + str(Ay)
+
         legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_ax, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_ay, markerfacecolor='white', markersize=0)]
+
         fig.set_size_inches(16,9)
-        plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
+        plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), ncol=5, fontsize = 20)
         plt.axis('scaled')
-        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(Ax,Ay), fontsize = 16)
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(A_{x}\frac{2\pi x}{length}) + \sin(A_{y}\frac{2\pi y}{height}) \right) + Mean$", fontsize = 20)
         plt.savefig('SampleViz_%i,%i,%i,%i,%i.png' %(amp*100,mean*100,Ax,Ay,self.seed))
         plt.close()
     

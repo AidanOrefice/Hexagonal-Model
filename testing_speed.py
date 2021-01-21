@@ -39,7 +39,7 @@ def plot_amp_offs_PS():
     f, ax = plt.subplots()
     sns.heatmap(df, ax = ax)
     ax.tick_params(axis='y', rotation=0)
-    ax.set_xlabel('Mean')
+    ax.set_xlabel('Offset')
     ax.set_ylabel('Amplitude')
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_25_large_colourmap')
@@ -92,7 +92,7 @@ df.columns = np.round(df.columns*100)/100
 f, ax = plt.subplots()
 sns.heatmap(df, ax = ax)
 ax.tick_params(axis='y', rotation=0)
-ax.set_xlabel('Mean')
+ax.set_xlabel('Offset')
 ax.set_ylabel('Amplitude')
 ax.set_title('Average % time simulations in spent AF')
 plt.savefig('PS_25_large_colourmap_time')'''
