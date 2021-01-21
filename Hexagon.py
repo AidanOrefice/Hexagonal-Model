@@ -162,17 +162,17 @@ class HexagonalLattice():
             x = index - (row * self.width) + 0.5
         return (x,y)
     
-    def sinusoid2D(self, x, y, A1, A2, amp, mean):
+    def sinusoid2D(self, x, y, Ax, Ay, amp, mean):
         #Amplitude - directly sets the amplitude of the function
         #Mean - directly sets the offset/mean of the function.
         # 0 < (Mean +/- amp) < 1 
-        #A1/A2 stretch out the modes.
-        #A2 must be an integer value to ensure periodicity.
+        #Ax/Ay stretch out the modes.
+        #Ay must be an integer value to ensure periodicity.
         amp = float(amp)
         mean = float(mean)
-        A1 = float(A1)
-        A2 = float(A2)
-        return (amp/2)*(np.sin(A1*x*(2*np.pi/self.width))+np.sin(A2*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
+        Ax = float(Ax)
+        Ay = float(Ay)
+        return (amp/2)*(np.sin(Ax*x*(2*np.pi/self.width))+np.sin(Ay*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
     def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1,1,0.1,0.6], 
     start = 0.9 , end = 0.7):
@@ -220,7 +220,7 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-    def Coupling_Sample(self, A1, A2, amp, mean):
+    def Coupling_Sample(self, Ax, Ay, amp, mean):
         fig,ax = plt.subplots()
         #print(mean)
         #print(amp)
@@ -237,8 +237,9 @@ class HexagonalLattice():
         fig.set_size_inches(16,9)
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         plt.axis('scaled')
-        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(A1,A2), fontsize = 16)
-        plt.savefig('SampleViz_%i,%i,%i,%i,%i.png' %(amp*100,mean*100,A1,A2,self.seed))
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(Ax,Ay), fontsize = 16)
+        plt.savefig('SampleViz_%i,%i,%i,%i,%i.png' %(amp*100,mean*100,Ax,Ay,self.seed))
+        plt.close()
     
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
@@ -340,6 +341,7 @@ class HexagonalLattice():
         ax.set_ylabel("Number of activated cells")
         ax.set_xlabel("Time")
         plt.savefig('Graphed' + '.png')  #################################
+        plt.close()
 
     def save_choice(self): #Run once at end
         #AF Start time and location

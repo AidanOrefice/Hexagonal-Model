@@ -47,7 +47,7 @@ def NormalModesPS():
     amps = np.linspace(0,0.5,26)
     amps = np.append(amps, [0.75,1,2,5,10])
     offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
-    A1, A2 = 10,3
+    Ax, Ay = 10,3
     runs = 1
     for o in offs:
         print('Offset:', o)
@@ -56,12 +56,12 @@ def NormalModesPS():
             for _ in range(runs):
                 lattice = InitialLattice()
 
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [A1,A2,a,o],
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [Ax,Ay,a,o],
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                lattice.Coupling_Sample(A1,A2,a,o)
-                run[13] = [A1,A2,a,o]
+                lattice.Coupling_Sample(Ax,Ay,a,o)
+                run[13] = [Ax,Ay,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
 
@@ -74,13 +74,13 @@ def Periodicity():
     df = InitialDF()
     amp = 0.2
     off = 0.75
-    A1 = [1,5,10,20]
-    A2 = [1,3,5]
+    Ax = [1,5,10,20]
+    Ay = [1,3,5]
     runs = 5
-    for i1 in A1:
-        print('A1:', i1)
-        for i2 in A2:
-            print('A2:', i2)
+    for i1 in Ax:
+        print('Ax:', i1)
+        for i2 in Ay:
+            print('Ay:', i2)
             for _ in range(runs):
                 lattice = InitialLattice()
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i1,i2,amp,off],
@@ -90,7 +90,7 @@ def Periodicity():
                     lattice.Coupling_Sample(i1,i2,amp,off)
                     VizTest(i1,i2,amp,off,80,140)
 
-                run[13] = [A1,A2,amp,off]
+                run[13] = [Ax,Ay,amp,off]
 
                 in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
 
