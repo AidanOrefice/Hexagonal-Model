@@ -12,8 +12,9 @@ Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice
 """
 amp = 0.2
 mean = 0.5
-A1 = 0.25
-A2 = 1
+
+A1 = 10
+A2 = 3
 
 rows = 80
 columns = 140 
@@ -24,7 +25,7 @@ def sinusoid2D(x, y, A1=A1, A2=A2,  amp = amp, mean = mean):
     # 0 < (Mean +/- amp) < 1 
     #A1/A2 stretch out the modes.
     #A2 must be an integer value to ensure periodicity.
-    return (amp/2)*(np.sin(A1*x)+np.sin(A2*y*(2*np.pi/(rows  - rows*(1-(np.sqrt(3)/2)))))) + mean
+    return (amp/2)*(np.sin(A1*x*(2*np.pi/columns))+np.sin(A2*y*(2*np.pi/(rows  - rows*(1-(np.sqrt(3)/2)))))) + mean
 
 def gradient(x,start=0.8,end = 0.6):
     delta = (end-start)/50
@@ -40,48 +41,34 @@ def index_to_xy(index):
         x = index - (row * 50) + 0.5
     return x,y
 
-fig,ax = plt.subplots()
+def VizTest(A1,A2,amp,mean,rows,columns):
+    fig,ax = plt.subplots()
+    fig.set_size_inches(16,9)
+    hex_centers, ax = create_hex_grid(nx=columns,ny=rows, do_plot=True, align_to_origin = False, h_ax = ax)
+    x = [i[0] for i in hex_centers]
+    y = [i[1] for i in hex_centers] 
 
-hex_centers, ax = create_hex_grid(nx=columns,ny=rows, do_plot=True, align_to_origin = False, h_ax = ax)
-x = [i[0] for i in hex_centers]
-y = [i[1] for i in hex_centers] 
+    sin_z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
+    grad_z = [gradient(i) for i in x]
+    a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
+    fig.colorbar(a,shrink=0.8)
 
-sin_z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
-grad_z = [gradient(i) for i in x]
-a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
-fig.colorbar(a,shrink=0.6)
+    print(np.mean(sin_z))
+    print(np.var(sin_z))
+    print(np.std(sin_z))
 
-print(np.mean(sin_z))
-print(np.var(sin_z))
-print(np.std(sin_z))
+    label_mean = 'Offset = ' + str(mean)
+    label_amp = 'Amplitude = ' + str(amp)
 
-label_mean = 'Mean = ' + str(mean)
-label_amp = 'Amplitdue = ' + str(amp)
-
-legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
-            Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
-
-
-
-plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5)
-
-plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(%.3fx) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(A1,A2), fontsize = 14)
-
-plt.savefig('viz_test.png')
-
-""""
-leng = np.arange(2500)
-x= [index_to_xy(i)[0] for i in leng]
-y= [index_to_xy(i)[1] for i in leng]
+    legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
 
 
 
-x, y = np.meshgrid(np.arange(1,51), np.arange(1,51))
-z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
-ax = fig.add_subplot(111, projection='3d')
-ax.contour3D(x, y, z, 60, cmap='plasma')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('f(x,y)')
+    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, fontsize = 20)
 
-"""
+    plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Offset$" %(A1,A2), fontsize = 20)
+
+    plt.savefig('viz_test.png')
+
+VizTest(A1,A2,amp,mean,rows,columns)

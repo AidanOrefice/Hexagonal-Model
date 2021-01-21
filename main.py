@@ -43,31 +43,34 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    amps = np.linspace(0,0.5,26)
-    amps = np.append(amps, [0.75,1,2,5,10])
-    offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
+    #amps = np.linspace(0,0.5,26)
+    #amps = np.append(amps, [0.75,1,2,5,10])
+    #offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
+    amps, offs = [0.3], [0.5]
+    A1, A2 = 10,3
+    
     print(amps)
     print(offs)
-    runs = 20
-    for k in offs:
-        print('Offset:', k)
-        for i in amps:
-            print('Amplitude:', i)
+    runs = 1
+    for o in offs:
+        print('Offset:', o)
+        for a in amps:
+            print('Amplitude:', a)
             for _ in range(runs):
                 lattice = InitialLattice()
 
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,k],
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [A1,A2,a,o],
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                run[13] = [0.25,1,i,k]
+                lattice.Coupling_Sample(A1,A2,a,o)
+                run[13] = [A1,A2,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
 
                 run.extend([in_AF]) 
                 df.loc[len(df)] = run
-                #print([i[0] for i in lattice.AF_bool if i[1] == True])
-    df.to_csv('Prelim.csv')
+    df.to_csv('Prelim111.csv')
     return df
 
 def main():

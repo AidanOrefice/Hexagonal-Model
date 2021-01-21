@@ -167,7 +167,7 @@ class HexagonalLattice():
             x = index - (row * self.width) + 0.5
         return (x,y)
     
-    def sinusoid2D(self, x, y,  amp, mean, A1 = 0.25, A2 =1):
+    def sinusoid2D(self, x, y, A1, A2, amp, mean):
         #Amplitude - directly sets the amplitude of the function
         #Mean - directly sets the offset/mean of the function.
         # 0 < (Mean +/- amp) < 1 
@@ -177,9 +177,9 @@ class HexagonalLattice():
         mean = float(mean)
         A1 = float(A1)
         A2 = float(A2)
-        return (amp/2)*(np.sin(A1*x)+np.sin(A2*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
+        return (amp/2)*(np.sin(A1*x*(2*np.pi/self.width))+np.sin(A2*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
-    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [0.1,0.6], 
+    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1,1,0.1,0.6], 
     start = 0.9 , end = 0.7):
         if constant + gradient + norm_modes != 1:
             raise ValueError('Cannot decouple using two different methods.')
@@ -225,21 +225,25 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-    '''def Coupling_Sample(self, mean, amp):
+    def Coupling_Sample(self, A1, A2, amp, mean):
         fig,ax = plt.subplots()
-        x = [self.index_to_xy(i)[0] for i in range(2500)]
-        y = [self.index_to_xy(i)[1] for i in range(2500)]
-        a = ax.scatter(x,y,marker = 'h', s=17, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
+        print(mean)
+        print(amp)
+        x = [self.index_to_xy(i)[0] for i in range(self.width*self.height)]
+        y = [self.index_to_xy(i)[1] for i in range(self.width*self.height)]
+        a = ax.scatter(x,y,marker = 'h', s=12, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
         cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
         cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
-
-        label_mean = 'Mean = ' + str(mean)
+        
+        label_mean = 'Offset = ' + str(mean)
         label_amp = 'Amplitude = ' + str(amp)
         legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
                 Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
+        fig.set_size_inches(16,9)
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
-        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(\frac{x}{4}) + \sin(\frac{2\pi y}{height}) \right) + Mean$", fontsize = 16)
-        plt.savefig('CouplingSpaceSample.png')'''
+        plt.axis('scaled')
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(A1,A2), fontsize = 16)
+        plt.savefig('CouplingSpaceSample.png')
     
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
