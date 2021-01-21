@@ -68,7 +68,7 @@ def VizTest(A1,A2,amp,mean,rows,columns):
     plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=5, fontsize = 20)
 
     plt.title(r"$\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Offset$" %(A1,A2), fontsize = 20)
+    title = 'CouplingViz_%i,%i,%i,%i,%i,%i.png' %(amp*100,mean*100,A1,A2,rows,columns)
+    plt.savefig(title)
 
-    plt.savefig('viz_test.png')
-
-VizTest(A1,A2,amp,mean,rows,columns)
+#VizTest(A1,A2,amp,mean,rows,columns)

@@ -21,7 +21,7 @@ def InitialLattice():
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed', 'title', 'in AF?']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'in AF?']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -46,7 +46,7 @@ def NormalModesPS():
     #amps = np.linspace(0,0.5,26)
     #amps = np.append(amps, [0.75,1,2,5,10])
     #offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
-    amps, offs = [0.3], [0.5]
+    amps, offs = [0.1], [0.5]
     A1, A2 = 10,3
     
     print(amps)
@@ -77,6 +77,7 @@ def main():
     t0 = time.time()
 
     df = NormalModesPS()
+    Animate(str(df['title'][0]),str(df['FullStateSave'][0]), df['location_2'][0], df['location_3'][0], df['location_4'][0])
     """
     lattice = InitialLattice()
     lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],

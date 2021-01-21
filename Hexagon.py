@@ -243,7 +243,7 @@ class HexagonalLattice():
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         plt.axis('scaled')
         plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(%.3f*\frac{2\pi x}{length}) + \sin(%.3f*\frac{2\pi y}{height}) \right) + Mean$" %(A1,A2), fontsize = 16)
-        plt.savefig('CouplingSpaceSample.png')
+        plt.savefig('SampleViz_%i,%i,%i,%i,%i.png' %(amp*100,mean*100,A1,A2,self.seed))
     
     def Initialise(self):
         self.index_int = [i*self.width for i in range(self.height)] #Left hand side
@@ -403,7 +403,7 @@ class HexagonalLattice():
             pass
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])
-            run.append(self.re_sites[4]) un comment when doing location stuff
+            run.append(self.re_sites[4])
             run.append(self.AF_time)
         else:
             pass
