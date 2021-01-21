@@ -1,61 +1,121 @@
 ,width,height,runtime,threshold,sigmoid_strength,coupling,refractory_period,set_seed,constant,gradient,grad_start,grad_end,normal_modes,normal_modes_config,graph,FullStateSave,stats,seed,location_2,location_3,location_4,AF_time,per_%,title,in AF?
-0,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1656623906,8494,8355,8077,"(1213, 1273)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1656623906",True
-1,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,531418695,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,531418695",False
-2,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,523515577,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,523515577",False
-3,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3990106248,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3990106248",False
-4,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2009853433,9343,9343,8920,"(1502, 1562)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2009853433",True
-5,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3671351888,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3671351888",False
-6,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2947282813,2620,2620,2620,"(1771, 1831)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2947282813",True
-7,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2037099470,9901,9901,9901,"(374, 434)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2037099470",True
-8,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,4058128408,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4058128408",False
-9,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1140886935,3053,3053,3053,"(947, 1007)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1140886935",True
-10,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2750438619,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2750438619",False
-11,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,736079951,3304,3304,3304,"(1191, 1251)",1.0,"140,80,2800,0.25,25,Normal Modes,10,736079951",True
-12,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,638501839,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,638501839",False
-13,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,468101115,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,468101115",False
-14,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3553307662,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3553307662",False
-15,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,966557728,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,966557728",False
-16,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,4214594660,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4214594660",False
-17,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3851083282,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3851083282",False
-18,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,351326995,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,351326995",False
-19,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,331167769,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,331167769",False
-20,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,108621331,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,108621331",False
-21,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1931801223,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1931801223",False
-22,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2825588411,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2825588411",False
-23,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,433073105,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,433073105",False
-24,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,902673212,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,902673212",False
-25,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,4049858476,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4049858476",False
-26,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2682421844,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2682421844",False
-27,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2747700020,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2747700020",False
-28,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3946750420,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3946750420",False
-29,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1716348220,5344,5344,5486,"(8, 68)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1716348220",True
-30,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3832718849,5901,5901,5901,"(1685, 1745)",1.0,"140,80,2800,0.25,25,Normal Modes,10,3832718849",True
-31,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2702219459,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2702219459",False
-32,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2249264370,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2249264370",False
-33,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1330260183,7629,7629,7629,"(341, 401)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1330260183",True
-34,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3618815527,9349,9349,9349,"(664, 724)",1.0,"140,80,2800,0.25,25,Normal Modes,10,3618815527",True
-35,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1370838666,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1370838666",False
-36,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3826606261,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3826606261",False
-37,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,379652913,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,379652913",False
-38,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,859640470,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,859640470",False
-39,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3690800236,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3690800236",False
-40,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2894702660,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2894702660",False
-41,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2346997814,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2346997814",False
-42,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2202504038,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2202504038",False
-43,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2838504760,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2838504760",False
-44,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3396155729,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3396155729",False
-45,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1851579130,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1851579130",False
-46,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3468523130,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3468523130",False
-47,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1262172526,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1262172526",False
-48,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1049333629,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1049333629",False
-49,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,821465479,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,821465479",False
-50,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1181181860,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1181181860",False
-51,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,504961442,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,504961442",False
-52,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,4045945588,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4045945588",False
-53,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3490306974,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3490306974",False
-54,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,1990401222,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1990401222",False
-55,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,522193211,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,522193211",False
-56,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,304837260,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,304837260",False
-57,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,3556311799,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3556311799",False
-58,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,719054630,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,719054630",False
-59,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[[1, 5, 10, 20], [1, 3, 5], 0.2, 0.75]",False,False,False,2564571804,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2564571804",False
+0,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,2670764858,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2670764858",False
+1,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,613628596,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,613628596",False
+2,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,197316087,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,197316087",False
+3,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,85975084,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,85975084",False
+4,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,4146926011,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4146926011",False
+5,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,1681957331,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1681957331",False
+6,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,3251764460,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3251764460",False
+7,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,3265905186,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3265905186",False
+8,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,1031020862,8903,8904,8904,"(1757, 1817)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1031020862",True
+9,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 1, 0.2, 0.75]",False,False,False,2684504471,6551,6551,7111,"(387, 447)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2684504471",True
+10,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,3853683716,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3853683716",False
+11,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,3747952998,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3747952998",False
+12,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,5529682,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,5529682",False
+13,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,3813699698,8896,8896,8896,"(904, 964)",1.0,"140,80,2800,0.25,25,Normal Modes,10,3813699698",True
+14,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,2380138426,9889,9889,9889,"(1762, 1822)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2380138426",True
+15,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,2649796642,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2649796642",False
+16,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,1928761679,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1928761679",False
+17,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,3531090493,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3531090493",False
+18,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,866114325,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,866114325",False
+19,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 3, 0.2, 0.75]",False,False,False,4231858231,1803,1803,1803,"(1236, 1296)",1.0,"140,80,2800,0.25,25,Normal Modes,10,4231858231",True
+20,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,2672122399,3747,3747,3747,"(939, 999)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2672122399",True
+21,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,539574040,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,539574040",False
+22,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,111342746,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,111342746",False
+23,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,3294801457,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3294801457",False
+24,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,3341881162,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3341881162",False
+25,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,890933623,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,890933623",False
+26,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,2618669847,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2618669847",False
+27,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,276924609,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,276924609",False
+28,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,454315141,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,454315141",False
+29,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[1, 5, 0.2, 0.75]",False,False,False,1645713949,8348,8348,8490,"(918, 978)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1645713949",True
+30,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,3857355069,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3857355069",False
+31,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,3280694423,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3280694423",False
+32,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,607341928,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,607341928",False
+33,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,3653602554,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3653602554",False
+34,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,2238698554,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2238698554",False
+35,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,339357842,7637,7637,7637,"(1750, 1810)",1.0,"140,80,2800,0.25,25,Normal Modes,10,339357842",True
+36,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,2424322727,8083,8083,8083,"(1502, 1562)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2424322727",True
+37,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,3695137894,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3695137894",False
+38,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,862228694,9708,9708,8059,"(1158, 1218)",1.0,"140,80,2800,0.25,25,Normal Modes,10,862228694",True
+39,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 1, 0.2, 0.75]",False,False,False,1384511241,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1384511241",False
+40,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,2450047659,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2450047659",False
+41,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,2182572076,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2182572076",False
+42,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,874898854,5985,5985,5985,"(937, 997)",1.0,"140,80,2800,0.25,25,Normal Modes,10,874898854",True
+43,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,94045999,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,94045999",False
+44,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,1867990115,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1867990115",False
+45,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,4115613900,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4115613900",False
+46,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,685371582,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,685371582",False
+47,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,407171796,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,407171796",False
+48,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,673546439,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,673546439",False
+49,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 3, 0.2, 0.75]",False,False,False,3373468331,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3373468331",False
+50,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,3619931736,8336,8336,8336,"(1745, 1805)",1.0,"140,80,2800,0.25,25,Normal Modes,10,3619931736",True
+51,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,512352542,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,512352542",False
+52,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,1959194378,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1959194378",False
+53,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,626024096,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,626024096",False
+54,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,2323318443,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2323318443",False
+55,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,103160486,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,103160486",False
+56,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,1084380002,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1084380002",False
+57,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,1866230174,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1866230174",False
+58,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,1306818090,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1306818090",False
+59,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[5, 5, 0.2, 0.75]",False,False,False,3311062118,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3311062118",False
+60,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,3065590283,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3065590283",False
+61,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,1932721152,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1932721152",False
+62,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,2748574288,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2748574288",False
+63,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,2439274343,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2439274343",False
+64,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,316249966,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,316249966",False
+65,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,248074412,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,248074412",False
+66,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,1483895515,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1483895515",False
+67,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,1196279288,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1196279288",False
+68,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,180735655,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,180735655",False
+69,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 1, 0.2, 0.75]",False,False,False,2248743816,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2248743816",False
+70,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,2932048552,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2932048552",False
+71,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,3856352505,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3856352505",False
+72,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,4278179683,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,4278179683",False
+73,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,2438097489,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2438097489",False
+74,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,2271653970,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2271653970",False
+75,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,2963107931,9122,9122,9122,"(6, 66)",1.0,"140,80,2800,0.25,25,Normal Modes,10,2963107931",True
+76,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,113022611,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,113022611",False
+77,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,847292613,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,847292613",False
+78,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,359058274,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,359058274",False
+79,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.2, 0.75]",False,False,False,41559986,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,41559986",False
+80,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,1559630487,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1559630487",False
+81,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,1309339932,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1309339932",False
+82,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,3025874652,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3025874652",False
+83,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,1205528678,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1205528678",False
+84,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,2501601713,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2501601713",False
+85,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,2694440740,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2694440740",False
+86,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,635827184,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,635827184",False
+87,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,1452179972,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1452179972",False
+88,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,2671556574,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2671556574",False
+89,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 5, 0.2, 0.75]",False,False,False,1136633118,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1136633118",False
+90,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,2170277863,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2170277863",False
+91,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,3227941419,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3227941419",False
+92,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,1605912508,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1605912508",False
+93,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,2071267628,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2071267628",False
+94,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,1772532600,9230,9230,9230,"(690, 750)",1.0,"140,80,2800,0.25,25,Normal Modes,10,1772532600",True
+95,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,3915539185,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3915539185",False
+96,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,641844701,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,641844701",False
+97,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,435302743,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,435302743",False
+98,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,480545137,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,480545137",False
+99,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 1, 0.2, 0.75]",False,False,False,754554755,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,754554755",False
+100,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,733839047,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,733839047",False
+101,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3174426512,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3174426512",False
+102,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3942336355,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3942336355",False
+103,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3793100644,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3793100644",False
+104,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3197989382,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3197989382",False
+105,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3652075050,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3652075050",False
+106,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,3720493263,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3720493263",False
+107,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,34562320,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,34562320",False
+108,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,638101882,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,638101882",False
+109,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 3, 0.2, 0.75]",False,False,False,2533722782,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2533722782",False
+110,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,2159952499,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2159952499",False
+111,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,2727638335,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2727638335",False
+112,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,1343175962,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1343175962",False
+113,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,3416516174,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3416516174",False
+114,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,3069687272,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3069687272",False
+115,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,497752898,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,497752898",False
+116,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,3932779896,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3932779896",False
+117,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,1036388322,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,1036388322",False
+118,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,3871413278,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,3871413278",False
+119,140,80,2800,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[20, 5, 0.2, 0.75]",False,False,False,2825110885,False,False,False,False,1.0,"140,80,2800,0.25,25,Normal Modes,10,2825110885",False

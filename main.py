@@ -76,7 +76,7 @@ def Periodicity():
     off = 0.75
     Ax = [1,5,10,20]
     Ay = [1,3,5]
-    runs = 5
+    runs = 10
     for i1 in Ax:
         print('Ax:', i1)
         for i2 in Ay:
@@ -90,7 +90,7 @@ def Periodicity():
                     lattice.Coupling_Sample(i1,i2,amp,off)
                     VizTest(i1,i2,amp,off,80,140)
 
-                run[13] = [Ax,Ay,amp,off]
+                run[13] = [i1,i2,amp,off]
 
                 in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
 
