@@ -11,10 +11,10 @@ Script that visualises the coupling in the lattice.
 Uses https://github.com/alexkaz2/hexalattice/blob/master/hexalattice/hexalattice.py
 """
 amp = 0.2
-mean = 0.5
+mean = 0.75
 
-A1 = 10
-A2 = 3
+A1 = 5
+A2 = 1
 
 rows = 80
 columns = 140 
@@ -53,9 +53,9 @@ def VizTest(A1,A2,amp,mean,rows,columns):
     a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
     fig.colorbar(a,shrink=0.8)
 
-    print(np.mean(sin_z))
-    print(np.var(sin_z))
-    print(np.std(sin_z))
+    #print(np.mean(sin_z))
+    #print(np.var(sin_z))
+    #print(np.std(sin_z))
 
     label_mean = 'Offset = ' + str(mean)
     label_amp = 'Amplitude = ' + str(amp)
@@ -71,4 +71,4 @@ def VizTest(A1,A2,amp,mean,rows,columns):
     title = 'CouplingViz_%i,%i,%i,%i,%i,%i.png' %(amp*100,mean*100,A1,A2,rows,columns)
     plt.savefig(title)
 
-#VizTest(A1,A2,amp,mean,rows,columns)
+VizTest(A1,A2,amp,mean,rows,columns)

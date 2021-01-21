@@ -3,7 +3,7 @@ import numpy as np
 config = dict(
     width = 140,
     height = 80,
-    runtime = 10000,
+    runtime = 2800,
     threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
@@ -16,7 +16,7 @@ config = dict(
     normal_modes = True,  #A1,  A2, amp, mean
     normal_modes_config = [0.25, 1, 0.1  ,0.9],
     graph = True ,
-    FullStateSave = 'transition',      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
+    FullStateSave = 'full',      #Options r full (whole run), transition (one beat_period before AF, one beat_period after AF), False (Nothing saved)
     stats = False
  )
 

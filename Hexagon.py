@@ -222,8 +222,8 @@ class HexagonalLattice():
 
     def Coupling_Sample(self, A1, A2, amp, mean):
         fig,ax = plt.subplots()
-        print(mean)
-        print(amp)
+        #print(mean)
+        #print(amp)
         x = [self.index_to_xy(i)[0] for i in range(self.width*self.height)]
         y = [self.index_to_xy(i)[1] for i in range(self.width*self.height)]
         a = ax.scatter(x,y,marker = 'h', s=12, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
@@ -311,7 +311,7 @@ class HexagonalLattice():
     def Search_Meth2(self): #Searches for the 2nd, 3rd and 4th re-excited sites. Returns time of 2nd re-excitation.
         sites = {}
         re_sites = {2:True, 3:True, 4:True}
-        for j in range(self.AF_first_beat - self.pacing_period + 1, self.AF_last_beat):
+        for j in range(self.AF_first_beat + 1, self.AF_last_beat):
             time_data = self.RefHistory[j*len(self.ref):(j+1)*len(self.ref)]
             activated_sites = np.where(time_data == 1)[0]
             for i in activated_sites:
@@ -321,7 +321,7 @@ class HexagonalLattice():
                         if sites[i] == 2:
                             re_sites[2] = i
                             self.AF_time = (max(j-30,1), j+30)
-                            print(self.AF_time)  #Transition time range
+                            #print(self.AF_time)  #Transition time range
                     if re_sites[3] == True:
                         if sites[i] == 3:
                             re_sites[3] = i
@@ -346,11 +346,11 @@ class HexagonalLattice():
         beat_af = [i[0] // self.pacing_period for i in self.AF_bool if i[1] == True]
         consec_AF_beats = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(beat_af), lambda ix : ix[0] - ix[1])]
         consec_AF_beats_3 = [i for i in consec_AF_beats if len(i) > 2]
-        print(consec_AF_beats_3)
+        #print(consec_AF_beats_3)
         if len(consec_AF_beats_3) > 0:
             self.AF_first_beat = (consec_AF_beats_3[0][0] - 1) * self.pacing_period  #first beat after fib starts
             self.AF_last_beat = consec_AF_beats_3[0][-1] * self.pacing_period  #last beat after fib starts
-            print(self.AF_first_beat, self.AF_last_beat)
+            #print(self.AF_first_beat, self.AF_last_beat)
             self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites. Uncomment when doing location stuff
             self.kill = True
 
@@ -394,7 +394,7 @@ class HexagonalLattice():
         run = list(config.values())
         run.append(self.seed)
         #'location_2', 'location_3', 'location_4', 'AF_time',
-        if self.in_AF:
+        if self.kill:
             pass
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])

@@ -1,6 +1,7 @@
 from Animation import *
 from Hexagon import *
 from configuration import *
+from CouplingViz import *
 import time 
 
 def InitialLattice():
@@ -43,14 +44,10 @@ def AF_stats(lattice):
 
 def NormalModesPS():
     df = InitialDF()
-    #amps = np.linspace(0,0.5,26)
-    #amps = np.append(amps, [0.75,1,2,5,10])
-    #offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
-    amps, offs = [0.1], [0.5]
+    amps = np.linspace(0,0.5,26)
+    amps = np.append(amps, [0.75,1,2,5,10])
+    offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
     A1, A2 = 10,3
-    
-    print(amps)
-    print(offs)
     runs = 1
     for o in offs:
         print('Offset:', o)
@@ -63,27 +60,52 @@ def NormalModesPS():
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                #lattice.Coupling_Sample(A1,A2,a,o)
+                lattice.Coupling_Sample(A1,A2,a,o)
                 run[13] = [A1,A2,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
 
                 run.extend([in_AF]) 
                 df.loc[len(df)] = run
-    df.to_csv('Prelim111.csv')
+    df.to_csv('Prelim.csv')
+    return df
+
+def Periodicity():
+    df = InitialDF()
+    amp = 0.2
+    off = 0.75
+    A1 = [1,5,10,20]
+    A2 = [1,3,5]
+    runs = 5
+    for i1 in A1:
+        print('A1:', i1)
+        for i2 in A2:
+            print('A2:', i2)
+            for _ in range(runs):
+                lattice = InitialLattice()
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i1,i2,amp,off],
+                config['grad_start'], config['grad_end'] )
+                run = lattice.RunIt()
+                if _ == 1:
+                    lattice.Coupling_Sample(i1,i2,amp,off)
+                    VizTest(i1,i2,amp,off,80,140)
+
+                run[13] = [A1,A2,amp,off]
+
+                in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
+
+                run.extend([in_AF]) 
+                df.loc[len(df)] = run
+    df.to_csv('PeriodicityInvestigation.csv')
     return df
 
 def main():
     t0 = time.time()
 
-    df = NormalModesPS()
+    df = Periodicity()
+    '''
     for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i])
-    """
-    lattice = InitialLattice()
-    lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],
-     config['grad_start'], config['grad_end'] )
-    lattice.RunIt()"""
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i])'''
     
     t1 = time.time()
     print(t1-t0)
