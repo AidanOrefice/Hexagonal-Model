@@ -77,7 +77,8 @@ def main():
     t0 = time.time()
 
     df = NormalModesPS()
-    Animate(str(df['title'][0]),str(df['FullStateSave'][0]), df['location_2'][0], df['location_3'][0], df['location_4'][0])
+    for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i])
     """
     lattice = InitialLattice()
     lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], config['normal_modes_config'][2:],
