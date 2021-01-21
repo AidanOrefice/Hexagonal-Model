@@ -48,7 +48,7 @@ def VizTest(Ax,Ay,amp,mean,rows,columns):
     x = [i[0] for i in hex_centers]
     y = [i[1] for i in hex_centers] 
 
-    sin_z = [sinusoid2D(x[i], y[i]) for i in range(len(x))]
+    sin_z = [sinusoid2D(x[i], y[i], Ax, Ay, amp, mean) for i in range(len(x))]
     grad_z = [gradient(i) for i in x]
     a = ax.scatter(x,y,marker = 'h', s=17, c = sin_z)
     fig.colorbar(a,shrink=0.8)
