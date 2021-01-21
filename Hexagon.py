@@ -354,7 +354,7 @@ class HexagonalLattice():
         if len(consec_AF_beats_3) > 0:
             self.AF_first_beat = consec_AF_beats_3[0][0] * self.pacing_period * 2  #first beat after fib starts
             self.AF_last_beat = consec_AF_beats_3[0][-1] * self.pacing_period * 2  #last beat after fib starts
-            #self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites. Uncomment when doing location stuff
+            self.re_sites = self.Search_Meth2()  #2nd,3rd,4th activated sites. Uncomment when doing location stuff
             self.kill = True
 
     def RunIt(self):
@@ -401,17 +401,17 @@ class HexagonalLattice():
         #'location_2', 'location_3', 'location_4', 'AF_time',
         if self.in_AF:
             pass
-            #run.append(self.re_sites[2])
-            #run.append(self.re_sites[3])
-            #run.append(self.re_sites[4]) un comment when doing location stuff
-            #run.append(self.AF_time)
+            run.append(self.re_sites[2])
+            run.append(self.re_sites[3])
+            run.append(self.re_sites[4]) un comment when doing location stuff
+            run.append(self.AF_time)
         else:
             pass
-            #run.append(False)
-            #run.append(False)
-            #run.append(False)
-            #run.append(False)
-        #run.append(self.percolating[0] / self.percolating[1])
+            run.append(False)
+            run.append(False)
+            run.append(False)
+            run.append(False)
+        run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run
 
