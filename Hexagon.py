@@ -228,6 +228,7 @@ class HexagonalLattice():
         y = [self.index_to_xy(i)[1] for i in range(self.width*self.height)]
         a = ax.scatter(x,y,marker = 'h', s=12, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
         cbar = plt.colorbar(a, ticks=np.arange(1/14,17/14,1/7), shrink = 0.75)
+        
         cbar.ax.set_yticklabels(['0', '1/6', '1/3', '1/2', '2/3', '5/6', '1'])
         
         label_mean = 'Offset = ' + str(mean)

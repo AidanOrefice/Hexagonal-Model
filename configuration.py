@@ -1,9 +1,9 @@
 import numpy as np
 
 config = dict(
-    width = 140,
-    height = 80,
-    runtime = 2800,
+    width = 100,
+    height = 100,
+    runtime = 1000,
     threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
