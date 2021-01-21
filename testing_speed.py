@@ -6,42 +6,85 @@ import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
 
-Runs = pd.read_csv('Prelim.csv')
+def plot_amp_offs_PS():
+    Runs = pd.read_csv('Prelim.csv')
 
-for index, row in Runs.iterrows():
-    list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
-    Runs.loc[index, 'normal_beta'] = float(list_[3].strip())
-    Runs.loc[index, 'normal_alpha'] = float(list_[2].strip())
+    for index, row in Runs.iterrows():
+        list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
+        Runs.loc[index, 'normal_beta'] = float(list_[3].strip())
+        Runs.loc[index, 'normal_alpha'] = float(list_[2].strip())
 
-map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
-map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
+    map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
+    map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
 
-print(map_alpha)
-print(map_beta)
+    print(map_alpha)
+    print(map_beta)
 
-tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
-print(tot_count)
-PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-#PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-print(PS.shape)
-for index, row in Runs.iterrows():
-    if row['in AF?']:
-        x = map_beta[row['normal_beta']]
-        y = map_alpha[row['normal_alpha']]
-        PS[y][x] += 1
-        #PS_time[y][x] += row['%time in AF']
-PS_per = PS / tot_count
-#PS_time = PS_time / tot_count
-df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
-df.index = np.round(df.index*100)/100
-df.columns = np.round(df.columns*100)/100
-f, ax = plt.subplots()
-sns.heatmap(df, ax = ax)
-ax.tick_params(axis='y', rotation=0)
-ax.set_xlabel('Mean')
-ax.set_ylabel('Amplitude')
-ax.set_title('Fraction of simulations that entered fibrillation')
-plt.savefig('PS_25_large_colourmap')
+    tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
+    print(tot_count)
+    PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    print(PS.shape)
+    for index, row in Runs.iterrows():
+        if row['in AF?']:
+            x = map_beta[row['normal_beta']]
+            y = map_alpha[row['normal_alpha']]
+            PS[y][x] += 1
+            #PS_time[y][x] += row['%time in AF']
+    PS_per = PS / tot_count
+    #PS_time = PS_time / tot_count
+    df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
+    df.index = np.round(df.index*100)/100
+    df.columns = np.round(df.columns*100)/100
+    f, ax = plt.subplots()
+    sns.heatmap(df, ax = ax)
+    ax.tick_params(axis='y', rotation=0)
+    ax.set_xlabel('Mean')
+    ax.set_ylabel('Amplitude')
+    ax.set_title('Fraction of simulations that entered fibrillation')
+    plt.savefig('PS_25_large_colourmap')
+
+def plot_amp_offs_periodicity():
+    Runs = pd.read_csv('PeriodicityInvestigation.csv')
+
+    for index, row in Runs.iterrows():
+        list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
+        Runs.loc[index, 'A1_x'] = float(list_[0].strip())
+        Runs.loc[index, 'A2_y'] = float(list_[1].strip())
+        Runs.loc[index, 'normal_beta'] = float(list_[3].strip())
+        Runs.loc[index, 'normal_alpha'] = float(list_[2].strip())
+
+    map_A1_x = {j:i for i,j in enumerate(sorted(np.unique(Runs['A1_x']), reverse = True))}
+    map_A2_y = {j:i for i,j in enumerate(np.unique(Runs['A2_y']))}
+
+    print(map_A1_x)
+    print(map_A2_y)
+
+    #tot_count = Runs['A1_x'].value_counts()[0]/len(map_A2_y.keys())
+    #print(tot_count)
+    PS = np.zeros((len(map_A1_x.keys()),len(map_A2_y.keys())))
+    #PS_time = np.zeros((len(map_A1_x.keys()),len(map_A2_y.keys())))
+    print(PS.shape)
+    for index, row in Runs.iterrows():
+        if row['in AF?']:
+            x = map_A2_y[row['A2_y']]
+            y = map_A1_x[row['A1_x']]
+            PS[y][x] += 1
+            #PS_time[y][x] += row['%time in AF']
+    PS_per = PS / 10 #Need to hard code number of runs
+    #PS_time = PS_time / tot_count
+    df = pd.DataFrame(PS_per, columns = list(map_A2_y.keys()), index = list(map_A1_x.keys()))
+    df.index = np.round(df.index*100)/100
+    df.columns = np.round(df.columns*100)/100
+    f, ax = plt.subplots()
+    sns.heatmap(df, ax = ax)
+    ax.tick_params(axis='y', rotation=0)
+    ax.set_xlabel('Periodicity in A2_y')
+    ax.set_ylabel('Periodicity in A1_x')
+    ax.set_title('Fraction of simulations that entered fibrillation')
+    plt.savefig('Periodicity_heatmap.png')
+
+plot_amp_offs_periodicity()
 
 '''df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
