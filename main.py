@@ -74,8 +74,8 @@ def Periodicity():
     df = InitialDF()
     amp = 0.2
     off = 0.75
-    Ax = [1,5,10,20]
-    Ay = [1,3,5]
+    Ax = [1,3,5,8,10,20]
+    Ay = [1,3,5,8,10]
     runs = 10
     for i1 in Ax:
         print('Ax:', i1)
