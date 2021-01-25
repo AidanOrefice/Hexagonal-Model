@@ -162,19 +162,18 @@ class HexagonalLattice():
             x = index - (row * self.width) + 0.5
         return (x,y)
     
-    def sinusoid2D(self, x, y, Ax, Ay, amp, mean):
+    def sinusoid2D(self, x, y, A, amp, mean):
         #Amplitude - directly sets the amplitude of the function
         #Mean - directly sets the offset/mean of the function.
         # 0 < (Mean +/- amp) < 1 
-        #Ax/Ay stretch out the modes.
+        #A stretch out the modes.
         #Ay must be an integer value to ensure periodicity.
         amp = float(amp)
         mean = float(mean)
-        Ax = float(Ax)
-        Ay = float(Ay)
-        return (amp/2)*(np.sin(Ax*x*(2*np.pi/self.width))+np.sin(Ay*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
+        A = float(A)
+        return (amp/2)*(np.sin(A*x*(2*np.pi/self.width))+np.sin(A*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
-    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1,1,0.1,0.6], 
+    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1,0.1,0.6], 
     start = 0.9 , end = 0.7):
         if constant + gradient + norm_modes != 1:
             raise ValueError('Cannot decouple using two different methods.')
@@ -204,12 +203,17 @@ class HexagonalLattice():
         elif norm_modes:
             for i in keys:
                 x,y = self.index_to_xy(i)
-                grad_coupling = np.sqrt(self.sinusoid2D(x, y, *sinusoid_params))
+                grad_coupling = self.sinusoid2D(x, y, *sinusoid_params)
                 neighbours = self.neighbours[i]
                 new, deleted =  choose_numbers(neighbours, grad_coupling)
                 self.neighbours[i] = new
                 deleted_dic[i] = deleted            
-            self.coupling_samp = [len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()]
+            self.coupling_samp = np.asarray([len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()])
+            self.mean, self.var = np.mean(self.coupling_samp), np.var(self.coupling_samp)
+
+            #If we want to look at the unique counts.
+            #unique, counts = np.unique(self.coupling_samp, return_counts=True)
+            #print(np.asarray((unique,counts)).T)
 
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
@@ -220,7 +224,7 @@ class HexagonalLattice():
                     neighbours2 = np.delete(neighbours1, index)
                     self.neighbours[j] = neighbours2
 
-    def Coupling_Sample(self, Ax, Ay, amp, mean):
+    def Coupling_Sample(self, A, amp, offs):
         fig,ax = plt.subplots()
         #print(mean)
         #print(amp)
@@ -232,21 +236,25 @@ class HexagonalLattice():
         plt.clim(0,1)
         
         
-        label_mean = 'Offset = ' + str(mean)
+        label_offs = 'Offset = ' + str(offs)
         label_amp = 'Amplitude = ' + str(amp)
-        label_ax = r'$A_{x}$ = ' + str(Ax)
-        label_ay = r'$A_{y}$ = ' + str(Ay)
+        label_a = r'$A$ = ' + str(A)
+        label_mean = 'Mean = ' + str(round(self.mean,3))
+        label_variance = 'Variance = ' + str(round(self.var,3))
+        label_seed = 'Seed = ' + str(self.seed)
 
-        legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+        legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_offs, markerfacecolor='white', markersize=0),
                 Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_ax, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_ay, markerfacecolor='white', markersize=0)]
+                Line2D([0], [0], marker='o', color='white', label=label_a, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_mean, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_variance, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_seed, markerfacecolor='white', markersize=0)]
 
         fig.set_size_inches(16,9)
-        plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), ncol=5, fontsize = 20)
+        plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), ncol=3, fontsize = 14)
         plt.axis('scaled')
-        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(A_{x}\frac{2\pi x}{length}) + \sin(A_{y}\frac{2\pi y}{height}) \right) + Mean$", fontsize = 20)
-        plt.savefig('SampleViz_%i,%i,%i,%i,%i.png' %(amp*100,mean*100,Ax,Ay,self.seed))
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(A\frac{2\pi x}{length}) + \sin(A\frac{2\pi y}{height}) \right) + Offset$", fontsize = 20)
+        plt.savefig('SampleViz_%i,%i,%i,%i.png' %(amp*100,offs*100,A,self.seed))
         plt.close()
     
     def Initialise(self):

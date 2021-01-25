@@ -1,2 +1,0 @@
-,width,height,runtime,threshold,sigmoid_strength,coupling,refractory_period,set_seed,constant,gradient,grad_start,grad_end,normal_modes,normal_modes_config,graph,FullStateSave,stats,seed,location_2,location_3,location_4,AF_time,per_%,title,in AF?
-0,140,80,10000,0.25,25,0.55,10,0,False,False,0.3,0.4,True,"[10, 3, 0.1, 0.5]",True,transition,False,803468498,7312,7591,7312,"(24, 84)",1.0,"140,80,10000,0.25,25,Normal Modes,10,803468498",True

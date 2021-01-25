@@ -22,32 +22,16 @@ def InitialLattice():
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'in AF?']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
-
-def AF_stats(lattice):
-    index = np.where(lattice.AF > 55)[0]
-    thing = [list(map(itemgetter(1), g)) for tk, g in groupby(enumerate(index), lambda ix : ix[0] - ix[1])]
-    thing = [i for i in thing if len(i) > 10]
-    len_thing = 0
-    if len(thing) > 0:
-        in_AF = True
-        for x in thing:
-            len_thing += len(x)
-    else:
-        in_AF = False
-
-    fraction_in_AF = len_thing/config['runtime']
-
-    return in_AF, fraction_in_AF
 
 def NormalModesPS():
     df = InitialDF()
     amps = np.linspace(0,0.5,26)
     amps = np.append(amps, [0.75,1,2,5,10])
     offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
-    Ax, Ay = 10,3
+    A = 5
     runs = 1
     for o in offs:
         print('Offset:', o)
@@ -56,48 +40,42 @@ def NormalModesPS():
             for _ in range(runs):
                 lattice = InitialLattice()
 
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [Ax,Ay,a,o],
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [A,a,o],
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                lattice.Coupling_Sample(Ax,Ay,a,o)
-                run[13] = [Ax,Ay,a,o]
+                lattice.Coupling_Sample(A,a,o)
+                run[13] = [A,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
 
-                run.extend([in_AF]) 
+                run.extend([lattice.mean, lattice.var, in_AF]) 
                 df.loc[len(df)] = run
     df.to_csv('Prelim.csv')
     return df
 
 def Periodicity():
     df = InitialDF()
-    amp = 0.4
-    off = 0.5
-    Ax = [3]
-    Ay = [3]
-    #Ax = [1,3,5,8,10,20]
-    #Ay = [1,3,5,8,10]
+    amp = 0.2
+    off = 0.7
+    A = [3]
     runs = 1
-    for i1 in Ax:
-        print('Ax:', i1)
-        for i2 in Ay:
-            print('Ay:', i2)
-            for _ in range(runs):
-                lattice = InitialLattice()
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i1,i2,amp,off],
-                config['grad_start'], config['grad_end'] )
-                run = lattice.RunIt()
-                lattice.Coupling_Sample(i1,i2,amp,off)
-                VizTest(i1,i2,amp,off,80,140)
+    for i in A:
+        print('A:', i)
+        for _ in range(runs):
+            lattice = InitialLattice()
+            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,amp,off],
+            config['grad_start'], config['grad_end'] )
+            run = lattice.RunIt()
+            lattice.Coupling_Sample(i,amp,off)
+            VizTest(i,amp,off,100,100)
 
-                run[13] = [i1,i2,amp,off]
+            run[13] = [i,amp,off]
 
-                in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-
-                run.extend([in_AF]) 
-                df.loc[len(df)] = run
-    df.to_csv('PeriodicityInvestigation.csv')
+            in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
+            run.extend([lattice.mean, lattice.var, in_AF]) 
+            df.loc[len(df)] = run
+    df.to_csv('Prelim.csv')
     return df
 
 def main():
