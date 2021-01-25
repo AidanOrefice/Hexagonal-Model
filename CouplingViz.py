@@ -29,19 +29,9 @@ def gradient(x,start=0.8,end = 0.6):
     delta = (end-start)/50
     return (delta*x) + start
 
-def index_to_xy(index):
-    row = np.floor(index / 50)
-    y = row  - row*(1-(np.sqrt(3)/2))#fix.
-    if_even = row % 2 == 0
-    if if_even:
-        x = index - (row * 50)
-    else:
-        x = index - (row * 50) + 0.5
-    return x,y
-
 def VizTest(A,amp,offs,rows,columns):
     fig,ax = plt.subplots()
-    fig.set_size_inches(15,9)
+    fig.set_size_inches(16,9)
     hex_centers, ax = create_hex_grid(nx=columns,ny=rows, do_plot=True, align_to_origin = False, h_ax = ax)
     x = [i[0] for i in hex_centers]
     y = [i[1] for i in hex_centers] 
