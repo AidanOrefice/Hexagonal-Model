@@ -32,7 +32,7 @@ def NormalModesPS():
     amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
     offs = np.linspace(0,1,21)  #Same width in each direction.
     A = 20#1,3,5,10,20
-4    print(A)
+    print(A)
     runs = 25
     for o in offs:
         print('Offset:', o)
