@@ -28,11 +28,12 @@ def InitialDF():
 
 def NormalModesPS():
     df = InitialDF()
-    amps = np.linspace(0,0.5,26)
-    amps = np.append(amps, [0.75,1,2,5,10])
-    offs = np.linspace(0.2,0.8,31)  #Same width in each direction.
-    A = 5
-    runs = 1
+    amps = np.linspace(0,0.5,11)
+    amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
+    offs = np.linspace(0,1,21)  #Same width in each direction.
+    A = 20#1,3,5,10,20
+4    print(A)
+    runs = 25
     for o in offs:
         print('Offset:', o)
         for a in amps:
@@ -44,14 +45,14 @@ def NormalModesPS():
                 config['grad_start'], config['grad_end'] )
 
                 run = lattice.RunIt()
-                lattice.Coupling_Sample(A,a,o)
+                #lattice.Coupling_Sample(A,a,o)
                 run[13] = [A,a,o]
 
                 in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
 
                 run.extend([lattice.mean, lattice.var, in_AF]) 
                 df.loc[len(df)] = run
-    df.to_csv('Prelim.csv')
+    df.to_csv('Normal_Modes_Phase_Space_{}.csv'.format(str(A)))
     return df
 
 def Periodicity():
@@ -81,7 +82,7 @@ def Periodicity():
 def main():
     t0 = time.time()
 
-    df = Periodicity()
+    df = NormalModesPS()
     '''
     for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i])'''
