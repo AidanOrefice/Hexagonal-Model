@@ -31,8 +31,7 @@ def NormalModesPS():
     amps = np.linspace(0,0.5,11)
     amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
     offs = np.linspace(0,1,21)  #Same width in each direction.
-    A = 20#1,3,5,10,20
-    print(A)
+    A = [1,3,5,10,20]
     runs = 25
     for o in offs:
         print('Offset:', o)
@@ -48,11 +47,42 @@ def NormalModesPS():
                 #lattice.Coupling_Sample(A,a,o)
                 run[13] = [A,a,o]
 
-                in_AF = lattice.kill#AF_stats(lattice) Did it enter AF
+                in_AF = lattice.kill
 
                 run.extend([lattice.mean, lattice.var, in_AF]) 
                 df.loc[len(df)] = run
     df.to_csv('Normal_Modes_Phase_Space_{}.csv'.format(str(A)))
+    return df
+
+
+def AnimationGrab():
+    df = InitialDF()
+    offs = [0,0.5,0.75,1]
+    amps = [0,0.1,0.3,0.5]
+    A = [1,3,5,10,20]
+    #Will potentially do up to 80 but it wont -- just being systematic. All data will be saved in AF run
+    for o in offs:
+        print('Offset:', o)
+        for a in amps:
+            print('Amplitude:', a)
+            for i in A:
+                print('A: ', i)
+                lattice = InitialLattice()
+
+                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,a,o],
+                config['grad_start'], config['grad_end'] )
+
+                run = lattice.RunIt()
+                run[13] = [i,a,o]
+
+                in_AF = lattice.kill
+                if in_AF:
+                    lattice.Coupling_Sample(i,a,o)
+
+
+                run.extend([lattice.mean, lattice.var, in_AF]) 
+                df.loc[len(df)] = run
+    df.to_csv('AnimationRun.csv')
     return df
 
 def Periodicity():
@@ -82,10 +112,10 @@ def Periodicity():
 def main():
     t0 = time.time()
 
-    df = NormalModesPS()
-    '''
+    df = AnimationGrab()
     for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i])'''
+        if df['in AF?'][i]:
+            Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
     
     t1 = time.time()
     print(t1-t0)

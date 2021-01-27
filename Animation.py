@@ -10,7 +10,7 @@ import time
 
 #Needs to be generalised for a full run and for a transition.
 
-def Animate(fname, type, loc2, loc3, loc4):
+def Animate(fname, type, loc2, loc3, loc4,adds):
     #data_file - filename of the .npy file 
     #type - type of animation to run e.g. full or transition.
 
@@ -40,9 +40,22 @@ def Animate(fname, type, loc2, loc3, loc4):
         lines.append(ax.plot(x, y, color='green', marker = 'h', ls = '', markersize = 5.5)[0])
     anim = FuncAnimation(fig, animate_func_loc, interval=100, frames=runtime, fargs = (F, lines, colors, tot, loc2, loc3, loc4))
 
-    plt.title(fname)
-    name = fname + ".gif"
+    #Fix to put A,a,o in animation title
+
+    A,a,o = str(adds).split('[')[1].split(']')[0].split(',')
+    if '.' in a:
+        amp = str(a.split('.')[0]) + str(a.split('.')[1])
+    else:
+        amp = a
+    if '.' in o:
+        off = str(o.split('.')[0]) + str(o.split('.')[1])
+    else:
+        off = o
+    plt.title(fname + "\n, A" + str(A) + ", amp" + str(amp) + ", offset" + str(off))
+    #Careful to avoid fullstop in filename
+    name = fname + ", A" + str(A) + ", amp" + str(amp) + ", offset" + str(off) +".gif"
     anim.save(name)
+    plt.close()
 
 def index_to_xy(index, width):
     row = np.floor(index / width)

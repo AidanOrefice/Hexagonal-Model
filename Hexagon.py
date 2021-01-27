@@ -337,7 +337,7 @@ class HexagonalLattice():
                     if re_sites[2] == True:
                         if sites[i] == 2:
                             re_sites[2] = i
-                            self.AF_time = (max(j-30,1), j+30)
+                            self.AF_time = (max(j-100,1), j+100) #Increased the range from 30 to 100
                             #print(self.AF_time)  #Transition time range
                     if re_sites[3] == True:
                         if sites[i] == 3:
@@ -396,7 +396,7 @@ class HexagonalLattice():
                 self.Initialise()
                 self.save_choice()
             self.ActivationCheck()
-            self.RefHistory[self.t*len(self.ref):(self.t+1)*len(self.ref)] = self.ref
+            self.RefHistory[self.t*len(self.ref):(self.t+self.dt)*len(self.ref)] = self.ref
             self.AF[self.t] = len(self.index_act)
             self.ChargeProp()
             self.StateDevelop()
