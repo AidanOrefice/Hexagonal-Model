@@ -10,7 +10,7 @@ from CouplingViz import sinusoid2D
 
 def value_counts(df,n):
     #n relates to which location method i.e. location_n
-    locs = df['location_' + str(n)].value_counts(sort = False, normalize = True)
+    locs = df['location_' + str(n)].value_counts(sort = False, normalize = False)
     
     inds = list(map(int, list(locs.index)))
     locs_ = pd.DataFrame(np.zeros(10000))
@@ -33,7 +33,7 @@ def plot_heat_map(fname):
     for ind, row in runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
         amp, offs = float(list_[1]), float(list_[2])
-        if (amp > 0.5) or (amp < 0.05) or (offs < 0.25):
+        if (amp > 0.5) or (amp < 0.05) or (offs < 0.4):
             runs = runs.drop(index = ind)
     
     A = int(fname.split('_')[-1]) #Need to pull out the value of A from fname, dont remember the format.
@@ -48,7 +48,7 @@ def plot_heat_map(fname):
     loc3 = value_counts(runs,3)
     loc4 = value_counts(runs,4)
 
-    locs = (loc2+loc3+loc4)/3
+    locs = (loc2+loc3+loc4)/(3*len(runs))
 
 
     loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
@@ -68,8 +68,9 @@ def plot_heat_map(fname):
     
     fig.suptitle('Heatmaps of location of AF induction and the Corresponding Coupling Space', fontsize = 16)
     plt.tight_layout()
-    plt.savefig('heatmap.png')
+    name = 'heatmap_' + str(A) +'.png'
+    plt.savefig(name)
     plt.close()
 
     
-plot_heat_map('Normal_Modes_Phase_Space_5')
+#plot_heat_map('Normal_Modes_Phase_Space_1')
