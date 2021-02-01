@@ -4,7 +4,7 @@ from configuration import *
 from CouplingViz import *
 import time 
 
-def InitialLattice():
+def InitialLattice(x = 0):
     lattice = HexagonalLattice(config['width'],
         config['height'],
         config['runtime'],
@@ -15,7 +15,8 @@ def InitialLattice():
         config['graph'],
         config['FullStateSave'],
         config['stats'],
-        config['set_seed'])
+        config['set_seed'],
+        x = x)
 
     lattice.CreateLattice()
     return lattice
@@ -54,12 +55,11 @@ def NormalModesPS():
     df.to_csv('Normal_Modes_Phase_Space_{}.csv'.format(str(A)))
     return df
 
-
 def AnimationGrab():
     df = InitialDF()
-    offs = [0,0.5,0.75,1]
-    amps = [0,0.1,0.3,0.5]
-    A = [1,3,5,10,20]
+    offs = np.linspace(0.4,1,13)
+    amps = [0]
+    A = [1]
     #Will potentially do up to 80 but it wont -- just being systematic. All data will be saved in AF run
     for o in offs:
         print('Offset:', o)
@@ -67,7 +67,7 @@ def AnimationGrab():
             print('Amplitude:', a)
             for i in A:
                 print('A: ', i)
-                lattice = InitialLattice()
+                lattice = InitialLattice(x = o)
 
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,a,o],
                 config['grad_start'], config['grad_end'] )
@@ -76,8 +76,7 @@ def AnimationGrab():
                 run[13] = [i,a,o]
 
                 in_AF = lattice.kill
-                if in_AF:
-                    lattice.Coupling_Sample(i,a,o)
+                lattice.Coupling_Sample(i,a,o)
 
 
                 run.extend([lattice.mean, lattice.var, in_AF]) 
@@ -109,14 +108,41 @@ def Periodicity():
     df.to_csv('Prelim.csv')
     return df
 
+def bond_counts():
+    df = InitialDF()
+    offs = np.linspace(0,1,101)
+    runs = 50
+    bonds = {i : [] for i in offs}
+    for o in offs:
+        for _ in range(runs):
+            lattice = InitialLattice(x = o)
+
+            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [1,0,o],
+            config['grad_start'], config['grad_end'] )
+            bonds[o].append(lattice.number_of_bonds())
+    first = True
+    for i in bonds.keys():
+        bonds[i] = np.mean(bonds[i]) / np.mean(bonds[1.0])
+        if first == True and bonds[i] > 2*np.sin(np.pi/18):
+            first = i * 100
+    f, ax = plt.subplots()
+    ax.bar(range(len(bonds)), list(bonds.values()), align='center')
+    plt.ylabel('Probability of a bond being filled')
+    plt.xlabel('Offset * 100')
+    plt.hlines(2*np.sin(np.pi/18), 0, 100, linestyles = 'dashed', colors = 'red', label = 'Bond percolation threshold')
+    plt.xlim(0,100)
+    plt.vlines(first, 0, 1, linestyles = 'dashed', colors = 'green', label = 'Coupling percolation threshold')
+    plt.ylim(0,1)
+    plt.legend()
+    plt.savefig('bonds_bar.png')
+
 def main():
     t0 = time.time()
-
-    df = AnimationGrab()
+    bond_counts()
+    '''df = AnimationGrab()
     for i in range(len(df)):
-        if df['in AF?'][i]:
-            Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
-    
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
+    '''
     t1 = time.time()
     print(t1-t0)
 

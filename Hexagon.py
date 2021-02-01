@@ -42,7 +42,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, FullStateMethod = False, stats = False, seed = 0):
+     graph = False, FullStateMethod = False, stats = False, seed = 0, x = 0):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -55,6 +55,7 @@ class HexagonalLattice():
         self.full_save = FullStateMethod #Options r full (whole run), any number (last x timesteps), transition (150 before AF, 150 after AF), False (Nothign saved)
         self.pacing_period = width * 2
         self.stats = stats
+        self.x_graph = x
         
         if seed == 0:
             self.seed = np.random.randint(0,int(2**32 - 1))
@@ -161,6 +162,13 @@ class HexagonalLattice():
         else:
             x = index - (row * self.width) + 0.5
         return (x,y)
+
+    def number_of_bonds(self):
+        bonds = 0
+        for i in self.neighbours.keys():
+            for j in self.neighbours[i]:
+                bonds += 1 
+        return bonds/2
     
     def sinusoid2D(self, x, y, A, amp, mean):
         #Amplitude - directly sets the amplitude of the function
@@ -317,11 +325,14 @@ class HexagonalLattice():
     def AF_check(self):
         if sum(self.AF[self.t - self.pacing_period:self.t]) > len(self.AF[self.t - self.pacing_period:self.t]) * self.height * 1.1:
             return True #If sum of activ. sites over pacing period > 1.1 * expected number of activate --> FIBRILLATION.
-        width_dif = int((self.pacing_period - self.width) / 2)  #Checking if sites are activated at end of beat - trying to catch special cases
+        width_dif = int((self.pacing_period - self.width) / 4)  #Checking if sites are activated at end of beat - trying to catch special cases
         avg_over_dif = sum(self.AF[self.t - width_dif:self.t]) / width_dif
         avg_over_norm = sum(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2]) / len(self.AF[self.t + 1 - self.pacing_period:self.t - width_dif * 2])
         if avg_over_dif > avg_over_norm / 6: #6 is an arbitrary fraction
-            return True
+            if self.AF[self.t - 1] > 0:
+                return True
+            else:
+                return False
         else:
             return False
 
@@ -356,7 +367,7 @@ class HexagonalLattice():
         ax.plot(x, self.AF, ls = '-', label = 'Number of activated sites')
         ax.set_ylabel("Number of activated cells")
         ax.set_xlabel("Time")
-        plt.savefig('Graphed' + '.png')  #################################
+        plt.savefig('Graphed_{}'.format(self.x_graph) + '.png')  #################################
         plt.close()
 
     def save_choice(self): #Run once at end

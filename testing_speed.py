@@ -44,43 +44,48 @@ def plot_amp_offs_PS():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_25_large_colourmap_20')
 
-def plot_mean_var_PS():
-    Runs = pd.read_csv('Normal_Modes_Phase_Space_1.csv')
-
+def plot_mean_var_PS(fname):
+    Runs = pd.read_csv(fname)
+    A = str(fname.split('_')[-1].split('.')[0])
+    print(A)
     for index, row in Runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
         Runs.loc[index, 'normal_beta'] = float(list_[2].strip())
         Runs.loc[index, 'normal_alpha'] = float(list_[1].strip())
 
-    map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
-    map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
+    Runs = Runs[Runs['normal_alpha'] < 0.51]
+    Runs['std'] = np.sqrt(Runs['variance'])
+
+    Runs['std_cut'] = pd.cut(Runs['std'], list(np.linspace(-0.01, 0.31, 17)), labels = list(np.linspace(0, 0.3, 16)))
+    Runs['mean_cut'] = pd.cut(Runs['mean'], list(np.linspace(-0.01, 1.01, 27)), labels = list(np.linspace(0, 1, 26)))
+
+    map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['std_cut']), reverse = True))}
+    map_beta = {j:i for i,j in enumerate(np.unique(Runs['mean_cut']))}
 
     print(map_alpha)
     print(map_beta)
 
-    tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
-    print(tot_count)
     PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-    #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-    print(PS.shape)
+    PS_tot = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
     for index, row in Runs.iterrows():
+        x = map_beta[row['mean_cut']]
+        y = map_alpha[row['std_cut']]
+        PS_tot[y][x] += 1
         if row['in AF?']:
-            x = map_beta[row['normal_beta']]
-            y = map_alpha[row['normal_alpha']]
             PS[y][x] += 1
             #PS_time[y][x] += row['%time in AF']
-    PS_per = PS / tot_count
-    #PS_time = PS_time / tot_count
+        
+    PS_per = PS / PS_tot
     df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
     df.index = np.round(df.index*100)/100
     df.columns = np.round(df.columns*100)/100
     f, ax = plt.subplots()
     sns.heatmap(df, ax = ax)
     ax.tick_params(axis='y', rotation=0)
-    ax.set_xlabel('Offset')
-    ax.set_ylabel('Amplitude')
+    ax.set_xlabel('Mean')
+    ax.set_ylabel('Std')
     ax.set_title('Fraction of simulations that entered fibrillation')
-    plt.savefig('PS_25_large_colourmap')
+    plt.savefig('PS_mean_std_large_colourmap_{}'.format(A))
 
 
 def plot_amp_offs_periodicity():
@@ -123,7 +128,9 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
-plot_amp_offs_PS()
+fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
+for i in fname:
+    plot_mean_var_PS(i)
 
 '''df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
