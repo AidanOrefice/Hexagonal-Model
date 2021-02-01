@@ -4,13 +4,39 @@ import matplotlib.pyplot as plt
 from Hexagon import HexagonalLattice
 from hexalattice.hexalattice import *
 from CouplingViz import sinusoid2D
+from scipy.spatial.distance import euclidean
+import time
 
 
-#Need to think about how it is normalised.
+def gaussian(dist,c):
+    #List of distances to a points
+    #List of c to that given point
+    exponent = -0.5*(np.square(dist) + np.square(c))
+    return np.exp(exponent)
+
+def xy_to_index(x,y,width):
+    if x % 1 == 0:
+        row = int(x)
+        col = int(y/(np.sqrt(3)/2))
+    else:
+        row = int(x-0.5)
+        col = int(y/(np.sqrt(3)/2)) + 1
+    idx = row + col*width
+    return idx
+
+def index_to_xy(index):
+    row = np.floor(index / 100)
+    y = row - row*(1-(np.sqrt(3)/2)) #fix.
+    if_even = row % 2 == 0
+    if if_even:
+        x = index - (row * 100)
+    else:
+        x = index - (row * 100) + 0.5
+    return (x,y)
 
 def value_counts(df,n):
     #n relates to which location method i.e. location_n
-    locs = df['location_' + str(n)].value_counts(sort = False, normalize = True)
+    locs = df['location_' + str(n)].value_counts(sort = False, normalize = False)
     
     inds = list(map(int, list(locs.index)))
     locs_ = pd.DataFrame(np.zeros(10000))
@@ -33,7 +59,7 @@ def plot_heat_map(fname):
     for ind, row in runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
         amp, offs = float(list_[1]), float(list_[2])
-        if (amp > 0.5) or (amp < 0.05) or (offs < 0.25):
+        if (amp > 0.5) or (amp < 0.05) or (offs < 0.4):
             runs = runs.drop(index = ind)
     
     A = int(fname.split('_')[-1]) #Need to pull out the value of A from fname, dont remember the format.
@@ -48,10 +74,10 @@ def plot_heat_map(fname):
     loc3 = value_counts(runs,3)
     loc4 = value_counts(runs,4)
 
-    locs = (loc2+loc3+loc4)/3
+    locs = (loc2+loc3+loc4)/(3*len(runs))
 
-
-    loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
+    #con_locs = Convolve3(locs,5)
+    loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = con_locs, cmap = 'gnuplot2') # gist_gray, gnuplot
     fig.colorbar(loc_plot, ax = ax1, shrink = 0.6)
 
     #Plot the sapce onto the same figure.
@@ -60,6 +86,7 @@ def plot_heat_map(fname):
     #0.1, 1 - amp,offs: I jsut chose arbitrary values but have to be careful with colorbars here.
 
     sin_z = [sinusoid2D(x[i], y[i], A, 0.1, 1) for i in range(len(x))]
+
     couple_plot = ax2.scatter(x,y,marker = 'h', s=17, c = sin_z)
     cbar = fig.colorbar(couple_plot, ax = ax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
 
@@ -68,8 +95,92 @@ def plot_heat_map(fname):
     
     fig.suptitle('Heatmaps of location of AF induction and the Corresponding Coupling Space', fontsize = 16)
     plt.tight_layout()
-    plt.savefig('heatmap.png')
+    name = 'convolved_heatmap_' + str(A) +'.png'
+    plt.savefig(name)
     plt.close()
 
     
+#plot_heat_map('Normal_Modes_Phase_Space_1')
+
+
+def ConvolveAttempt1():
+    abs_dist = [np.sqrt(pow(x[i],2)+pow(y[i],2)) for i in range(len(x))]
+    #print(abs_dist)
+    for i in abs_dist:
+        diffs = np.array([abs(i-j) for j in abs_dist])
+        inds = np.argwhere(diffs <= l) # returns indices that are within distance l in the lattice.
+    
+    #This includes its own index so will have to subtract 1 from the summation.
+    #x,y -positions of hex_centres
+    #c - grayscale intensitiy value
+    #l - critical length scale to average over
+
+    #for each point in the lattice
+    #Need to calculate the weight vector i.e for each site in a given area
+    #Instead of using physical distance -> now use number of indices to include.
+
+
+def ConvolveAttempt2(fname):
+
+    runs = pd.read_csv(fname + '.csv')
+    #print(type(runs.iloc[6438,21]))
+    #Fix problem of trues in location 4, set to location 3 value
+    runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
+    runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
+
+    #Amplitude above 0.5
+    #Amplitude below 0.1
+    #LIMITS
+    for ind, row in runs.iterrows():
+        list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
+        amp, offs = float(list_[1]), float(list_[2])
+        if (amp > 0.5) or (amp < 0.05) or (offs < 0.4):
+            runs = runs.drop(index = ind)
+    
+    A = int(fname.split('_')[-1]) #Need to pull out the value of A from fname, dont remember the format.
+
+    hex_centers, _ = create_hex_grid(nx=100, ny=100, do_plot=False, align_to_origin = False)
+    x = [i[0] for i in hex_centers]
+    y = [i[1] for i in hex_centers]
+
+    fig = plt.figure()
+    fig.set_size_inches(16,7)
+
+
+    loc2 = value_counts(runs,2)
+    loc3 = value_counts(runs,3)
+    loc4 = value_counts(runs,4)
+
+    locs = (loc2+loc3+loc4)/(3*len(runs))
+
+    plt.hexbin(x,y,locs, gridsize = (100,100), bins = 'log')
+    plt.axis('equal')
+    plt.savefig('test.png')
+
+
+
+def Convolve3(c,l):
+    #for a given index - calculate all indexs that should for convolve with it
+    #With these indicies, calculate the exponential weight terms
+    #With these uou can calculate the convolved value.
+    convolved = []
+    coords = np.array([index_to_xy(i) for i in range(10000)])
+    cnt = 0
+    for i in coords:
+        if cnt % 1000 == 0:
+            t = time.localtime()
+            current_time = time.strftime("%H:%M:%S", t)
+            print(current_time)
+        vals = np.array([euclidean(k, i) for k in coords])
+        inc_bool = vals <= 3
+        c_diff = np.abs(c[inc_bool] - c[cnt])
+        unsum = gaussian(vals[inc_bool], c_diff)
+        convolved.append(sum(unsum*c[inc_bool])/sum(unsum))
+        cnt += 1
+    return convolved
+
+
+t0 = time.time()
 plot_heat_map('Normal_Modes_Phase_Space_5')
+t1 = time.time()
+print(t1-t0)
