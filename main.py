@@ -3,6 +3,16 @@ from Hexagon import *
 from configuration import *
 from CouplingViz import *
 import time 
+import pickle
+
+
+def save_dict(fname, a):
+    with open('{}.pickle'.format(fname), 'wb') as handle:
+        pickle.dump(a, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+def open_dict(fname):
+    with open('{}.pickle'.format(fname), 'rb') as handle:
+        b = pickle.load(handle)
 
 def InitialLattice(x = 0):
     lattice = HexagonalLattice(config['width'],
@@ -87,25 +97,25 @@ def AnimationGrab():
 def Periodicity():
     df = InitialDF()
     amp = 0.2
-    off = 0.7
-    A = [3]
-    runs = 1
+    off = 0.75
+    A = [10]
+    runs = 10000
     for i in A:
         print('A:', i)
         for _ in range(runs):
-            lattice = InitialLattice()
+            lattice = InitialLattice(x = i)
             lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,amp,off],
             config['grad_start'], config['grad_end'] )
             run = lattice.RunIt()
-            lattice.Coupling_Sample(i,amp,off)
-            VizTest(i,amp,off,100,100)
+            #lattice.Coupling_Sample(i,amp,off)
+            #VizTest(i,amp,off,100,100)
 
             run[13] = [i,amp,off]
 
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
             run.extend([lattice.mean, lattice.var, in_AF]) 
             df.loc[len(df)] = run
-    df.to_csv('Prelim.csv')
+    df.to_csv('Prelim_10.csv')
     return df
 
 def bond_counts():
@@ -125,8 +135,9 @@ def bond_counts():
         bonds[i] = np.mean(bonds[i]) / np.mean(bonds[1.0])
         if first == True and bonds[i] > 2*np.sin(np.pi/18):
             first = i * 100
+    save_dict('bonds_dict', bonds)
     f, ax = plt.subplots()
-    ax.bar(range(len(bonds)), list(bonds.values()), align='center')
+    ax.bar(range(len(bonds)), list(bonds.values()), align='center', color= 'dimgrey')
     plt.ylabel('Probability of a bond being filled')
     plt.xlabel('Offset * 100')
     plt.hlines(2*np.sin(np.pi/18), 0, 100, linestyles = 'dashed', colors = 'red', label = 'Bond percolation threshold')
@@ -138,11 +149,11 @@ def bond_counts():
 
 def main():
     t0 = time.time()
-    bond_counts()
-    '''df = AnimationGrab()
-    for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
-    '''
+    #Periodicity()
+    df = Periodicity()
+    '''for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
+    
     t1 = time.time()
     print(t1-t0)
 
