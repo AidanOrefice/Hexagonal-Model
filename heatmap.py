@@ -8,10 +8,10 @@ from scipy.spatial.distance import euclidean
 import time
 
 
-def gaussian(dist,c):
+def gaussian(dist,c,theta):
     #List of distances to a points
     #List of c to that given point
-    exponent = -0.5*(np.square(dist) + np.square(c))
+    exponent = -0.5*(np.square(dist/theta) + np.square(c/theta))
     return np.exp(exponent)
 
 def xy_to_index(x,y,width):
@@ -59,7 +59,7 @@ def plot_heat_map(fname, convolve = True):
     for ind, row in runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
         amp, offs = float(list_[1]), float(list_[2])
-        if (amp > 0.5) or (amp < 0.05) or (offs < 0.4):
+        if (amp > 0.5) or (amp < 0.05) or (offs < 0.59):
             runs = runs.drop(index = ind)
     
     A = int(fname.split('_')[-1]) #Need to pull out the value of A from fname, dont remember the format.
@@ -77,7 +77,7 @@ def plot_heat_map(fname, convolve = True):
     locs = (loc2+loc3+loc4)/(3*len(runs))
 
     if convolve:
-        locs = Convolve(locs,10)
+        locs = Convolve(locs, 3, 0.75)
     
     loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
     fig.colorbar(loc_plot, ax = ax1, shrink = 0.6)
@@ -103,10 +103,11 @@ def plot_heat_map(fname, convolve = True):
 
     
 
-def Convolve(c,l):
+def Convolve(c,l,theta):
     #for a given index - calculate all indexs that should for convolve with it
     #With these indicies, calculate the exponential weight terms
     #With these uou can calculate the convolved value.
+    #Scaling our vectors by theta - should scale length scale accordingly
     convolved = []
     coords = np.array([index_to_xy(i) for i in range(10000)])
     cnt = 0
@@ -118,7 +119,7 @@ def Convolve(c,l):
         vals = np.array([euclidean(k, i) for k in coords])
         inc_bool = vals <= l
         c_diff = np.abs(c[inc_bool] - c[cnt])
-        unsum = gaussian(vals[inc_bool], c_diff)
+        unsum = gaussian(vals[inc_bool], c_diff, theta)
         convolved.append(sum(unsum*c[inc_bool])/sum(unsum))
         cnt += 1
     return convolved
@@ -128,3 +129,7 @@ t0 = time.time()
 plot_heat_map('Normal_Modes_Phase_Space_5', True)
 t1 = time.time()
 print(t1-t0)
+
+
+#Amps and offsets
+#(0.2,0.75)
