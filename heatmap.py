@@ -125,6 +125,6 @@ def Convolve(c,l):
 
 
 t0 = time.time()
-plot_heat_map('Normal_Modes_Phase_Space_5', True)
+plot_heat_map('Prelim_3', False)
 t1 = time.time()
 print(t1-t0)
