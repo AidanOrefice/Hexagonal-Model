@@ -99,7 +99,7 @@ def Periodicity():
     amp = 0.2
     off = 0.75
     A = [1]
-    runs = 10000
+    runs = 1
     for i in A:
         print('A:', i)
         for _ in range(runs):
@@ -117,7 +117,7 @@ def Periodicity():
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
             run.extend([lattice.mean, lattice.var, in_AF]) 
             df.loc[len(df)] = run
-    df.to_csv('Prelim_1.csv')
+    #df.to_csv('Prelim_1.csv')
     return df
 
 def bond_counts():
@@ -151,10 +151,9 @@ def bond_counts():
 
 def main():
     t0 = time.time()
-    #Periodicity()
     df = Periodicity()
-    '''for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
+    for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
     
     t1 = time.time()
     print(t1-t0)

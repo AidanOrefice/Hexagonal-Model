@@ -42,7 +42,7 @@ def value_counts(df,n):
     locs_ = pd.DataFrame(np.zeros(10000))
     for i in range(10000):
         if i in inds:
-            locs_[0][i] = locs[str(i)]
+            locs_[0][i] = locs[i] #str(i) or i - if key error occurs
 
     return np.array(locs_[0])
 
@@ -56,11 +56,11 @@ def plot_heat_map(fname, convolve = True):
     #Amplitude above 0.5
     #Amplitude below 0.1
     #LIMITS
-    for ind, row in runs.iterrows():
+    '''for ind, row in runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
         amp, offs = float(list_[1]), float(list_[2])
         if (amp > 0.5) or (amp < 0.05) or (offs < 0.59):
-            runs = runs.drop(index = ind)
+            runs = runs.drop(index = ind)'''
     
     A = int(fname.split('_')[-1]) #Need to pull out the value of A from fname, dont remember the format.
 
@@ -97,7 +97,7 @@ def plot_heat_map(fname, convolve = True):
     
     fig.suptitle('Heatmaps of location of AF induction and the Corresponding Coupling Space', fontsize = 16)
     plt.tight_layout()
-    name = 'test_convolved_heatmap_' + str(A) +'.png'
+    name = 'heatmap_' + str(A) +'.png'
     plt.savefig(name)
     plt.close()
 
@@ -126,7 +126,7 @@ def Convolve(c,l,theta):
 
 
 t0 = time.time()
-plot_heat_map('Prelim_3', False)
+plot_heat_map('Prelim_10', False)
 t1 = time.time()
 print(t1-t0)
 
