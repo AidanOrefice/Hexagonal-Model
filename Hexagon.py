@@ -42,7 +42,7 @@ class HexagonalLattice():
     neighbours - dictionary of the neighbours of each lattice site.
     '''
     def __init__(self, width, height, runtime, threshold, sigmoid_strength, coupling = 1, refractory_period = 10,
-     graph = False, FullStateMethod = False, stats = False, seed = 0, x = 0):
+     graph = False, FullStateMethod = False, stats = False, seed = 0, x = 0, multiplier = 7):
         self.height = height
         self.width = width
         self.dt = 1 #Discrete time width of lattice.
@@ -56,6 +56,7 @@ class HexagonalLattice():
         self.pacing_period = width * 2
         self.stats = stats
         self.x_graph = x
+        self.multiplier = multiplier
         
         if seed == 0:
             self.seed = np.random.randint(0,int(2**32 - 1))
@@ -146,8 +147,8 @@ class HexagonalLattice():
                              #, index + 1, index - (self.width * 2) + 1, index - self.width + 1
                     else: #All non-edge sites.
                         if if_even:
-                            self.neighbours[index] = np.asarray([index - self.width, index + 1, index - 1, index + self.width,
-                             index + self.width - 1, index - self.width - 1])
+                            self.neighbours[index] = np.asarray([index - self.width, index + 1, index + self.width,
+                             index + self.width - 1, index - self.width - 1, index - 1])
                         else:
                             self.neighbours[index] = np.asarray([ index - self.width + 1, index + 1,  index + self.width + 1,
                              index - 1, index + self.width, index - self.width])
@@ -188,48 +189,40 @@ class HexagonalLattice():
         keys = self.neighbours.keys()
         copy = self.neighbours.copy()
         #new_dic = {i : [] for i in range(len(keys))}
-        deleted_dic = {}
-
-        if constant:
-            for i in keys:
-                neighbours = self.neighbours[i]
-                new, deleted =  choose_numbers(neighbours, self.coupling)
-                self.neighbours[i] = new
-                deleted_dic[i] = deleted           
-        
-        elif gradient:
-            delta = (end-start)/self.width
-            for i in keys:
-                x,y = self.index_to_xy(i)
-                grad_coupling = np.sqrt((delta*x) + start) 
-                neighbours = self.neighbours[i]
-                new, deleted =  choose_numbers(neighbours, grad_coupling)
-                self.neighbours[i] = new
-                deleted_dic[i] = deleted
-
-        elif norm_modes:
-            for i in keys:
-                x,y = self.index_to_xy(i)
+        deleted_dic = {i : [] for i in range(len(keys))}  
+        counter = 0
+        for i in keys:
+            if i % self.width == self.width - 1:
+                if np.floor(i/self.width) % 2 == 0:
+                    no_neighbours = 2
+                else:
+                    no_neighbours = 0
+            else:
+                no_neighbours = 3
+            for j in self.neighbours[i][:no_neighbours]:
+                counter += 1
+                x1, x2 = self.index_to_xy(i), self.index_to_xy(j)# change this x,y
+                x,y = 0.5*(x1[0] + x2[0]), 0.5*(x1[1] + x2[1])
                 grad_coupling = self.sinusoid2D(x, y, *sinusoid_params)
-                neighbours = self.neighbours[i]
-                new, deleted =  choose_numbers(neighbours, grad_coupling)
-                self.neighbours[i] = new
-                deleted_dic[i] = deleted            
-            self.coupling_samp = np.asarray([len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()])
-            self.mean, self.var = np.mean(self.coupling_samp), np.var(self.coupling_samp)
+                p = np.random.uniform(0,1)
+                if p < grad_coupling:
+                    pass #keep bond
+                else:
+                    deleted_dic[i].append(j)
+                    deleted_dic[j].append(i)
 
             #If we want to look at the unique counts.
             #unique, counts = np.unique(self.coupling_samp, return_counts=True)
             #print(np.asarray((unique,counts)).T)
-
+            
         for i in deleted_dic.keys():
             neighbours = deleted_dic[i]
             for j in neighbours:
-                neighbours1 = list(self.neighbours[j])
-                if i in neighbours1:
-                    index = neighbours1.index(i)
-                    neighbours2 = np.delete(neighbours1, index)
-                    self.neighbours[j] = neighbours2
+                index = list(self.neighbours[i]).index(j)
+                self.neighbours[i] = np.delete(self.neighbours[i], index)
+
+        self.coupling_samp = np.asarray([len(self.neighbours[i])/len(copy[i]) for i in self.neighbours.keys()])
+        self.mean, self.var = np.mean(self.coupling_samp), np.var(self.coupling_samp)
 
     def Coupling_Sample(self, A, amp, offs):
         fig,ax = plt.subplots()
@@ -273,9 +266,9 @@ class HexagonalLattice():
 
     def ActivationCheck(self):
         index_charged = np.where(self.hexagon > 0)[0]
-        p = self.SigmoidDist(self.hexagon[index_charged])
+        p = (1 - self.SigmoidDist(self.hexagon[index_charged])) * self.multiplier
         a = np.random.rand(len(index_charged))
-        self.index_act = index_charged[p>a]
+        self.index_act = index_charged[a>p]
         self.ref[self.index_act] = 1 #Set sites to activated.
         self.hexagon[index_charged] = 0
         if self.t % self.pacing_period == 0:

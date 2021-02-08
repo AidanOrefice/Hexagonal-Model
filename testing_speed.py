@@ -6,8 +6,9 @@ import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
 
-def plot_amp_offs_PS():
-    Runs = pd.read_csv('Normal_Modes_Phase_Space_20.csv')
+def plot_amp_offs_PS(fname):
+    Runs = pd.read_csv(fname)
+    A = str(fname.split('_')[-1].split('.')[0])
 
     for index, row in Runs.iterrows():
         list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
@@ -42,7 +43,7 @@ def plot_amp_offs_PS():
     ax.set_xlabel('Offset')
     ax.set_ylabel('Amplitude')
     ax.set_title('Fraction of simulations that entered fibrillation')
-    plt.savefig('PS_25_large_colourmap_20')
+    plt.savefig('PS_25_large_colourmap_{}'.format(A))
 
 def plot_mean_var_PS(fname):
     Runs = pd.read_csv(fname)
@@ -130,7 +131,7 @@ def plot_amp_offs_periodicity():
 
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
 for i in fname:
-    plot_mean_var_PS(i)
+    plot_amp_offs_PS(i)
 
 '''df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
