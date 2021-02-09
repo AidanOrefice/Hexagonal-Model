@@ -2,7 +2,7 @@ from time import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
 
@@ -88,6 +88,19 @@ def plot_mean_var_PS(fname):
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_mean_std_large_colourmap_{}'.format(A))
 
+def SigmoidPlot(fname):
+    Runs = pd.read_csv(fname)
+    df = Runs[Runs['in AF?']]
+    fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    avg_time = []
+    for i in fun:
+        vals = df.loc[df['multiplier'] == i]['AF_time']
+        times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
+        avg_time.append(np.average(times))
+
+    plt.plot(fun,avg_time)
+    plt.savefig('testie.png')
+
 
 def plot_amp_offs_periodicity():
     Runs = pd.read_csv('PeriodicityInvestigation.csv')
@@ -129,11 +142,15 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
+
+SigmoidPlot('Prelim_0.6.csv')
+
+'''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
 for i in fname:
     plot_amp_offs_PS(i)
 
-'''df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
+df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
 df.columns = np.round(df.columns*100)/100
 f, ax = plt.subplots()
