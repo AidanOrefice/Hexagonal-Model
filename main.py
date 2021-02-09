@@ -99,16 +99,16 @@ def Periodicity():
     df = InitialDF()
     amp = 0.2
     off = 0.6
-    A = [1]
-    runs = 100
+    A = [5]
+    runs = 300
     fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     for i in A:
         print('A:', i)
         for _ in range(runs):
             if _ % 10 == 0:
                 print(_)
-            for x in fun:
-                lattice = InitialLattice(x = i)
+            for k in fun:
+                lattice = InitialLattice(x = k)
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,amp,off],
                 config['grad_start'], config['grad_end'])
                 run = lattice.RunIt()
@@ -118,9 +118,9 @@ def Periodicity():
                 run[13] = [i,amp,off]
 
                 in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-                run.extend([lattice.mean, lattice.var, in_AF,x]) 
+                run.extend([lattice.mean, lattice.var, in_AF, k]) 
                 df.loc[len(df)] = run
-    df.to_csv('Prelim_{}.csv'.format(off))
+    df.to_csv('Prelim_{}_{}.csv'.format(off,i))
     return df
 
 def bond_counts():
