@@ -33,7 +33,7 @@ def InitialLattice(x = 0):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -98,14 +98,14 @@ def AnimationGrab():
 def Periodicity():
     df = InitialDF()
     amp = 0.2
-    off = 0.5
+    off = 0.6
     A = [1]
     runs = 100
-    fun = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     for i in A:
         print('A:', i)
         for _ in range(runs):
-            if _ % 100 == 0:
+            if _ % 10 == 0:
                 print(_)
             for x in fun:
                 lattice = InitialLattice(x = i)
@@ -118,7 +118,7 @@ def Periodicity():
                 run[13] = [i,amp,off]
 
                 in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-                run.extend([lattice.mean, lattice.var, in_AF]) 
+                run.extend([lattice.mean, lattice.var, in_AF,x]) 
                 df.loc[len(df)] = run
     df.to_csv('Prelim_{}.csv'.format(off))
     return df

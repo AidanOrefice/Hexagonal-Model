@@ -5,7 +5,7 @@ import numpy as np
 config = dict(
     width = 100,
     height = 100,
-    runtime = 100000,
+    runtime = 10000,
     threshold = 0.25,
     sigmoid_strength = 25,
     coupling = 0.55,
