@@ -14,7 +14,7 @@ def open_dict(fname):
     with open('{}.pickle'.format(fname), 'rb') as handle:
         b = pickle.load(handle)
 
-def InitialLattice(x = 0):
+def InitialLattice(x = 1):
     lattice = HexagonalLattice(config['width'],
         config['height'],
         config['runtime'],
@@ -33,7 +33,7 @@ def InitialLattice(x = 0):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -68,9 +68,9 @@ def NormalModesPS():
 
 def AnimationGrab():
     df = InitialDF()
-    offs = np.linspace(0.4,1,13)
-    amps = [0]
-    A = [1]
+    offs = [0.8]
+    amps = [0.2,0.3,0.4,0.5]
+    A = [1,3,5,10,20]
     #Will potentially do up to 80 but it wont -- just being systematic. All data will be saved in AF run
     for o in offs:
         print('Offset:', o)
@@ -108,12 +108,12 @@ def Periodicity():
             if _ % 10 == 0:
                 print(_)
             for k in fun:
-                lattice = InitialLattice(x = k)
+                lattice = InitialLattice()
                 lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,amp,off],
                 config['grad_start'], config['grad_end'])
                 run = lattice.RunIt()
-                #lattice.Coupling_Sample(i,amp,off)
-                #VizTest(i,amp,off,100,100)
+                lattice.Coupling_Sample(i,amp,off)
+                VizTest(i,amp,off,100,100)
 
                 run[13] = [i,amp,off]
 
@@ -155,9 +155,9 @@ def bond_counts():
 
 def main():
     t0 = time.time()
-    df = Periodicity()
-    '''for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
+    df = AnimationGrab()
+    for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
     
     t1 = time.time()
     print(t1-t0)

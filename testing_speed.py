@@ -93,13 +93,17 @@ def SigmoidPlot(fname):
     df = Runs[Runs['in AF?']]
     fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     avg_time = []
+    re_plot = []
+    off, A = 0.6,5
     for i in fun:
         vals = df.loc[df['multiplier'] == i]['AF_time']
         times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
-        avg_time.append(np.average(times))
+        if len(times) > 0:
+            avg_time.append(np.average(times))
+            re_plot.append(i)
 
-    plt.plot(fun,avg_time)
-    plt.savefig('testie.png')
+    plt.plot(re_plot,avg_time)
+    plt.savefig('testie_{}_{}.png'.format(off,A))
 
 
 def plot_amp_offs_periodicity():
@@ -143,7 +147,7 @@ def plot_amp_offs_periodicity():
     plt.savefig('Periodicity_heatmap.png')
 
 
-SigmoidPlot('Prelim_0.6.csv')
+SigmoidPlot('Prelim_0.6_5.csv')
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
