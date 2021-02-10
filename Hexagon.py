@@ -181,11 +181,7 @@ class HexagonalLattice():
         A = float(A)
         return (amp/2)*(np.sin(A*x*(2*np.pi/self.width))+np.sin(A*y*(2*np.pi/self.index_to_xy(self.height* self.width -1)[1]))) + mean
 
-    def CouplingMethod(self, constant = False, gradient = False, norm_modes = True, sinusoid_params = [1,0.1,0.6], 
-    start = 0.9 , end = 0.7):
-        if constant + gradient + norm_modes != 1:
-            raise ValueError('Cannot decouple using two different methods.')
-
+    def CouplingMethod(self, sinusoid_params = [1,0.1,0.6]):
         keys = self.neighbours.keys()
         copy = self.neighbours.copy()
         #new_dic = {i : [] for i in range(len(keys))}

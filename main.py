@@ -33,7 +33,7 @@ def InitialLattice(x = 1):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -52,12 +52,11 @@ def NormalModesPS():
             for _ in range(runs):
                 lattice = InitialLattice()
 
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [A,a,o],
-                config['grad_start'], config['grad_end'] )
+                lattice.CouplingMethod([A,a,o])
 
                 run = lattice.RunIt()
                 #lattice.Coupling_Sample(A,a,o)
-                run[13] = [A,a,o]
+                run[8] = [A,a,o]
 
                 in_AF = lattice.kill
 
@@ -80,11 +79,10 @@ def AnimationGrab():
                 print('A: ', i)
                 lattice = InitialLattice(x = o)
 
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,a,o],
-                config['grad_start'], config['grad_end'] )
+                lattice.CouplingMethod([i,a,o])
 
                 run = lattice.RunIt()
-                run[13] = [i,a,o]
+                run[8] = [i,a,o]
 
                 in_AF = lattice.kill
                 lattice.Coupling_Sample(i,a,o)
@@ -95,55 +93,64 @@ def AnimationGrab():
     df.to_csv('AnimationRun.csv')
     return df
 
-def Periodicity():
+def Periodicity(): #Ensure Config is set up properly
     df = InitialDF()
     amp = 0.2
-    off = 0.6
-    A = [5]
-    runs = 300
-    fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    off = 0.5
+    A = [5] #0,1,3,5,10,20
+    multi = 7 ### Need to make sure this is the value we want
+    runs = 5
+    print(df)
     for i in A:
         print('A:', i)
         for _ in range(runs):
             if _ % 10 == 0:
                 print(_)
-            for k in fun:
-                lattice = InitialLattice()
-                lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [i,amp,off],
-                config['grad_start'], config['grad_end'])
-                run = lattice.RunIt()
-                lattice.Coupling_Sample(i,amp,off)
-                VizTest(i,amp,off,100,100)
 
-                run[13] = [i,amp,off]
+            lattice = InitialLattice(x=multi)
+            lattice.CouplingMethod([i,amp,off])
+            run = lattice.RunIt()
 
-                in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-                run.extend([lattice.mean, lattice.var, in_AF, k]) 
-                df.loc[len(df)] = run
-    df.to_csv('Prelim_{}_{}.csv'.format(off,i))
+            #lattice.Coupling_Sample(i,amp,off)
+            #VizTest(i,amp,off,100,100)
+
+            run[8] = [i,amp,off]
+            in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
+            run.extend([lattice.mean, lattice.var, in_AF, multi]) 
+            df.loc[len(df)] = run
+    df.to_csv('HeatMapCollection_{}.csv'.format(i))
     return df
 
-def bond_counts():
-    df = InitialDF()
-    offs = [0,0.5,0.75,1]
+def bond_counts(load = True):
+    t0 = time.time()
+    offs = np.linspace(0,1,201)
     runs = 10
-    bonds = {i : [] for i in offs}
-    for o in offs:
-        for _ in range(runs):
-            lattice = InitialLattice(x = o)
-
-            lattice.CouplingMethod(config['constant'], config['gradient'], config['normal_modes'], [1,0,o],
-            config['grad_start'], config['grad_end'] )
-            bonds[o].append(lattice.number_of_bonds()/ 29800)
-    print(bonds)
-    '''first = True
+    if not load:
+        bonds = {i : [] for i in offs}
+        for o in offs:
+            print(o)
+            for _ in range(runs):
+                lattice = InitialLattice(x = o)
+                lattice.CouplingMethod([1,0,o])
+                bonds[o].append(lattice.number_of_bonds()/ 29800)
+    else:
+        pickle_in = open("bonds_dict.pickle","rb")
+        bonds = pickle.load(pickle_in)
+    
+    first = True
     for i in bonds.keys():
         bonds[i] = np.mean(bonds[i]) / np.mean(bonds[1.0])
         if first == True and bonds[i] > 2*np.sin(np.pi/18):
             first = i * 100
-    save_dict('bonds_dict', bonds)
+            print(first)
+    if not load:
+        save_dict('bonds_dict', bonds)
+
+    new_bonds = []
+    #for i in range(len(offs))
     f, ax = plt.subplots()
-    ax.bar(range(len(bonds)), list(bonds.values()), align='center', color= 'dimgrey')
+    ax.bar(100*offs, list(bonds.values()), align='center', color= 'dimgrey')
+    ax.plot(100*offs, list(bonds.values()), linestyle = '--', color = 'blue', label = 'Linear Fit')
     plt.ylabel('Probability of a bond being filled')
     plt.xlabel('Offset * 100')
     plt.hlines(2*np.sin(np.pi/18), 0, 100, linestyles = 'dashed', colors = 'red', label = 'Bond percolation threshold')
@@ -151,7 +158,9 @@ def bond_counts():
     plt.vlines(first, 0, 1, linestyles = 'dashed', colors = 'green', label = 'Coupling percolation threshold')
     plt.ylim(0,1)
     plt.legend()
-    plt.savefig('bonds_bar.png')'''
+    plt.savefig('bonds_bar.png')
+    t1 = time.time()
+    print(t1-t0)
 
 def main():
     t0 = time.time()
@@ -163,7 +172,7 @@ def main():
     print(t1-t0)
 
 if __name__ == '__main__':
-    main()
+   Periodicity()
 
 
 

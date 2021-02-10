@@ -2,9 +2,10 @@ from time import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-#import seaborn as sns
+import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
+from matplotlib.lines import Line2D
 
 def plot_amp_offs_PS(fname):
     Runs = pd.read_csv(fname)
@@ -94,16 +95,37 @@ def SigmoidPlot(fname):
     fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     avg_time = []
     re_plot = []
-    off, A = 0.6,5
+    off, A = fname.split('_')[1], fname.split('_')[-1].split('.')[0]
+    lens = {}
     for i in fun:
         vals = df.loc[df['multiplier'] == i]['AF_time']
         times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
         if len(times) > 0:
             avg_time.append(np.average(times))
             re_plot.append(i)
+            lens[i] = len(times)
+    print(avg_time)
+    print(lens)
+    plt.figure(figsize=(16,9))
+    plt.bar(re_plot,avg_time)
+    plt.xlabel('Multiplier on Misfire Probability', fontsize = 18)
+    plt.ylabel('Average time to induce Fibrillation', fontsize = 18)
+    plt.title('')
 
-    plt.plot(re_plot,avg_time)
-    plt.savefig('testie_{}_{}.png'.format(off,A))
+    plt.xticks(fontsize =15)
+    plt.yticks(fontsize =15)
+
+    label_offs = 'Offset = ' + str(off)
+    label_amp = 'Amplitude = 0.2'
+    label_a = r'$A$ = ' + str(A)
+
+    legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_offs, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0),
+                Line2D([0], [0], marker='o', color='white', label=label_a, markerfacecolor='white', markersize=0)]
+    plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.075), ncol=3, fontsize = 14)
+
+    plt.savefig('SigMultiPlot_{}_{}.png'.format(off,A))
+
 
 
 def plot_amp_offs_periodicity():
@@ -147,7 +169,7 @@ def plot_amp_offs_periodicity():
     plt.savefig('Periodicity_heatmap.png')
 
 
-SigmoidPlot('Prelim_0.6_5.csv')
+SigmoidPlot('Prelim_0.5_1.csv')
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']

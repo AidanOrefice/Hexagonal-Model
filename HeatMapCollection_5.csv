@@ -1,0 +1,6 @@
+,width,height,runtime,threshold,sigmoid_strength,coupling,refractory_period,set_seed,normal_modes_config,graph,FullStateSave,stats,seed,location_2,location_3,location_4,AF_time,per_%,title,mean,variance,in AF?,multiplier
+0,100,100,1000,0.25,25,0.55,10,0,"[5, 0.2, 0.5]",False,full,False,416284247,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,416284247",0.5019833333333334,0.050462177500000004,False,7
+1,100,100,1000,0.25,25,0.55,10,0,"[5, 0.2, 0.5]",False,full,False,2433136603,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,2433136603",0.50571,0.0492892847888889,False,7
+2,100,100,1000,0.25,25,0.55,10,0,"[5, 0.2, 0.5]",False,full,False,2194086137,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,2194086137",0.5038933333333333,0.05046661973333334,False,7
+3,100,100,1000,0.25,25,0.55,10,0,"[5, 0.2, 0.5]",False,full,False,297222114,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,297222114",0.50107,0.05123563287777779,False,7
+4,100,100,1000,0.25,25,0.55,10,0,"[5, 0.2, 0.5]",False,full,False,4152778959,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,4152778959",0.4992433333333333,0.050862649677777774,False,7
