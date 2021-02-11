@@ -97,10 +97,9 @@ def Periodicity(): #Ensure Config is set up properly
     df = InitialDF()
     amp = 0.2
     off = 0.5
-    A = [5] #0,1,3,5,10,20
+    A = [20] #0,1,3,5,10,20
     multi = 7 ### Need to make sure this is the value we want
-    runs = 5
-    print(df)
+    runs = 10000
     for i in A:
         print('A:', i)
         for _ in range(runs):
@@ -111,8 +110,9 @@ def Periodicity(): #Ensure Config is set up properly
             lattice.CouplingMethod([i,amp,off])
             run = lattice.RunIt()
 
-            #lattice.Coupling_Sample(i,amp,off)
-            #VizTest(i,amp,off,100,100)
+            if _ == 0:
+                lattice.Coupling_Sample(i,amp,off)
+                VizTest(i,amp,off,100,100)
 
             run[8] = [i,amp,off]
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
@@ -172,7 +172,10 @@ def main():
     print(t1-t0)
 
 if __name__ == '__main__':
-   Periodicity()
+    t0 = time.time()
+    Periodicity()
+    t1 = time.time()
+    print(t1-t0)
 
 
 
