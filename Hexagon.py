@@ -285,7 +285,6 @@ class HexagonalLattice():
         self.ref[self.ref == self.ref_per] = 0
 
     def Per_check(self, per):
-        print('per_check')
         indi = [(i*self.width) - 1 for i in range(1,self.height + 1)]#Indexs of right hand side
         pre_length = len(indi)
         for i in range(self.width - int(self.width/5), self.pacing_period):

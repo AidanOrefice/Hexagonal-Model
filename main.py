@@ -92,8 +92,8 @@ def PercolationGrab():
 
 def AnimationGrab():
     df = InitialDF()
-    offs = [0.5]
-    amps = [0.2]
+    offs = [0.65]
+    amps = [0]
     A = [1]
     #Will potentially do up to 80 but it wont -- just being systematic. All data will be saved in AF run
     for o in offs:
@@ -102,11 +102,7 @@ def AnimationGrab():
             print('Amplitude:', a)
             for i in A:
                 print('A: ', i)
-<<<<<<< Updated upstream
-                lattice = InitialLattice(x = 7)
-=======
                 lattice = InitialLattice()
->>>>>>> Stashed changes
 
                 lattice.CouplingMethod([i,a,o])
 
@@ -196,8 +192,8 @@ def bond_counts(load = True):
 def main():
     t0 = time.time()
     df = AnimationGrab()
-    for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])
+    '''for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
     
     t1 = time.time()
     print(t1-t0)

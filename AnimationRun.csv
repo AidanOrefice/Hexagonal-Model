@@ -1,2 +1,2 @@
 ,width,height,runtime,threshold,sigmoid_strength,coupling,refractory_period,set_seed,normal_modes_config,graph,FullStateSave,stats,seed,location_2,location_3,location_4,AF_time,per_%,title,mean,variance,in AF?,multiplier
-0,100,100,1000,0.25,25,0.55,10,0,"[1, 0.2, 0.5]",True,False,False,2013801095,False,False,False,False,0.0,"100,100,1000,0.25,25,Normal Modes,10,2013801095",0.50604,0.05077462951111112,False,1
+0,100,100,1000,0.25,25,0.55,10,0,"[1, 0, 0.65]",True,False,False,1309259548,False,False,False,False,1.0,"100,100,1000,0.25,25,Normal Modes,10,1309259548",0.65295,0.03825196416666667,False,1
