@@ -67,11 +67,11 @@ def NormalModesPS():
 
 def PercolationGrab():
     df = InitialDF()
-    amps = []
-    offs = []
-    A = 1
-    multi = 7
-    runs = 1
+    amps = np.linspace(0,0.5,11)
+    offs = np.linspace(0.35,0.75,9)
+    A = 20
+    multi = 1
+    runs = 6
     for o in offs:
         print('Offset:', o)
         for a in amps:
@@ -84,7 +84,7 @@ def PercolationGrab():
                 #lattice.Coupling_Sample(A,a,o)
                 run[8] = [A,a,o]
                 in_AF = lattice.kill
-                run.extend([lattice.mean, lattice.var, in_AF]) 
+                run.extend([lattice.mean, lattice.var, in_AF, multi]) 
                 df.loc[len(df)] = run
     df.to_csv('PercolationData_{}.csv'.format(str(A)))
     return df
@@ -190,13 +190,10 @@ def bond_counts(load = True):
     print(t1-t0)
 
 def main():
-    t0 = time.time()
-    df = AnimationGrab()
+    df = PercolationGrab()
     '''for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
-    
-    t1 = time.time()
-    print(t1-t0)
+
 
 if __name__ == '__main__':
     t0 = time.time()
