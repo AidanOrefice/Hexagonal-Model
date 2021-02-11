@@ -65,6 +65,31 @@ def NormalModesPS():
     df.to_csv('Normal_Modes_Phase_Space_{}.csv'.format(str(A)))
     return df
 
+def PercolationGrab():
+    df = InitialDF()
+    amps = []
+    offs = []
+    A = 1
+    multi = 7
+    runs = 1
+    for o in offs:
+        print('Offset:', o)
+        for a in amps:
+            print('Amplitude:', a)
+            for _ in range(runs):
+                lattice = InitialLattice(x = multi)
+
+                lattice.CouplingMethod([A,a,o])
+                run = lattice.RunIt()
+                #lattice.Coupling_Sample(A,a,o)
+                run[8] = [A,a,o]
+                in_AF = lattice.kill
+                run.extend([lattice.mean, lattice.var, in_AF]) 
+                df.loc[len(df)] = run
+    df.to_csv('PercolationData_{}.csv'.format(str(A)))
+    return df
+
+
 def AnimationGrab():
     df = InitialDF()
     offs = [0.5]
@@ -77,7 +102,11 @@ def AnimationGrab():
             print('Amplitude:', a)
             for i in A:
                 print('A: ', i)
+<<<<<<< Updated upstream
                 lattice = InitialLattice(x = 7)
+=======
+                lattice = InitialLattice()
+>>>>>>> Stashed changes
 
                 lattice.CouplingMethod([i,a,o])
 
@@ -106,7 +135,7 @@ def Periodicity(): #Ensure Config is set up properly
             if _ % 10 == 0:
                 print(_)
 
-            lattice = InitialLattice(x=multi)
+            lattice = InitialLattice(x = multi)
             lattice.CouplingMethod([i,amp,off])
             run = lattice.RunIt()
 
@@ -121,6 +150,8 @@ def Periodicity(): #Ensure Config is set up properly
     df.to_csv('HeatMapCollection_{}.csv'.format(i))
     return df
 
+
+
 def bond_counts(load = True):
     t0 = time.time()
     offs = np.linspace(0,1,201)
@@ -130,7 +161,7 @@ def bond_counts(load = True):
         for o in offs:
             print(o)
             for _ in range(runs):
-                lattice = InitialLattice(x = o)
+                lattice = InitialLattice()
                 lattice.CouplingMethod([1,0,o])
                 bonds[o].append(lattice.number_of_bonds()/ 29800)
     else:

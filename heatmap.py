@@ -42,7 +42,7 @@ def value_counts(df,n):
     locs_ = pd.DataFrame(np.zeros(10000))
     for i in range(10000):
         if i in inds:
-            locs_[0][i] = locs[i] #str(i) or i - if key error occurs
+            locs_[0][i] = locs[str(i)] #str(i) or i - if key error occurs
 
     return np.array(locs_[0])
 
@@ -97,7 +97,7 @@ def plot_heat_map(fname, convolve = True):
     
     fig.suptitle('Heatmaps of location of AF induction and the Corresponding Coupling Space', fontsize = 16)
     plt.tight_layout()
-    name = 'heatmap_' + str(A) +'.png'
+    name = 'new_heatmap_' + str(A) +'.png'
     plt.savefig(name)
     plt.close()
 
@@ -126,7 +126,7 @@ def Convolve(c,l,theta):
 
 
 t0 = time.time()
-plot_heat_map('Prelim_10', False)
+plot_heat_map('HeatMapCollection_10', False) #0,1,3,5,10,20
 t1 = time.time()
 print(t1-t0)
 
