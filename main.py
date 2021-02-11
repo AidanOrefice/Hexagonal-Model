@@ -67,9 +67,9 @@ def NormalModesPS():
 
 def AnimationGrab():
     df = InitialDF()
-    offs = [0.8]
-    amps = [0.2,0.3,0.4,0.5]
-    A = [1,3,5,10,20]
+    offs = [0.5]
+    amps = [0.2]
+    A = [1]
     #Will potentially do up to 80 but it wont -- just being systematic. All data will be saved in AF run
     for o in offs:
         print('Offset:', o)
@@ -77,7 +77,7 @@ def AnimationGrab():
             print('Amplitude:', a)
             for i in A:
                 print('A: ', i)
-                lattice = InitialLattice(x = o)
+                lattice = InitialLattice(x = 7)
 
                 lattice.CouplingMethod([i,a,o])
 
@@ -88,7 +88,7 @@ def AnimationGrab():
                 lattice.Coupling_Sample(i,a,o)
 
 
-                run.extend([lattice.mean, lattice.var, in_AF]) 
+                run.extend([lattice.mean, lattice.var, in_AF,1]) 
                 df.loc[len(df)] = run
     df.to_csv('AnimationRun.csv')
     return df
@@ -173,7 +173,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Periodicity()
+    main()
     t1 = time.time()
     print(t1-t0)
 

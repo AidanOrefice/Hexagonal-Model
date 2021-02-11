@@ -285,11 +285,12 @@ class HexagonalLattice():
         self.ref[self.ref == self.ref_per] = 0
 
     def Per_check(self, per):
+        print('per_check')
         indi = [(i*self.width) - 1 for i in range(1,self.height + 1)]#Indexs of right hand side
         pre_length = len(indi)
         for i in range(self.width - int(self.width/5), self.pacing_period):
-            data = self.RefHistory[(self.t + i) * len(self.ref) : (self.t + i + 1) * len(self.ref)]
-            indi = [i for i in indi if data[i] != 0]
+            data = self.RefHistory[(self.t - self.pacing_period + i) * len(self.ref) : (self.t - self.pacing_period + i + 1) * len(self.ref)]
+            indi = [j for j in indi if data[j] == 0]
             if len(indi) < pre_length / 4: #Arbitrary fraction
                 self.per = True
                 return [per[0] + 1, per[1] + 1]
@@ -423,6 +424,7 @@ class HexagonalLattice():
             run.append(False)
             run.append(False)
             run.append(False)
+        print(self.percolating[0] / self.percolating[1])
         run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run
