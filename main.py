@@ -122,28 +122,30 @@ def Periodicity(): #Ensure Config is set up properly
     df = InitialDF()
     amp = 0.2
     off = 0.5
-    A = [20] #0,1,3,5,10,20
-    multi = 7 ### Need to make sure this is the value we want
-    runs = 10000
-    for i in A:
-        print('A:', i)
+    A = 1 #0,1,3,5,10,20
+    heh = np.linspace(0,0.2,21) ### Need to make sure this is the value we want
+    multi = np.append(heh, np.linspace(0.2,1,17)[1:])
+    print(multi)
+    runs = 1
+    for i in multi:
+        print('multi', i)
         for _ in range(runs):
             if _ % 10 == 0:
                 print(_)
 
-            lattice = InitialLattice(x = multi)
-            lattice.CouplingMethod([i,amp,off])
+            lattice = InitialLattice(x = i)
+            lattice.CouplingMethod([A,amp,off])
             run = lattice.RunIt()
 
             if _ == 0:
-                lattice.Coupling_Sample(i,amp,off)
-                VizTest(i,amp,off,100,100)
+                lattice.Coupling_Sample(A,amp,off)
+                VizTest(A,amp,off,100,100)
 
-            run[8] = [i,amp,off]
+            run[8] = [A,amp,off]
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-            run.extend([lattice.mean, lattice.var, in_AF, multi]) 
+            run.extend([lattice.mean, lattice.var, in_AF, i]) 
             df.loc[len(df)] = run
-    df.to_csv('HeatMapCollection_{}.csv'.format(i))
+    df.to_csv('FailureMultiplierData_{}.csv'.format(A))
     return df
 
 
@@ -190,7 +192,7 @@ def bond_counts(load = True):
     print(t1-t0)
 
 def main():
-    df = PercolationGrab()
+    df = Periodicity()
     '''for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
 
