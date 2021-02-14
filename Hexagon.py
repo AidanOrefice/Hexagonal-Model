@@ -57,6 +57,7 @@ class HexagonalLattice():
         self.stats = stats
         self.x_graph = x
         self.multiplier = multiplier
+        print(self.full_save)
         
         if seed == 0:
             self.seed = np.random.randint(0,int(2**32 - 1))
@@ -290,7 +291,7 @@ class HexagonalLattice():
         for i in range(self.width - int(self.width/5), self.pacing_period):
             data = self.RefHistory[(self.t - self.pacing_period + i) * len(self.ref) : (self.t - self.pacing_period + i + 1) * len(self.ref)]
             indi = [j for j in indi if data[j] == 0]
-            if len(indi) < pre_length / 4: #Arbitrary fraction
+            if len(indi) < pre_length: #Arbitrary fraction, len(indi) is number of edge sites not activated yet
                 self.per = True
                 return [per[0] + 1, per[1] + 1]
         return [per[0], per[1] + 1]
@@ -423,7 +424,6 @@ class HexagonalLattice():
             run.append(False)
             run.append(False)
             run.append(False)
-        print(self.percolating[0] / self.percolating[1])
         run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run

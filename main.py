@@ -123,10 +123,10 @@ def Periodicity(): #Ensure Config is set up properly
     amp = 0.2
     off = 0.5
     A = 1 #0,1,3,5,10,20
-    heh = np.linspace(0,0.2,21) ### Need to make sure this is the value we want
+    heh = np.linspace(0.01,0.2,20) ### Need to make sure this is the value we want
     multi = np.append(heh, np.linspace(0.2,1,17)[1:])
     print(multi)
-    runs = 1
+    runs = 300
     for i in multi:
         print('multi', i)
         for _ in range(runs):
@@ -137,18 +137,12 @@ def Periodicity(): #Ensure Config is set up properly
             lattice.CouplingMethod([A,amp,off])
             run = lattice.RunIt()
 
-            if _ == 0:
-                lattice.Coupling_Sample(A,amp,off)
-                VizTest(A,amp,off,100,100)
-
             run[8] = [A,amp,off]
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
             run.extend([lattice.mean, lattice.var, in_AF, i]) 
             df.loc[len(df)] = run
     df.to_csv('FailureMultiplierData_{}.csv'.format(A))
     return df
-
-
 
 def bond_counts(load = True):
     t0 = time.time()

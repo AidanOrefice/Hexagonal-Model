@@ -46,6 +46,46 @@ def plot_amp_offs_PS(fname):
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_25_large_colourmap_{}'.format(A))
 
+def plot_per_percent_PS(fname):
+    Runs = pd.read_csv(fname)
+    A = str(fname.split('_')[-1].split('.')[0])
+
+    for index, row in Runs.iterrows():
+        list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
+        Runs.loc[index, 'normal_beta'] = float(list_[2].strip())
+        Runs.loc[index, 'normal_alpha'] = float(list_[1].strip())
+
+    map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
+    map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
+
+    print(map_alpha)
+    print(map_beta)
+
+    tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
+    print(tot_count)
+    PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    Per_S = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    print(PS.shape)
+    for index, row in Runs.iterrows():
+        x = map_beta[row['normal_beta']]
+        y = map_alpha[row['normal_alpha']]
+        Per_S[y][x] += row['per_%']
+        PS[y][x] += 1
+            #PS_time[y][x] += row['%time in AF']
+    PS_per = Per_S / PS
+    #PS_time = PS_time / tot_count
+    df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
+    df.index = np.round(df.index*100)/100
+    df.columns = np.round(df.columns*100)/100
+    f, ax = plt.subplots()
+    sns.heatmap(df, ax = ax)
+    ax.tick_params(axis='y', rotation=0)
+    ax.set_xlabel('Offset')
+    ax.set_ylabel('Amplitude')
+    ax.set_title('Fraction of wavefronts that Percolate')
+    plt.savefig('PS_per_percent_{}'.format(A))
+
 def plot_mean_var_PS(fname):
     Runs = pd.read_csv(fname)
     A = str(fname.split('_')[-1].split('.')[0])
@@ -92,10 +132,12 @@ def plot_mean_var_PS(fname):
 def SigmoidPlot(fname):
     Runs = pd.read_csv(fname)
     df = Runs[Runs['in AF?']]
-    fun = [0.1,0.5,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    heh = np.linspace(0.01,0.2,20) ### Need to make sure this is the value we want
+    multi = np.append(heh, np.linspace(0.2,1,17)[1:])
+    fun = sorted(multi)
     avg_time = []
     re_plot = []
-    off, A = fname.split('_')[1], fname.split('_')[-1].split('.')[0]
+    off, A = 0.5, fname.split('_')[-1].split('.')[0]
     lens = {}
     for i in fun:
         vals = df.loc[df['multiplier'] == i]['AF_time']
@@ -107,7 +149,7 @@ def SigmoidPlot(fname):
     print(avg_time)
     print(lens)
     plt.figure(figsize=(16,9))
-    plt.bar(re_plot,avg_time)
+    plt.plot(re_plot,avg_time, ls = ' ', marker = 'x')
     plt.xlabel('Multiplier on Misfire Probability', fontsize = 18)
     plt.ylabel('Average time to induce Fibrillation', fontsize = 18)
     plt.title('')
@@ -168,8 +210,9 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
-
-SigmoidPlot('Prelim_0.5_1.csv')
+SigmoidPlot('FailureMultiplierData_1.csv')
+'''for i in ['PercolationData_0.csv','PercolationData_1.csv','PercolationData_3.csv','PercolationData_5.csv','PercolationData_10.csv','PercolationData_20.csv']:
+    plot_per_percent_PS(i)'''
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
