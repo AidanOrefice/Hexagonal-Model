@@ -143,7 +143,9 @@ def SigmoidPlot(fname):
         vals = df.loc[df['multiplier'] == i]['AF_time']
         times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
         if len(times) > 0:
-            avg_time.append(np.average(times))
+            beat = np.average(times)//200
+            print(beat)
+            avg_time.append(beat)
             re_plot.append(i)
             lens[i] = len(times)
     print(avg_time)
@@ -211,6 +213,7 @@ def plot_amp_offs_periodicity():
     plt.savefig('Periodicity_heatmap.png')
 
 SigmoidPlot('FailureMultiplierData_1.csv')
+
 '''for i in ['PercolationData_0.csv','PercolationData_1.csv','PercolationData_3.csv','PercolationData_5.csv','PercolationData_10.csv','PercolationData_20.csv']:
     plot_per_percent_PS(i)'''
 
