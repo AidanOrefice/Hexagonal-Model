@@ -57,7 +57,6 @@ class HexagonalLattice():
         self.stats = stats
         self.x_graph = x
         self.multiplier = multiplier
-        print(self.full_save)
         
         if seed == 0:
             self.seed = np.random.randint(0,int(2**32 - 1))
