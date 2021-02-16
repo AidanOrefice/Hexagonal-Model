@@ -338,6 +338,15 @@ class HexagonalLattice():
                             re_sites[2] = i
                             self.AF_time = (max(j-100,1), j+100) #Increased the range from 30 to 100
                             #print(self.AF_time)  #Transition time range
+                            k = 9
+                            while k < j - self.AF_first_beat:
+                                new_time = j - k
+                                time_data = self.RefHistory[new_time*len(self.ref):(new_time+1)*len(self.ref)]
+                                activated_sites = np.where(time_data == 1)[0]
+                                if i in activated_sites:
+                                    Ham_dis = self.Hamming_distance(new_time)
+                                    print(Ham_dis)
+                                k += 1
                     if re_sites[3] == True:
                         if sites[i] == 3:
                             re_sites[3] = i
@@ -348,6 +357,14 @@ class HexagonalLattice():
                 else:
                     sites[i] = 1
         return re_sites
+
+    def Hamming_distance(self, AF_time):
+        time_data = self.RefHistory[AF_time*len(self.ref):(AF_time+1)*len(self.ref)]
+        activated_sites = np.where(time_data == 1)[0]
+        activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
+        x_mean = np.mean(activated_sites_x)
+        Ham_dis = np.sum((activated_sites_x-x_mean)**2)
+        return np.sqrt(Ham_dis)
 
     def Graph(self):
         f, ax = plt.subplots()

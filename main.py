@@ -190,12 +190,23 @@ def main():
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
 
 
+
+def ham_dis_test(a):
+    print('A = ' + str(a))
+    lattice = InitialLattice(x = 1)
+    lattice.CouplingMethod([a,0.3,0.75])
+    run = lattice.RunIt()
+    if lattice.kill:
+        for i in range(50):
+            print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)
+            
+
+
 if __name__ == '__main__':
     t0 = time.time()
-    main()
+    ham_dis_test(5)
     t1 = time.time()
     print(t1-t0)
-
 
 
 
