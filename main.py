@@ -33,7 +33,7 @@ def InitialLattice(x = 1):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -191,20 +191,20 @@ def main():
 
 
 
-def ham_dis_test(a):
+def loc_dis_test(a):
     print('A = ' + str(a))
     lattice = InitialLattice(x = 1)
     lattice.CouplingMethod([a,0.3,0.75])
     run = lattice.RunIt()
-    if lattice.kill:
+    '''if lattice.kill:
         for i in range(50):
-            print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)
+            print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)'''
             
 
 
 if __name__ == '__main__':
     t0 = time.time()
-    ham_dis_test(5)
+    loc_dis_test(5)
     t1 = time.time()
     print(t1-t0)
 

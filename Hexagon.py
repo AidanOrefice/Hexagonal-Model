@@ -14,6 +14,7 @@ import pandas as pd
 from itertools import groupby
 from operator import itemgetter
 from matplotlib.lines import Line2D
+from scipy.spatial.distance import euclidean
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -366,6 +367,25 @@ class HexagonalLattice():
         Ham_dis = np.sum((activated_sites_x-x_mean)**2)
         return np.sqrt(Ham_dis)
 
+    def Location_Check(self, site2, site3, site4):
+        locs = [self.index_to_xy(site2), self.index_to_xy(site2), self.index_to_xy(site2)]
+        verify = True
+        err = 8
+        height_y = self.index_to_xy(self.width*self.height -1)[1]
+        for i in range(len(locs)-1):
+            for j in range(1,len(locs)-i):
+                if euclidean(locs[i],locs[i+j]) > err:
+                    verify = False
+                if verify == False:
+                    val1 = (locs[i][0], locs[i][1] + height_y)
+                    val2 = (locs[i+j][0], locs[i+j][1] + height_y)
+                    if euclidean(val1,locs[i+j]) < err:
+                        verify = True
+                    elif euclidean(locs[i],val2) < err:
+                        verify = True
+        return verify
+
+
     def Graph(self):
         f, ax = plt.subplots()
         x = [i for i in range(len(self.AF))]
@@ -430,9 +450,11 @@ class HexagonalLattice():
         #'location_2', 'location_3', 'location_4', 'AF_time',
         if self.kill:
             pass
+            self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4])
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])
             run.append(self.re_sites[4])
+            run.append(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4]))
             run.append(self.AF_time)
         else:
             pass
