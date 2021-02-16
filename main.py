@@ -125,7 +125,7 @@ def Periodicity(): #Ensure Config is set up properly
     A = [1] #0,1,3,5,10,20
     multi = 0.04
     print(multi)
-    runs = 10
+    runs = 10000
     for i in A:
         print('multi', i)
         for _ in range(runs):

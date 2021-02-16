@@ -142,7 +142,7 @@ def plot_heat_map_contour(fname, convolve = True):
 
     levels = np.linspace(min(sin_z), max(sin_z), 5)
 
-    ax1.contour(X,Y, sin_z, levels = 5, cmap = 'binary', alpha = 0.6)#, levels)
+    ax1.contour(X,Y, sin_z, levels = 3, cmap = 'binary', alpha = 0.6)#, levels)
         
     fig.suptitle('Heatmaps of location of AF induction \nand the Corresponding Coupling Space', fontsize = 16)
     plt.tight_layout()
