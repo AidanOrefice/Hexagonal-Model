@@ -33,7 +33,7 @@ def InitialLattice(x = 1):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time','per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time', 'Hamming_dis_arr', 'per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -43,7 +43,7 @@ def NormalModesPS():
     amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
     offs = np.linspace(0,1,21)  #Same width in each direction.
     A = 1
-    runs = 25
+    runs = 15
     print(A)
     for o in offs:
         print('Offset:', o)
@@ -53,16 +53,15 @@ def NormalModesPS():
                 lattice = InitialLattice()
 
                 lattice.CouplingMethod([A,a,o])
-
                 run = lattice.RunIt()
                 #lattice.Coupling_Sample(A,a,o)
                 run[8] = [A,a,o]
 
                 in_AF = lattice.kill
 
-                run.extend([lattice.mean, lattice.var, in_AF]) 
+                run.extend([lattice.mean, lattice.var, in_AF, 1])
                 df.loc[len(df)] = run
-    df.to_csv('Normal_Modes_Phase_Space_{}.csv'.format(str(A)))
+    df.to_csv('Normal_Modes_Phase_Space_Ham_dis_{}.csv'.format(str(A)))
     return df
 
 def PercolationGrab():
@@ -185,7 +184,7 @@ def bond_counts(load = True):
     print(t1-t0)
 
 def main():
-    df = Periodicity()
+    df = NormalModesPS()
     '''for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
 
@@ -196,15 +195,15 @@ def loc_dis_test(a):
     lattice = InitialLattice(x = 1)
     lattice.CouplingMethod([a,0.3,0.75])
     run = lattice.RunIt()
-    '''if lattice.kill:
+    if lattice.kill:
         for i in range(50):
-            print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)'''
+            print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)
             
 
 
 if __name__ == '__main__':
     t0 = time.time()
-    loc_dis_test(5)
+    main()
     t1 = time.time()
     print(t1-t0)
 

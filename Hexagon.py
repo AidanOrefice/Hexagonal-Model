@@ -346,8 +346,12 @@ class HexagonalLattice():
                                 activated_sites = np.where(time_data == 1)[0]
                                 if i in activated_sites:
                                     Ham_dis = self.Hamming_distance(new_time)
-                                    print(Ham_dis)
+                                    set_time = new_time
+                                    k = self.runtime + 1
                                 k += 1
+                            self.Hamming_distance_arr = []
+                            for k in range(set_time - 10, set_time + 6):
+                                self.Hamming_distance_arr.append(self.Hamming_distance(k))
                     if re_sites[3] == True:
                         if sites[i] == 3:
                             re_sites[3] = i
@@ -363,14 +367,17 @@ class HexagonalLattice():
         time_data = self.RefHistory[AF_time*len(self.ref):(AF_time+1)*len(self.ref)]
         activated_sites = np.where(time_data == 1)[0]
         activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
-        x_mean = np.mean(activated_sites_x)
-        Ham_dis = np.sum((activated_sites_x-x_mean)**2)
-        return np.sqrt(Ham_dis)
+        if len(activated_sites) > 0:
+            x_mean = np.mean(activated_sites_x)
+            Ham_dis = np.sum((activated_sites_x-x_mean)**2)
+            return np.sqrt(Ham_dis)
+        else:
+            return 0
 
     def Location_Check(self, site2, site3, site4):
-        locs = [self.index_to_xy(site2), self.index_to_xy(site2), self.index_to_xy(site2)]
+        locs = [self.index_to_xy(site2), self.index_to_xy(site3), self.index_to_xy(site4)]
         verify = True
-        err = 8
+        err = 5.01
         height_y = self.index_to_xy(self.width*self.height -1)[1]
         for i in range(len(locs)-1):
             for j in range(1,len(locs)-i):
@@ -384,7 +391,6 @@ class HexagonalLattice():
                     elif euclidean(locs[i],val2) < err:
                         verify = True
         return verify
-
 
     def Graph(self):
         f, ax = plt.subplots()
@@ -449,15 +455,16 @@ class HexagonalLattice():
         run.append(self.seed)
         #'location_2', 'location_3', 'location_4', 'AF_time',
         if self.kill:
-            pass
-            self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4])
+            #self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4])
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])
             run.append(self.re_sites[4])
             run.append(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4]))
             run.append(self.AF_time)
+            run.append([self.Hamming_distance_arr])
         else:
-            pass
+            run.append(False)
+            run.append(False)
             run.append(False)
             run.append(False)
             run.append(False)
