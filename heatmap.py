@@ -5,6 +5,7 @@ from Hexagon import HexagonalLattice
 from hexalattice.hexalattice import *
 from CouplingViz import sinusoid2D
 from scipy.spatial.distance import euclidean
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import time
 
 
@@ -52,21 +53,23 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
     runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
 
-    A = 0.75_1#int(fname.split('_')[-1])
+    A = int(fname.split('_')[-1])
 
     if contour:
         fig,ax1 = plt.subplots()
     else:
         fig,(ax1,ax2) = plt.subplots(1,2)
-        fig.set_size_inches(16,7)
+        fig.set_size_inches(16,8)
 
     hex_centers, ax1 = create_hex_grid(nx=100, ny=100, do_plot=True, align_to_origin = False, h_ax = ax1)
     x = [i[0] for i in hex_centers]
     y = [i[1] for i in hex_centers]
 
     if presave:
+        print('yes')
         locs = np.load('con_locs_{}.npy'.format(A)) #Retri
     else:
+        print('errr')
         loc2 = value_counts(runs,2)
         loc3 = value_counts(runs,3)
         loc4 = value_counts(runs,4)
@@ -78,28 +81,71 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
             np.save('con_locs_{}.npy'.format(A), np.asanyarray(locs))
 
     if contour:
-        loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'ocean') # gist_gray, gnuplot
-        fig.colorbar(loc_plot, ax = ax1, shrink = 0.6)
+        loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'pink') # gist_gray, gnuplot, gist_rainbow, ocean, jet
+        plt.title('Heatmaps of location of AF induction \nand the Corresponding Coupling Space, A = {}'.format(str(A)), fontsize =13)
+        
+        divider = make_axes_locatable(ax1)
+        cax1 = divider.append_axes("right", size="3%", pad=0.1)
+        cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 0.6, ticks = [min(locs), max(locs)])
+        cbar.ax.set_yticklabels(['RARE', 'COMMON'])  # vertically oriented colorbar
 
         X = np.linspace(0,100,100)
         Y = np.linspace(0, max(y), 100)
         sin_z = [[sinusoid2D(X[i], Y[j], A, 0.1, 1) for i in range(100)] for j in range(100)]
-        ax1.contour(X,Y, sin_z, levels = 3, cmap = 'binary', alpha = 0.6)#, levels)
-        name = 'a_contour_heatmap_' + str(A) +'.png'
+
+        levels_dict = {'1': 5, '3': 5, '5': 5, '10': 3, '20': 3 }
+        alpha_dict = {'1': 1, '3': 0.8, '5': 0.6, '10': 0.5, '20': 0.5}
+
+        cp = ax1.contour(X,Y, sin_z, levels = levels_dict[str(A)], cmap = 'gray', alpha = alpha_dict[str(A)])# change the number of levels, binary,gray
+        name = 'contour_heatmap_' + str(A) +'.png'
+
+        mini = np.where(sin_z == np.min(sin_z))
+        min_x, min_y = x[mini[0][0]], Y[mini[1][0]]
+        maxi = np.where(sin_z == np.max(sin_z))
+        max_x, max_y = X[maxi[0][0]], Y[maxi[1][0]]
+
+        print(min_x,min_y)
+        print(max_x,max_y)
+
+        #Adding labels to the max and min
+        if str(A) == '1': 
+            ax1.text(max_x-4, max_y, 'HIGH', color = 'white')
+            ax1.text(min_x-4, min_y, 'LOW', color = 'white')
+
+        '''print(cp.levels)
+        fmt = {}
+        strs = ['low','high']
+        for l, s in zip(cp.levels, strs):
+            fmt[l] = s
+
+        # Label every other level using strings
+        ax1.clabel(cp, [cp.levels[0], cp.levels[-1]], inline=True, fmt=fmt, fontsize=10)'''
+
     else:
         loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
 
+        divider = make_axes_locatable(ax1)
+        cax1 = divider.append_axes("right", size="3%", pad=0.1)
+        cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 0.6, ticks = [min(locs), max(locs)])
+        cbar.ax.set_yticklabels(['RARE', 'COMMON'])  # vertically oriented colorbar
+
+
         sin_z = [sinusoid2D(x[i], y[i], A, 0.1, 1) for i in range(len(x))]
         _, ax2 = create_hex_grid(nx=100,ny=100, do_plot=True, align_to_origin = False, h_ax = ax2)
+
         couple_plot = ax2.scatter(x,y,marker = 'h', s=17, c = sin_z)
-        cbar = fig.colorbar(couple_plot, ax = ax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
-        name = 'a_heatmap_' + str(A) +'.png'
+
+        divider = make_axes_locatable(ax2)
+        cax2 = divider.append_axes("right", size="3%", pad=0.1)
+        cbar = fig.colorbar(couple_plot, cax = cax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
         cbar.ax.set_yticklabels(['LOW', 'HIGH'])  # vertically oriented colorbar
-    
-    fig.suptitle('Heatmaps of location of AF induction and the Corresponding Coupling Space', fontsize = 16)
+
+        name = 'heatmap_' + str(A) +'.png'
+        fig.suptitle('Heatmaps of location of AF induction \nand the Corresponding Coupling Space, A = {}'.format(str(A)), fontsize =20)
+        
     plt.tight_layout()
     if convolve:
-        name = 'a_convolved_' + name
+        name = 'convolved_' + name
     plt.savefig(name)
     plt.close()
     
@@ -126,7 +172,8 @@ def Convolve(c,l,theta):
 
 
 t0 = time.time()
-plot_heat_map('FailureMultiplierData__0.75_1',0,0,0) #0,1,3,5,10,20
+plot_heat_map('FailureMultiplierData_1',0,0,0) #0,1,3,5,10,20
+
 t1 = time.time()
 print(t1-t0)
 

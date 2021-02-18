@@ -155,7 +155,7 @@ def SigmoidPlot(fname):
     plt.figure(figsize=(16,9))
     plt.plot(re_plot,avg_time, ls = ' ', marker = 'x')
     plt.xlabel('Multiplier on Misfire Probability', fontsize = 18)
-    plt.ylabel('Average time to induce Fibrillation', fontsize = 18)
+    plt.ylabel('Average Number of Beats before Fib', fontsize = 18)
     plt.title('')
 
     plt.xticks(fontsize =15)
@@ -214,10 +214,10 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
-#SigmoidPlot('FailureMultiplierData_1.csv')
+SigmoidPlot('FailureMultiplierData_1.csv')
 
-for i in ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_3.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv','Normal_Modes_Phase_Space_Ham_dis_20.csv']:
-    plot_amp_offs_PS(i)
+'''for i in ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_3.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv','Normal_Modes_Phase_Space_Ham_dis_20.csv']:
+    plot_amp_offs_PS(i)'''
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']

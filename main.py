@@ -119,27 +119,28 @@ def AnimationGrab():
 
 def Periodicity(): #Ensure Config is set up properly
     df = InitialDF()
-    amp = 0.2
-    off = 0.75
-    A = [1] #0,1,3,5,10,20
-    multi = 0.04
+    amp = 0.28
+    off = 0.4 #0.4,0.5,0.6,0.7,0.
+    A = 1 
+    multi = np.linspace(0.01,0.2,20)
+    multi  = np.append(multi, np.linspace(0.25,1,16))
     print(multi)
-    runs = 10000
-    for i in A:
+    runs = 1
+    for i in multi:
         print('multi', i)
         for _ in range(runs):
             if _ % 10 == 0:
                 print(_)
 
             lattice = InitialLattice(x = multi)
-            lattice.CouplingMethod([i,amp,off])
+            lattice.CouplingMethod([A,amp,off])
             run = lattice.RunIt()
 
-            run[8] = [i,amp,off]
+            run[8] = [A,amp,off]
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
             run.extend([lattice.mean, lattice.var, in_AF, multi]) 
             df.loc[len(df)] = run
-    df.to_csv('FailureMultiplierData__0.75_{}.csv'.format(i))
+    df.to_csv('FailureMultiplierData_{}.csv'.format(off))
     return df
 
 def bond_counts(load = True):
@@ -224,7 +225,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Hamming_Dis_graph_data()
+    Periodicity()
     t1 = time.time()
     print(t1-t0)
 
