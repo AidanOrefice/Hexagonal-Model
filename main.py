@@ -183,13 +183,6 @@ def bond_counts(load = True):
     t1 = time.time()
     print(t1-t0)
 
-def main():
-    df = NormalModesPS()
-    '''for i in range(len(df)):
-        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
-
-
-
 def loc_dis_test(a):
     print('A = ' + str(a))
     lattice = InitialLattice(x = 1)
@@ -198,12 +191,40 @@ def loc_dis_test(a):
     if lattice.kill:
         for i in range(50):
             print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)
+
+def Hamming_Dis_graph_data():
+    df = InitialDF()
+    periodicity = [i for i in range(1,21)]
+    runs = 3
+    off = 0.8
+    amps = [0.2+i*0.1 for i in range(0,4)]
+    for amp in amps:
+        print(amps)
+        for a in periodicity:
+            print(a)
+            for _ in range(runs):
+                lattice = InitialLattice(x = 1)
+                lattice.CouplingMethod([a,amp,off])
+                run = lattice.RunIt()
+
+                run[8] = [a,amp,off]
+                in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
+                run.extend([lattice.mean, lattice.var, in_AF, 1]) 
+                df.loc[len(df)] = run
+    df.to_csv('Ham_dis_run.csv')
+    return df
+
+def main():
+    df = NormalModesPS()
+    '''for i in range(len(df)):
+        Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
+
             
 
 
 if __name__ == '__main__':
     t0 = time.time()
-    main()
+    Hamming_Dis_graph_data()
     t1 = time.time()
     print(t1-t0)
 

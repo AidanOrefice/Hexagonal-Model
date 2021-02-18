@@ -19,21 +19,21 @@ def plot_amp_offs_PS(fname):
     map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
     map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
 
-    print(map_alpha)
-    print(map_beta)
-
     tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
     print(tot_count)
     PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+    Per_percent = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
     #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
     print(PS.shape)
     for index, row in Runs.iterrows():
+        x = map_beta[row['normal_beta']]
+        y = map_alpha[row['normal_alpha']]
         if row['in AF?']:
-            x = map_beta[row['normal_beta']]
-            y = map_alpha[row['normal_alpha']]
             PS[y][x] += 1
-            #PS_time[y][x] += row['%time in AF']
+        Per_percent[y][x] += row['per_%']
+        #PS_time[y][x] += row['%time in AF']
     PS_per = PS / tot_count
+    Per_percent = Per_percent / tot_count
     #PS_time = PS_time / tot_count
     df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
     df.index = np.round(df.index*100)/100
@@ -41,6 +41,8 @@ def plot_amp_offs_PS(fname):
     f, ax = plt.subplots()
     sns.heatmap(df, ax = ax)
     ax.tick_params(axis='y', rotation=0)
+    CS = ax.contour([i for i in range(len(map_beta.keys()))],[i for i in range(len(map_alpha.keys()))], Per_percent, levels = [0,0.5,0.99], colors = 'blue', alpha = 1)
+    ax.clabel(CS, inline=1, fontsize=10)
     ax.set_xlabel('Offset')
     ax.set_ylabel('Amplitude')
     ax.set_title('Fraction of simulations that entered fibrillation')
@@ -212,10 +214,10 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
-SigmoidPlot('FailureMultiplierData_1.csv')
+#SigmoidPlot('FailureMultiplierData_1.csv')
 
-'''for i in ['PercolationData_0.csv','PercolationData_1.csv','PercolationData_3.csv','PercolationData_5.csv','PercolationData_10.csv','PercolationData_20.csv']:
-    plot_per_percent_PS(i)'''
+for i in ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_3.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv','Normal_Modes_Phase_Space_Ham_dis_20.csv']:
+    plot_amp_offs_PS(i)
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
