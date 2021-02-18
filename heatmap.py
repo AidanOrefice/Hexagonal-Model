@@ -52,7 +52,7 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
     runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
 
-    A = int(fname.split('_')[-1])
+    A = 0.75_1#int(fname.split('_')[-1])
 
     if contour:
         fig,ax1 = plt.subplots()
@@ -126,7 +126,7 @@ def Convolve(c,l,theta):
 
 
 t0 = time.time()
-plot_heat_map('FailureMultiplierData_1',0,0,0) #0,1,3,5,10,20
+plot_heat_map('FailureMultiplierData__0.75_1',0,0,0) #0,1,3,5,10,20
 t1 = time.time()
 print(t1-t0)
 
