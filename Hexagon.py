@@ -369,7 +369,7 @@ class HexagonalLattice():
         activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
         if len(activated_sites) > 0:
             x_mean = np.mean(activated_sites_x)
-            Ham_dis = np.sum((activated_sites_x-x_mean)**2)
+            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/len(activated_sites_x)
             return np.sqrt(Ham_dis)
         else:
             return 0
@@ -459,6 +459,7 @@ class HexagonalLattice():
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])
             run.append(self.re_sites[4])
+            print(12222, type(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4])))
             run.append(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4]))
             run.append(self.AF_time)
             run.append([self.Hamming_distance_arr])
