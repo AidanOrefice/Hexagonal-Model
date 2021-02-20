@@ -134,18 +134,18 @@ def plot_mean_var_PS(fname):
 def SigmoidPlot(fname):
     Runs = pd.read_csv(fname)
     df = Runs[Runs['in AF?']]
-    heh = np.linspace(0.01,0.2,20) ### Need to make sure this is the value we want
-    multi = np.append(heh, np.linspace(0.2,1,17)[1:])
-    fun = sorted(multi)
+    fun = np.unique(Runs['multiplier'])
     avg_time = []
     re_plot = []
-    off, A = 0.5, fname.split('_')[-1].split('.')[0]
+    off = fname.split('_')[-1].split('.c')[0]
     lens = {}
     for i in fun:
         vals = df.loc[df['multiplier'] == i]['AF_time']
         times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
+        for j in range(200-len(times)):
+            times.append(10000)
         if len(times) > 0:
-            beat = np.average(times)//200
+            beat = np.median(times)//200
             print(beat)
             avg_time.append(beat)
             re_plot.append(i)
@@ -163,14 +163,12 @@ def SigmoidPlot(fname):
 
     label_offs = 'Offset = ' + str(off)
     label_amp = 'Amplitude = 0.2'
-    label_a = r'$A$ = ' + str(A)
 
     legend_elements = [Line2D([0], [0], marker='o', color='white', label=label_offs, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0),
-                Line2D([0], [0], marker='o', color='white', label=label_a, markerfacecolor='white', markersize=0)]
+                Line2D([0], [0], marker='o', color='white', label=label_amp, markerfacecolor='white', markersize=0)]
     plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.075), ncol=3, fontsize = 14)
 
-    plt.savefig('SigMultiPlot_{}_{}.png'.format(off,A))
+    plt.savefig('SigMultiPlot_{}.png'.format(off))
 
 
 
@@ -214,10 +212,10 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
-SigmoidPlot('FailureMultiplierData_1.csv')
+#SigmoidPlot('FailureMultiplierData_1.csv')
 
-'''for i in ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_3.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv','Normal_Modes_Phase_Space_Ham_dis_20.csv']:
-    plot_amp_offs_PS(i)'''
+for i in ['FailureMultiplierData_0.7.csv']:
+    SigmoidPlot(i)
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']

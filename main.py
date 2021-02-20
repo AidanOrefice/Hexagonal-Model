@@ -119,28 +119,32 @@ def AnimationGrab():
 
 def Periodicity(): #Ensure Config is set up properly
     df = InitialDF()
-    amp = 0.28
-    off = 0.4 #0.4,0.5,0.6,0.7,0.
+    amp = 0.2
+    off = 0.8 #0.4,0.5,0.6,0.7,0.
+    '''For 0.7:
+    0.5 to 0.7, small spacing, larger to 1.2
+    For 0.8:
+    1,1.5,2,2.5,3
+    '''
     A = 1 
-    multi = np.linspace(0.01,0.2,20)
-    multi  = np.append(multi, np.linspace(0.25,1,16))
+    multi = [1,1.5,2,2.5,3]
     print(multi)
-    runs = 1
+    runs = 20
     for i in multi:
         print('multi', i)
         for _ in range(runs):
-            if _ % 10 == 0:
+            if _ % 100 == 0:
                 print(_)
 
-            lattice = InitialLattice(x = multi)
+            lattice = InitialLattice(x = i)
             lattice.CouplingMethod([A,amp,off])
             run = lattice.RunIt()
 
             run[8] = [A,amp,off]
             in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-            run.extend([lattice.mean, lattice.var, in_AF, multi]) 
+            run.extend([lattice.mean, lattice.var, in_AF, i]) 
             df.loc[len(df)] = run
-    df.to_csv('FailureMultiplierData_{}.csv'.format(off))
+    df.to_csv('FailureMultiplierData_{}_20.csv'.format(off))
     return df
 
 def bond_counts(load = True):

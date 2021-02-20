@@ -459,7 +459,6 @@ class HexagonalLattice():
             run.append(self.re_sites[2])
             run.append(self.re_sites[3])
             run.append(self.re_sites[4])
-            print(12222, type(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4])))
             run.append(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4]))
             run.append(self.AF_time)
             run.append([self.Hamming_distance_arr])
