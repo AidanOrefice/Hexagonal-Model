@@ -53,7 +53,10 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
     runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
 
-    A = int(fname.split('_')[-1])
+    A = 1#int(fname.split('_')[-1])
+    off = float(fname.split('_')[1])
+    #101,201,301
+    runs = runs[runs['location_err']]
 
     if contour:
         fig,ax1 = plt.subplots()
@@ -79,6 +82,9 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
         if convolve:
             locs = Convolve(locs, 3, 0.75)
             np.save('con_locs_{}.npy'.format(A), np.asanyarray(locs))
+    locs[101] = 0
+    locs[201] = 0
+    locs[301] = 0
 
     if contour:
         loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'pink') # gist_gray, gnuplot, gist_rainbow, ocean, jet
@@ -140,7 +146,7 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
         cbar = fig.colorbar(couple_plot, cax = cax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
         cbar.ax.set_yticklabels(['LOW', 'HIGH'])  # vertically oriented colorbar
 
-        name = 'heatmap_' + str(A) +'.png'
+        name = 'heatmap_{}_'.format(off) + str(A) +'.png'
         fig.suptitle('Heatmaps of location of AF induction \nand the Corresponding Coupling Space, A = {}'.format(str(A)), fontsize =20)
         
     plt.tight_layout()
@@ -172,7 +178,8 @@ def Convolve(c,l,theta):
 
 
 t0 = time.time()
-plot_heat_map('FailureMultiplierData_1',0,0,0) #0,1,3,5,10,20
+for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
+    plot_heat_map(i,0,0,0) #0,1,3,5,10,20
 
 t1 = time.time()
 print(t1-t0)

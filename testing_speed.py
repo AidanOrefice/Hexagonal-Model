@@ -142,10 +142,10 @@ def SigmoidPlot(fname):
     for i in fun:
         vals = df.loc[df['multiplier'] == i]['AF_time']
         times = [int(k.split(' ')[-1].split(')')[0])-100 for k in vals]
-        for j in range(200-len(times)):
+        for j in range(100-len(times)):
             times.append(10000)
         if len(times) > 0:
-            beat = np.median(times)//200
+            beat = np.mean(times)//200
             print(beat)
             avg_time.append(beat)
             re_plot.append(i)
@@ -212,10 +212,51 @@ def plot_amp_offs_periodicity():
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('Periodicity_heatmap.png')
 
+def ham_dis_fun(fnames):
+    Runs = {}
+    offs = [0.4,0.5,0.6,0.7,0.8]
+    for i in fnames:
+        Run = pd.read_csv(i)
+        Run = Run[Run['location_err']]
+        Run = Run[Run['in AF?']]
+        Run['AF_time_real'] = False
+        Run['AF_beat'] = False
+        Run['10_before_fib'] = False
+        Run['3_before_fib'] = False
+        Run['Fib_beat'] = False
+        Run['5_after_fib'] = False
+        for index, row in Run.iterrows():
+            Run.loc[index,'Periodicity'] = int(str(row['normal_modes_config']).strip('[').split(',')[0])
+            Run.loc[index,'amp'] = float(str(row['normal_modes_config']).replace(' ', '').split(',')[1])
+            Run.loc[index,'off'] = float(str(row['normal_modes_config']).replace(' ', '').replace(']', '').split(',')[2])
+            if row['in AF?']:
+                Run.loc[index,'AF_time_real'] = int(str(row['AF_time']).split(',')[1].strip(')')) - 100
+                Run.loc[index,'AF_beat'] = np.floor(Run.loc[index,'AF_time_real'] / 200)
+                Run.loc[index,'Fib_beat'] = float(str(row['Hamming_dis_arr']).split(',')[10].strip(' '))
+                arr = str(row['Hamming_dis_arr']).replace(' ', '').replace('[', '').replace(']', '').split(',')
+                arr_new = [float(i) for i in arr]
+                Run.loc[index,'10_before_fib'] = np.mean(arr_new[:11])
+                Run.loc[index,'3_before_fib'] = np.mean(arr_new[8:11])
+                Run.loc[index,'5_after_fib'] = np.mean(arr_new[11:])
+        Runs[float(i.split('_')[1])] = Run
+    
+    Mean_Ham_dis = []
+    for i in offs:
+        Mean_Ham_dis.append(np.mean(Runs[i]['Fib_beat']))
+    
+    f, ax = plt.subplots()
+    ax.plot(offs, Mean_Ham_dis, ls = '', marker = 'x')
+    ax.set_xlabel('Offset')
+    ax.set_ylabel('Average Hamming distance before fibrillation')
+    plt.savefig('Ham_dis_test_.png')
+
+
+ham_dis_fun(['FailureMultiplierData_0.4_full.csv', 'FailureMultiplierData_0.5_full.csv', 'FailureMultiplierData_0.6_full.csv','FailureMultiplierData_0.7_full.csv','FailureMultiplierData_0.8_full.csv'])
+
 #SigmoidPlot('FailureMultiplierData_1.csv')
 
-for i in ['FailureMultiplierData_0.7.csv']:
-    SigmoidPlot(i)
+'''for i in ['FailureMultiplierData_0.8_20.csv']:
+    SigmoidPlot(i)'''
 
 '''
 fname = ['Normal_Modes_Phase_Space_20.csv','Normal_Modes_Phase_Space_10.csv','Normal_Modes_Phase_Space_5.csv','Normal_Modes_Phase_Space_3.csv','Normal_Modes_Phase_Space_1.csv']
