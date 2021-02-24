@@ -214,6 +214,17 @@ def Hamming_Dis_graph_data():
     df.to_csv('Ham_dis_run.csv')
     return df
 
+def Toy_Anim():
+    #Need to make sure config is set properly.
+    #Create a toy animation with hamming distance overlaid
+    off = 0.5
+    amp = 0.2
+    A = 2
+    lattice = InitialLattice()
+    lattice.CouplingMethod([A,amp,off])
+    run = lattice.RunIt()
+    Animate(str(run[-1]), 'full', 0, 0, 0, '[%s, %s, %s]' % (str(A), str(amp), str(off)), True)
+
 def main():
     df = NormalModesPS()
     '''for i in range(len(df)):
@@ -224,7 +235,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Periodicity()
+    Toy_Anim()
     t1 = time.time()
     print(t1-t0)
 

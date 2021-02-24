@@ -176,11 +176,34 @@ def Convolve(c,l,theta):
         cnt += 1
     return convolved
 
+def ReturnUnitCell(a, p):
+    width = 100
+    height = 100
+    hex_centers, _ = create_hex_grid(nx=100, ny=100, do_plot=False, align_to_origin = False)
+    bar_ind = [round((width*i)/p)-1 for i in range(1,p+1)]
+    bar_xy = [index_to_xy(i) for i in bar_ind]
+    print(bar_xy)
+    
+    ind = 0
+    for i in range(1,p+1):
+    #a - array of data for the locations (should not be convolved.)
+    #p - periodicity
+
+    #Using the periodicity need to setup unit cell widths and heights (i.e. boundary locations) which I will then use 
+    #to split up a.
+
+    #Try and do a unit cell around the maximum site locations
+    #Create a mask indicating what cell each site belongs to 
+
+        pass
+
 
 t0 = time.time()
+'''
 for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
-    plot_heat_map(i,0,0,0) #0,1,3,5,10,20
-
+    plot_heat_map(i,0,0,0) #0,1,3,5,10,20'''
+a = []
+ReturnUnitCell(a,3)
 t1 = time.time()
 print(t1-t0)
 
