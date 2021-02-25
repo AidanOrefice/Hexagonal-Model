@@ -345,13 +345,13 @@ class HexagonalLattice():
                                 time_data = self.RefHistory[new_time*len(self.ref):(new_time+1)*len(self.ref)]
                                 activated_sites = np.where(time_data == 1)[0]
                                 if i in activated_sites:
-                                    Ham_dis = self.Hamming_distance(new_time)
+                                    self.ham_dis_time, self.x_mean_time = self.Hamming_distance(new_time)
                                     set_time = new_time
                                     k = self.runtime + 1
                                 k += 1
                             self.Hamming_distance_arr = []
                             for k in range(set_time - 10, set_time + 6):
-                                self.Hamming_distance_arr.append(self.Hamming_distance(k))
+                                self.Hamming_distance_arr.append(self.Hamming_distance(k)[0])
                     if re_sites[3] == True:
                         if sites[i] == 3:
                             re_sites[3] = i
@@ -370,9 +370,9 @@ class HexagonalLattice():
         if len(activated_sites) > 0:
             x_mean = np.mean(activated_sites_x)
             Ham_dis = np.sum((activated_sites_x-x_mean)**2)/len(activated_sites_x)
-            return np.sqrt(Ham_dis)
+            return np.sqrt(Ham_dis), x_mean
         else:
-            return 0
+            return 0, 0
 
     def Location_Check(self, site2, site3, site4):
         locs = [self.index_to_xy(site2), self.index_to_xy(site3), self.index_to_xy(site4)]
@@ -437,6 +437,9 @@ class HexagonalLattice():
                 self.Stats_check()
                 self.Initialise()
                 self.save_choice()
+            elif self.t == self.runtime - 1:
+                self.Stats_check()
+                self.save_choice()
             self.ActivationCheck()
             self.RefHistory[self.t*len(self.ref):(self.t+self.dt)*len(self.ref)] = self.ref
             self.AF[self.t] = len(self.index_act)
@@ -462,13 +465,10 @@ class HexagonalLattice():
             run.append(self.Location_Check(self.re_sites[2],self.re_sites[3],self.re_sites[4]))
             run.append(self.AF_time)
             run.append([self.Hamming_distance_arr])
+            run.append(self.ham_dis_time)
+            run.append(self.x_mean_time)
         else:
-            run.append(False)
-            run.append(False)
-            run.append(False)
-            run.append(False)
-            run.append(False)
-            run.append(False)
+            run.extend([False]*8)
         run.append(self.percolating[0] / self.percolating[1])
         run.append(self.title)
         return run

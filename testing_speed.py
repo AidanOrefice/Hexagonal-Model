@@ -6,6 +6,7 @@ import seaborn as sns
 from Animation import Animate
 from Hexagon import HexagonalLattice
 from matplotlib.lines import Line2D
+import math
 
 def plot_amp_offs_PS(fname):
     Runs = pd.read_csv(fname)
@@ -250,8 +251,99 @@ def ham_dis_fun(fnames):
     ax.set_ylabel('Average Hamming distance before fibrillation')
     plt.savefig('Ham_dis_test_.png')
 
+def Ham_Dis_plot(fname):
+    Runs = pd.read_csv(fname)
+    Runs_no_fib = Runs[Runs['Ham_dis_fib_beat?'] == False]
+    Ham_dis_avg = [np.mean(Runs_no_fib[Runs_no_fib.loc[:,str(i)] != 'False'].loc[:,str(i)].astype(float)) for i in range(200)]
+    time = [i for i in range(200)]
+    f, ax = plt.subplots()
+    ax.plot(time, Ham_dis_avg, color = 'black', label = 'Non-fibrillatory beats')
+    Runs_fib = Runs[Runs['Ham_dis_fib_beat?'] == True]
+    for i in [0,1,2,3,4]:
+        Ham_dis_avg_fib = []
+        time1 = []
+        Runs_no_fib_i = Runs_fib.iloc[i]
+        for j in range(200):
+            x = str(Runs_no_fib_i.loc[str(j)])
+            if x != 'False':
+                Ham_dis_avg_fib.append(float(x))
+                time1.append(j)
+        ax.plot(time1, Ham_dis_avg_fib, color = 'red', label = 'Fibrillatory beats_{}'.format(i))
+    plt.legend()
+    plt.savefig('Ham_dis_test__.png')
 
-ham_dis_fun(['FailureMultiplierData_0.4_full.csv', 'FailureMultiplierData_0.5_full.csv', 'FailureMultiplierData_0.6_full.csv','FailureMultiplierData_0.7_full.csv','FailureMultiplierData_0.8_full.csv'])
+def Ham_Dis_plot_per_dep(fname):
+    Runs = pd.read_csv(fname)
+    Runs = Runs[Runs['Ham_dis_fib_beat?'] == False]
+    periodicity = [1,3,5,10,20]
+    time = [i for i in range(200)]
+    f, ax = plt.subplots()
+    Runs['periodicity'] = Runs['normal_modes_config'].str.extract('(\d+)')
+    colors = {0 : 'black', 1: 'red', 3 : 'blue', 5 : 'green', 10 : 'orange', 20 : 'purple'}
+    for i in periodicity:
+        Runs_p = Runs[Runs.periodicity == str(i)]
+        Ham_dis_avg = [np.mean(Runs_p[Runs_p.loc[:,str(j)] != 'False'].loc[:,str(j)].astype(float)) for j in range(200)]
+        ax.plot(np.asarray(time[0:int(100/i)])*i, Ham_dis_avg[0:int(100/i)], color = colors[i], label = 'periodicity {}'.format(i))
+    ax.set_xlabel('Time since last activation')
+    ax.set_ylabel('Average Hamming distance')
+    plt.legend()
+    plt.savefig('Ham_dis_test__.png')
+
+def Ham_Dis_plot_per1(fname):
+    Runs = pd.read_csv(fname)
+    periodicity = [i for i in range(1, 21)]
+    f, ax = plt.subplots()
+    Runs['periodicity'] = Runs['normal_modes_config'].str.extract('(\d+)')
+    print(Runs.periodicity)
+    colors = {0 : 'black', 1: 'red', 3 : 'blue', 5 : 'green', 10 : 'orange', 20 : 'purple'}
+    Ham_dis_avg = {i : [] for i in list(colors.keys())}
+    xmean = {i : [] for i in list(colors.keys())}
+    for index, row in Runs.iterrows():
+        periodicity = float(row.periodicity)
+        if periodicity in list(colors.keys()):
+            Ham_dis_avg[periodicity].append(row['Ham_dis_AF'])
+            xmean[periodicity].append(row['Ham_dis_meanx'])
+    for i in list(colors.keys()):
+        ax.plot(xmean[i], Ham_dis_avg[i], color = colors[i], ls = '', marker = 'x', label = 'Periodicty of {}'.format(i))
+    plt.legend()
+    plt.savefig('Ham_dis_test_periodicity.png')
+
+def Merge_data(fnames):
+    Runs = [0 for i in fnames]
+    for i,j in enumerate(fnames):
+        Runs[i] = pd.read_csv(j)
+    Run_tot = pd.concat(Runs)
+    for index, row in Run_tot.iterrows():
+        Run_tot.loc[index,'Periodicity'] = int(str(row['normal_modes_config']).strip('[').split(',')[0])
+        Run_tot.loc[index,'amp'] = float(str(row['normal_modes_config']).replace(' ', '').split(',')[1])
+        Run_tot.loc[index,'off'] = float(str(row['normal_modes_config']).replace(' ', '').replace(']', '').split(',')[2])
+    Run_tot.to_csv('Ham_dis_run_All_Data.csv')
+
+def Ham_Dis_plot_per(fname):
+    Runs = pd.read_csv(fname)
+    Runs = Runs[Runs['Ham_dis_fib_beat?'] == False]
+    Runs = Runs[Runs['location_err']]
+    periodicity = 1
+    off = np.unique(Runs['off'])
+    amp = 0.2
+    time = [i for i in range(200)]
+    f, ax = plt.subplots()
+    colors = {0.4 : 'black', 0.45: 'red', 0.5 : 'grey', 0.55 : 'blue', 0.6: 'green', 0.65 : 'yellow', 0.7 : 'orange', 0.75 : 'black', 0.8 : 'blue', 0.85 : 'cyan', 0.8999999999999999  : 'brown', 0.95 : 'purple', 1: 'pink'}
+    for i in off:
+        Runs_p = Runs[Runs.Periodicity == periodicity]
+        Runs_p = Runs_p[Runs_p.amp == amp]
+        Runs_p = Runs_p[Runs_p.off == i]
+        if len(Runs_p) > 0:
+            Ham_dis_avg = [np.mean(Runs_p[Runs_p.loc[:,str(j)] != 'False'].loc[:,str(j)].astype(float)) for j in range(200)]
+            ax.plot(time, Ham_dis_avg, color = colors[i], label = 'Offset {}'.format(i))
+    ax.set_xlabel('Time since last activation')
+    ax.set_ylabel('Average Hamming distance')
+    plt.legend()
+    plt.savefig('Ham_dis_test__.png')
+
+Ham_Dis_plot_per('Ham_dis_run_All_Data.csv')
+#Merge_data(['Ham_dis_run_fib_PS_{}.csv'.format(i) for i in [1,2,3,4,5,6]])
+#ham_dis_fun(['FailureMultiplierData_0.4_full.csv', 'FailureMultiplierData_0.5_full.csv', 'FailureMultiplierData_0.6_full.csv','FailureMultiplierData_0.7_full.csv','FailureMultiplierData_0.8_full.csv'])
 
 #SigmoidPlot('FailureMultiplierData_1.csv')
 

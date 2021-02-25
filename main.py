@@ -14,6 +14,16 @@ def open_dict(fname):
     with open('{}.pickle'.format(fname), 'rb') as handle:
         b = pickle.load(handle)
 
+def index_to_xy(index):
+    row = np.floor(index / 100)
+    y = row - row*(1-(np.sqrt(3)/2)) #fix.
+    if_even = row % 2 == 0
+    if if_even:
+        x = index - (row * 100)
+    else:
+        x = index - (row * 100) + 0.5
+    return (x,y)
+
 def InitialLattice(x = 1):
     lattice = HexagonalLattice(config['width'],
         config['height'],
@@ -33,7 +43,16 @@ def InitialLattice(x = 1):
 
 def InitialDF():
     columns = list(config.keys())
-    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time', 'Hamming_dis_arr', 'per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time', 'Hamming_dis_arr', 'Ham_dis_AF', 'Ham_dis_meanx', 'per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    df = pd.DataFrame(columns=columns)
+    return df
+
+def InitialDF_Ham():
+    columns = list(config.keys())
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time', 'Hamming_dis_arr', 'Ham_dis_AF', 'Ham_dis_meanx', 'per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['Ham_dis_beats_avg_over'])
+    columns.extend(['Ham_dis_fib_beat?'])
+    columns.extend([str(i) for i in range(200)])
     df = pd.DataFrame(columns=columns)
     return df
 
@@ -192,26 +211,83 @@ def loc_dis_test(a):
         for i in range(50):
             print(lattice.Hamming_distance(lattice.AF_time[1]-100-i), i)
 
-def Hamming_Dis_graph_data():
-    df = InitialDF()
-    periodicity = [i for i in range(1,21)]
-    runs = 3
-    off = 0.8
-    amps = [0.2+i*0.1 for i in range(0,4)]
-    for amp in amps:
-        print(amps)
-        for a in periodicity:
-            print(a)
-            for _ in range(runs):
-                lattice = InitialLattice(x = 1)
-                lattice.CouplingMethod([a,amp,off])
-                run = lattice.RunIt()
+def Hamming_distance(time_data):
+    activated_sites = np.where(time_data == 1)[0]
+    activated_sites_x = [index_to_xy(i)[0] for i in activated_sites]
+    if len(activated_sites) > 0:
+        x_mean = np.mean(activated_sites_x)
+        Ham_dis = np.sum((activated_sites_x-x_mean)**2)/len(activated_sites_x)
+        return np.sqrt(Ham_dis)
+    else:
+        return 0
 
-                run[8] = [a,amp,off]
-                in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
-                run.extend([lattice.mean, lattice.var, in_AF, 1]) 
-                df.loc[len(df)] = run
-    df.to_csv('Ham_dis_run.csv')
+def Ham_dis_inves(lattice,run):
+    '''
+    Important things:
+    - Do not calculate on asymptotic beats
+    - Calculate separately on AFIB beats
+    - Save as dataframe with one row of 1-199
+    '''
+    run_fib = run.copy()
+    run_no_fib = run.copy()
+    if lattice.kill:
+        AF_beat = int(np.floor((lattice.AF_time[1]-100) / lattice.pacing_period))
+        Hamming_dis_fib = [False for i in range(200)]
+        for j in range(lattice.AF_time[1]-100 - AF_beat * 200):
+            time = AF_beat*200 + j
+            beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
+            Hamming_dis_fib[j] = Hamming_distance(beat_data)
+        run_fib.extend([1])
+        run_fib.extend([True])
+        run_fib.extend(Hamming_dis_fib)
+    else:
+        AF_beat = 50
+        run_fib.extend([0])
+        run_fib.extend([False])
+        Hamming_dis_fib = [False for i in range(200)]
+        run_fib.extend(Hamming_dis_fib)
+    Hamming_dis_non_fib = {i : [] for i in range(200)}
+    for i in range(AF_beat):
+        if lattice.AF_bool[i][1] == False:
+            for j in range(200):
+                time = i*200 + j
+                beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
+                Hamming_dis_non_fib[j].append(Hamming_distance(beat_data))
+    if AF_beat > 0:
+        run_no_fib.extend([len(Hamming_dis_non_fib)])
+        Hamming_dis_non_fib_mean = [np.mean(Hamming_dis_non_fib[i]) for i in range(200)]
+    else:
+        run_no_fib.extend([0])
+        Hamming_dis_non_fib_mean = [False for i in range(200)]
+    run_no_fib.extend([False])
+    run_no_fib.extend(Hamming_dis_non_fib_mean)
+    return run_fib, run_no_fib
+
+def Hamming_dis_graph_data():
+    df = InitialDF_Ham()
+    periodicity = [1,2,3,5,7,10,13,16,20]
+    runs = 6
+    offs = np.linspace(0.4,1,13)
+    amps = np.linspace(0,0.5,11)
+    print(offs,amps)
+    for off in offs:
+        print('off : {}'.format(off))
+        for amp in amps:
+            print('amp : {}'.format(amp))
+            for a in periodicity:
+                for _ in range(runs):
+                    lattice = InitialLattice(x = 1)
+                    lattice.CouplingMethod([a,amp,off])
+                    run = lattice.RunIt()
+
+                    run[8] = [a,amp,off]
+                    in_AF = lattice.kill #AF_stats(lattice) Did it enter AF
+                    run.extend([lattice.mean, lattice.var, in_AF, 1]) 
+                    #Some Hamming distance investigation:
+                    run_fib, run_no_fib = Ham_dis_inves(lattice,run)
+                    df.loc[len(df)] = run_fib
+                    df.loc[len(df)] = run_no_fib
+    df.to_csv('Ham_dis_run_fib_PS_{}.csv'.format(6))
     return df
 
 def Toy_Anim():
@@ -235,7 +311,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Toy_Anim()
+    Hamming_dis_graph_data()
     t1 = time.time()
     print(t1-t0)
 
