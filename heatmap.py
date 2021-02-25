@@ -56,7 +56,7 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     A = 1#int(fname.split('_')[-1])
     off = float(fname.split('_')[1])
     #101,201,301
-    runs = runs[runs['location_err']]
+    #runs = runs[runs['location_err']] Taken out to do earlier data
 
     if contour:
         fig,ax1 = plt.subplots()
@@ -67,6 +67,8 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     hex_centers, ax1 = create_hex_grid(nx=100, ny=100, do_plot=True, align_to_origin = False, h_ax = ax1)
     x = [i[0] for i in hex_centers]
     y = [i[1] for i in hex_centers]
+
+    l_dict = {1:7, 3:5, 5:3 ,10: 1, 20: 1}
 
     if presave:
         print('yes')
@@ -80,8 +82,9 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
         locs = (loc2+loc3+loc4)/(3*len(runs))
 
         if convolve:
-            locs = Convolve(locs, 3, 0.75)
-            np.save('con_locs_{}.npy'.format(A), np.asanyarray(locs))
+            print('connin')
+            locs = Convolve(locs, l_dict[int(A)], 0.75)
+            np.save('varkern_con_locs_{}.npy'.format(A), np.asanyarray(locs))
     locs[101] = 0
     locs[201] = 0
     locs[301] = 0
@@ -151,7 +154,7 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
         
     plt.tight_layout()
     if convolve:
-        name = 'convolved_' + name
+        name = 'varkern_convolved_' + name
     plt.savefig(name)
     plt.close()
     
@@ -199,13 +202,13 @@ def ReturnUnitCell(a, p):
 
 
 t0 = time.time()
-'''
-for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
-    plot_heat_map(i,0,0,0) #0,1,3,5,10,20'''
-a = []
-ReturnUnitCell(a,3)
-t1 = time.time()
-print(t1-t0)
+plot_heat_map('FailureMultiplierData_20',1,0,0) #0,1,3,5,10,20
+
+'''for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
+    #data, convolve, presave, contour
+    plot_heat_map(i,1,1,0) #0,1,3,5,10,20'''
+
+print(time.time() -t0)
 
 
 #Amps and offsets

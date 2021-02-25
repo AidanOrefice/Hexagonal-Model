@@ -369,7 +369,7 @@ class HexagonalLattice():
         activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
         if len(activated_sites) > 0:
             x_mean = np.mean(activated_sites_x)
-            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/len(activated_sites_x)
+            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2) #2d dimensions
             return np.sqrt(Ham_dis), x_mean
         else:
             return 0, 0

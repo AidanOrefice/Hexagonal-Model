@@ -311,7 +311,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Hamming_dis_graph_data()
+    Toy_Anim()
     t1 = time.time()
     print(t1-t0)
 
