@@ -1,13 +1,18 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from Hexagon import HexagonalLattice
 from hexalattice.hexalattice import *
-from CouplingViz import sinusoid2D
 from scipy.spatial.distance import euclidean
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from collections import Counter
 import time
 
+def sinusoid2D(x, y, A,  amp, mean):
+    #Amplitude - directly sets the amplitude of the function
+    #Mean - directly sets the offset/mean of the function.
+    # 0 < (Mean +/- amp) < 1 
+    #A stretch out the modes. A must be an integer value.
+    return (amp/2)*(np.sin(A*x*(2*np.pi/100))+np.sin(A*y*(2*np.pi/(100  - 100*(1-(np.sqrt(3)/2)))))) + mean #(x+25), (y+20) - ideal unit cell
 
 def gaussian(dist,c,theta):
     #List of distances to a points
@@ -53,7 +58,8 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
     runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
 
-    A = 1#int(fname.split('_')[-1])
+    A = int(fname.split('_')[-1])
+    print(A)
     off = float(fname.split('_')[1])
     #101,201,301
     #runs = runs[runs['location_err']] Taken out to do earlier data
@@ -132,25 +138,28 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
 
     else:
         loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
+        ax1.tick_params(axis = 'both', labelsize = 16)
 
         divider = make_axes_locatable(ax1)
         cax1 = divider.append_axes("right", size="3%", pad=0.1)
         cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 0.6, ticks = [min(locs), max(locs)])
-        cbar.ax.set_yticklabels(['RARE', 'COMMON'])  # vertically oriented colorbar
+        cbar.ax.set_yticklabels(['RARE', 'COMMON'], fontsize = 16)  # vertically oriented colorbar
 
 
         sin_z = [sinusoid2D(x[i], y[i], A, 0.1, 1) for i in range(len(x))]
         _, ax2 = create_hex_grid(nx=100,ny=100, do_plot=True, align_to_origin = False, h_ax = ax2)
+        ax2.axes.yaxis.set_ticklabels([])
+        ax2.tick_params(axis = 'both', labelsize = 16)
 
         couple_plot = ax2.scatter(x,y,marker = 'h', s=17, c = sin_z)
 
         divider = make_axes_locatable(ax2)
         cax2 = divider.append_axes("right", size="3%", pad=0.1)
         cbar = fig.colorbar(couple_plot, cax = cax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
-        cbar.ax.set_yticklabels(['LOW', 'HIGH'])  # vertically oriented colorbar
+        cbar.ax.set_yticklabels(['LOW', 'HIGH'], fontsize = 16)  # vertically oriented colorbar
 
-        name = 'heatmap_{}_'.format(off) + str(A) +'.png'
-        fig.suptitle('Heatmaps of location of AF induction \nand the Corresponding Coupling Space, A = {}'.format(str(A)), fontsize =20)
+        name = 'poster_heatmap_{}_'.format(off) + str(A) +'.png'
+        fig.suptitle('A = {}'.format(str(A)), fontsize =20, x  = 0.09, y = 0.91)
         
     plt.tight_layout()
     if convolve:
@@ -179,46 +188,81 @@ def Convolve(c,l,theta):
         cnt += 1
     return convolved
 
-def ReturnUnitCell(a, p):
-    width = 100
-    height = 100
-    hex_centers, _ = create_hex_grid(nx=100, ny=100, do_plot=False, align_to_origin = False)
-    bar_ind = [round((width*i)/p)-1 for i in range(1,p+1)]
-    bar_xy = [index_to_xy(i) for i in bar_ind]
-    print(bar_xy)
-    
-    ind = 0
-    for i in range(1,p+1):
-    #a - array of data for the locations (should not be convolved.)
-    #p - periodicity
+#Generates a mask of indicies and the unit cell to use.
+def UnitCell(A, w, h):
+    arr = []
+    cellw = int(w/A)
+    cellh = int(h/A)
+    for i in range(cellh):
+        initial = [j for j in range(i*cellw, (i*cellw) + cellw)] *A
+        arr.extend(initial)
+    arr = arr * A
+    return arr, [0]*cellw*cellh
 
-    #Using the periodicity need to setup unit cell widths and heights (i.e. boundary locations) which I will then use 
-    #to split up a.
+def UnitCellGenerate(fname):
+    runs = pd.read_csv(fname + '.csv')
+    #Fix problem of trues in location 4, set to location 3 value
+    runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
+    runs = runs.loc[runs['in AF?']] #Only look at ones that enter AF.
 
-    #Try and do a unit cell around the maximum site locations
-    #Create a mask indicating what cell each site belongs to 
+    A = int(fname.split('_')[-1])
+    print(A)
+    off = float(fname.split('_')[1])
+    #runs = runs[runs['location_err']] Taken out to do earlier data
 
-        pass
+    fig,ax = plt.subplots()
+
+    hex_centers, ax = create_hex_grid(nx=int(100/A), ny=int(100/A), do_plot=True, align_to_origin = False, h_ax = ax)
+    x = [i[0] for i in hex_centers]
+    y = [i[1] for i in hex_centers]
 
 
-t0 = time.time()
-plot_heat_map('FailureMultiplierData_20',1,0,0) #0,1,3,5,10,20
+    loc2 = value_counts(runs,2)
+    loc3 = value_counts(runs,3)
+    loc4 = value_counts(runs,4)
+    locs = (loc2+loc3+loc4)/(3*len(runs))
+    locs[101] = 0
+    locs[201] = 0
+    locs[301] = 0
 
-'''for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
+    mask, unit = UnitCell(A,100,100)
+
+    for ind,val in enumerate(locs):
+        unit[mask[ind]] += val
+
+    sdict = {1: 17, 5: 170, 10: 450, 20: 1300}
+    unit_plot = ax.scatter(x,y,marker = 'h', s=sdict[A], c = unit, cmap = 'gnuplot2') # gist_gray, gnuplot
+    ax.tick_params(axis = 'both', labelsize = 16)
+
+    cbar = fig.colorbar(unit_plot, ax = ax, shrink = 0.9)
+    '''divider = make_axes_locatable(ax)
+    cax1 = divider.append_axes("right", size="3%", pad=0.1)
+    cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 0.6, ticks = [min(unit), max(unit)])
+    cbar.ax.set_yticklabels(['RARE', 'COMMON'], fontsize = 16)  # vertically oriented colorbar'''
+
+    plt.savefig('UnitCell_{}'.format(A))
+    plt.close()
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    t0 = time.time()
+    UnitCellGenerate('FailureMultiplierData_20')
+    t1 = time.time()
+    print(t1-t0)
+
+
+
+
+
+''' Other Runs
+plot_heat_map('FailureMultiplierData_1',1,1,0) #0,1,3,5,10,20
+
+for i in ['FailureMultiplierData_0.4_full', 'FailureMultiplierData_0.5_full', 'FailureMultiplierData_0.6_full','FailureMultiplierData_0.7_full','FailureMultiplierData_0.8_full']:
     #data, convolve, presave, contour
     plot_heat_map(i,1,1,0) #0,1,3,5,10,20'''
 
-print(time.time() -t0)
-
-
-#Amps and offsets
-#(0.2,0.75)
-
-
-'''
-#Applying limits to the runs - DONT NEED THIS ANYMORE
-for ind, row in runs.iterrows():
-    list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
-    amp, offs = float(list_[1]), float(list_[2])
-    if (amp > 0.5) or (amp < 0.05) or (offs < 0.59):
-        runs = runs.drop(index = ind)'''
