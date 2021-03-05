@@ -2,6 +2,11 @@ import numpy as np
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+from Animation import *
+from Hexagon import *
+from configuration import *
+from CouplingViz import *
+import pickle
 
 def index_to_xy(index):
     row = np.floor(index / 100)
@@ -84,8 +89,126 @@ def Add_data(Runs):
             Runs.loc[index, 'Ham_dis_80'] = row['Fib_beat']
     Runs.to_csv('Ham_dis_run_add_data.csv')
 
+def InitialDF_Ham():
+    columns = list(config.keys())
+    columns.extend(['seed','location_2', 'location_3', 'location_4', 'location_err', 'AF_time', 'Hamming_dis_arr', 'Ham_dis_AF', 'Ham_dis_meanx', 'per_%', 'title', 'mean', 'variance', 'in AF?', 'multiplier']) #Other columns - need animate? and fname
+    columns.extend(['Ham_dis_fib_beat?'])
+    columns.extend(['Max_ham_dis'])
+    df = pd.DataFrame(columns=columns)
+    return df
+    
+def InitialLattice(x = 1):
+    lattice = HexagonalLattice(config['width'],
+        config['height'],
+        config['runtime'],
+        config['threshold'],
+        config['sigmoid_strength'],
+        config['coupling'],
+        config['refractory_period'],
+        config['graph'],
+        config['FullStateSave'],
+        config['stats'],
+        config['set_seed'],
+        multiplier = x)
+
+    lattice.CreateLattice()
+    return lattice
+
+def Hamming_distance(time_data):
+    activated_sites = np.where(time_data == 1)[0]
+    activated_sites_x = [index_to_xy(i)[0] for i in activated_sites]
+    if len(activated_sites) > 0:
+        x_mean = np.mean(activated_sites_x)
+        Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2)
+        return np.sqrt(Ham_dis)
+    else:
+        return 0
+
+def Ham_dis_inves_pdf(lattice, run):
+    non_fib = []
+    fib = False
+    if lattice.kill:
+        AF_beat = int(np.floor((lattice.AF_time[1]-100) / lattice.pacing_period))
+        fib = run[19]
+    else:
+        AF_beat = 50
+    for i in range(AF_beat):
+        ham_dis_beat = []
+        if lattice.AF_bool[i][1] == False:
+            for j in range(200):
+                time = i*200 + j
+                beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
+                ham_dis_beat.append(Hamming_distance(beat_data))
+            non_fib.append(max(ham_dis_beat))
+    return fib, non_fib
+
+def Ham_dis_pdf():
+    '''
+    Do every beat indivdually, say if a certain Max(HAM_DIS) is reached, then all previous values are reached as well.
+    Therefore, each beat only max Ham_dis and in_AF? must be recorded.
+    For AF beats, need to record hamming distance at time when fibrillation induced.
+    We will get some form of a cumulative PDF
+    Only want to cycle through areas with (mean-amp > percolation_threshold) to avoid trouble
+    '''
+    offs = np.linspace(0.4,1,13)
+    amps = np.linspace(0,0.5,11)
+    off_amp_pairs = [(off, amp) for off in offs for amp in amps if (off - amp) >= 0.4]
+    periodicity = [20]
+    runs = 60
+    fib = []
+    non_fib = []
+    print(periodicity)
+    for off_amp in off_amp_pairs:
+        off = off_amp[0]
+        amp = off_amp[1]
+        print(off,amp)
+        for a in periodicity:
+            for _ in range(runs):
+                lattice = InitialLattice(x = 1)
+                lattice.CouplingMethod([a,amp,off])
+                run = lattice.RunIt()
+                #Some Hamming distance investigation:
+                fib1, non_fib1 = Ham_dis_inves_pdf(lattice, run)
+                fib.append(fib1)
+                non_fib.extend(non_fib1)
+    np.save('fib_data_{}'.format(a), fib)
+    np.save('non_fib_data_{}'.format(a), non_fib)
+
+def data_hist():
+    '''
+    Assumptions:
+    - If a simulation enters fibrillation at a hamming distance of 1, it would also enter at a Ham_dis of 2
+    - If a simulation hasn't entered fibrillation with a hamming distance of 1, then it has passed through every other hamming distance between 0 and 1
+    '''
+    colors = {0 : 'black', 1 : 'red', 3 : 'orange', 5 : 'green', 10 : 'blue', 20 : 'pink'}
+    for i in list(colors.keys()):
+        fib_data = np.load('fib_data_{}.npy'.format(i))
+        fib_data = fib_data[fib_data != False]
+        non_fib_data = np.load('non_fib_data_{}.npy'.format(i))
+        bins = np.linspace(min(non_fib_data), max([max(fib_data)]), 100)
+        prob = []
+        for j in bins:
+            if len(np.where(j<non_fib_data)[0]) > 0:
+                prob.append(len(np.where(j>fib_data)[0])/(len(np.where(j<non_fib_data)[0]) + len(np.where(j>fib_data)[0])))
+            else:
+                if len(np.where(j<fib_data)[0]) > 0:
+                    prob.append(1)
+                else:
+                    prob.append(1)
+        plt.plot(bins,prob, marker = 'x', ls = ' ', color = colors[i], label = 'A = {}'.format(i), markersize = 3)
+    plt.ylabel('"Fibrillation proability"')
+    plt.xlabel('Hamming Distance')
+    plt.legend()
+    plt.savefig('Ham_dis_prob_all.png')
+
+def data_hist1():
+    fib_data = np.load('fib_data_{}.npy'.format(0))
+    fib_data = fib_data[fib_data != False]
+    plt.hist(fib_data)
+    plt.savefig('FUNNNN.png')
+
 if __name__ == '__main__':
     t0 = time.time()
-    Add_data(pd.read_csv('Ham_dis_run_fib_real.csv'))
+    data_hist()
     #main()
     print(time.time() - t0)

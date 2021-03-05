@@ -254,7 +254,7 @@ def Ham_dis_inves(lattice,run):
                 beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
                 Hamming_dis_non_fib[j].append(Hamming_distance(beat_data))
     if AF_beat > 0:
-        run_no_fib.extend([len(Hamming_dis_non_fib)])
+        run_no_fib.extend([AF_beat])
         Hamming_dis_non_fib_mean = [np.mean(Hamming_dis_non_fib[i]) for i in range(200)]
     else:
         run_no_fib.extend([0])
@@ -293,16 +293,92 @@ def Hamming_dis_graph_data():
 def Toy_Anim():
     #Need to make sure config is set properly.
     #Create a toy animation with hamming distance overlaid
-    off = 0.5
+    off = 1
     amp = 0.2
-    A = 2
+    A = 1
     lattice = InitialLattice()
     lattice.CouplingMethod([A,amp,off])
     run = lattice.RunIt()
     Animate(str(run[-1]), 'full', 0, 0, 0, '[%s, %s, %s]' % (str(A), str(amp), str(off)), True)
 
+def Ham_dis_Max():
+    a = 10
+    off = 0.8
+    amp = 0.4
+    runs = range(10)
+    for i in runs:
+        print(i)
+        lattice = InitialLattice(x = 1)
+        lattice.CouplingMethod([a,amp,off])
+        run = lattice.RunIt()
+        if lattice.kill:
+            AF_beat = int(np.floor((lattice.AF_time[1]-100) / lattice.pacing_period))
+            print(AF_beat)
+            if AF_beat < 10:
+                if AF_beat > 2:
+                    Ham_dis_dict = {i : [] for i in range(AF_beat+1)}
+                    times = [i for i in range(200)]
+                    af_time = (lattice.AF_time[1] - 100) - AF_beat * 200
+                    for i in range(AF_beat + 1):
+                        for j in range(200):
+                            time = i*200 + j
+                            beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
+                            Ham_dis_dict[i].append(Hamming_distance(beat_data))
+                        if i < 1:
+                            plt.plot(times, Ham_dis_dict[i], color = 'black', label = 'Normal beats')
+                        elif i < AF_beat:
+                            plt.plot(times, Ham_dis_dict[i], color = 'black')
+                        else:
+                            plt.plot(times[:af_time + 2], Ham_dis_dict[i][:af_time + 2], color = 'red', label = 'Fibrillation beat')
+                    plt.vlines((lattice.new_time) - AF_beat * 200, 0, max(Ham_dis_dict[i][:af_time + 2]), color = 'blue', ls = '--', label = 'Fibrillation initiation')
+                    plt.ylabel('Hamming Distance')
+                    plt.xlabel('Time after beat initiation')
+                    plt.legend()
+                    plt.savefig('fib_vs_non_fib_10_{}.png'.format(lattice.seed))
+
+def Ham_dis_Max1():
+    a = 20
+    off = 0.8
+    amp = 0.45
+    runs = range(10)
+    for i in runs:
+        print(i)
+        lattice = InitialLattice(x = 1)
+        lattice.CouplingMethod([a,amp,off])
+        run = lattice.RunIt()
+        if lattice.kill:
+            AF_beat = int(np.floor((lattice.AF_time[1]-100) / lattice.pacing_period))
+            print(AF_beat)
+            if AF_beat < 51:
+                if AF_beat > 2:
+                    Ham_dis_dict = {i : [] for i in range(AF_beat+1)}
+                    times = [i for i in range(200)]
+                    af_time = (lattice.AF_time[1] - 100) - AF_beat * 200
+                    for i in range(AF_beat + 1):
+                        for j in range(200):
+                            time = i*200 + j
+                            beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
+                            Ham_dis_dict[i].append(Hamming_distance(beat_data))
+                    mean_ham_t = np.asarray([np.mean([Ham_dis_dict[k][j] for k in range(AF_beat)]) for j in range(200)])
+                    std_ham_t = np.asarray([np.std([Ham_dis_dict[k][j] for k in range(AF_beat)]) for j in range(200)])
+                    plt.plot(times, mean_ham_t, color = 'black', label = 'Average of {} normal beats'.format(AF_beat - 1))
+                    plt.fill_between(times, mean_ham_t + std_ham_t, mean_ham_t - std_ham_t, color = 'gray', label = 'Standard deviation')
+                    plt.plot(times[:af_time + 2], Ham_dis_dict[i][:af_time + 2], color = 'red', label = 'Fibrillation beat')
+                    plt.vlines((af_time - 12), 0, max(Ham_dis_dict[i][:af_time + 2]), color = 'blue', ls = '--', label = 'Fibrillation initiation')
+                    plt.ylabel('Hamming Distance')
+                    plt.xlabel('Time after beat initiation')
+                    plt.legend()
+                    plt.savefig('fib_vs_non_fib_20_{}.png'.format(lattice.seed))
+                    plt.close()
+
+                    plt.plot(times[:af_time], Ham_dis_dict[i][:af_time] - mean_ham_t[:af_time], color = 'red')
+                    plt.vlines((af_time - 12), 0, max(Ham_dis_dict[i][:af_time + 2]), color = 'blue', ls = '--', label = 'Fibrillation initiation')
+                    plt.savefig('fib_vs_non_fib_20_minus_{}.png'.format(lattice.seed))
+                    plt.close()
+
+
 def main():
-    df = NormalModesPS()
+    df = Ham_dis_Max1()
     '''for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
 
@@ -311,7 +387,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    Toy_Anim()
+    main()
     t1 = time.time()
     print(t1-t0)
 

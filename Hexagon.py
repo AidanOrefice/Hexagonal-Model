@@ -345,6 +345,7 @@ class HexagonalLattice():
                                 time_data = self.RefHistory[new_time*len(self.ref):(new_time+1)*len(self.ref)]
                                 activated_sites = np.where(time_data == 1)[0]
                                 if i in activated_sites:
+                                    self.new_time = new_time
                                     self.ham_dis_time, self.x_mean_time = self.Hamming_distance(new_time)
                                     set_time = new_time
                                     k = self.runtime + 1
@@ -369,7 +370,7 @@ class HexagonalLattice():
         activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
         if len(activated_sites) > 0:
             x_mean = np.mean(activated_sites_x)
-            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2) #2d dimensions
+            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2) 
             return np.sqrt(Ham_dis), x_mean
         else:
             return 0, 0
