@@ -337,9 +337,9 @@ def Ham_dis_Max():
                     plt.savefig('fib_vs_non_fib_10_{}.png'.format(lattice.seed))
 
 def Ham_dis_Max1():
-    a = 20
+    a = 5
     off = 0.8
-    amp = 0.45
+    amp = 0.3
     runs = range(10)
     for i in runs:
         print(i)
@@ -368,12 +368,12 @@ def Ham_dis_Max1():
                     plt.ylabel('Hamming Distance')
                     plt.xlabel('Time after beat initiation')
                     plt.legend()
-                    plt.savefig('fib_vs_non_fib_20_{}.png'.format(lattice.seed))
+                    plt.savefig('fib_vs_non_fib_5_{}.png'.format(lattice.seed))
                     plt.close()
 
                     plt.plot(times[:af_time], Ham_dis_dict[i][:af_time] - mean_ham_t[:af_time], color = 'red')
                     plt.vlines((af_time - 12), 0, max(Ham_dis_dict[i][:af_time + 2]), color = 'blue', ls = '--', label = 'Fibrillation initiation')
-                    plt.savefig('fib_vs_non_fib_20_minus_{}.png'.format(lattice.seed))
+                    plt.savefig('fib_vs_non_fib_5_minus_{}.png'.format(lattice.seed))
                     plt.close()
 
 

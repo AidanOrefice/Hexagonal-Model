@@ -339,7 +339,7 @@ class HexagonalLattice():
                             re_sites[2] = i
                             self.AF_time = (max(j-100,1), j+100) #Increased the range from 30 to 100
                             #print(self.AF_time)  #Transition time range
-                            k = 9
+                            k = self.ref_per - 1
                             while k < j - self.AF_first_beat:
                                 new_time = j - k
                                 time_data = self.RefHistory[new_time*len(self.ref):(new_time+1)*len(self.ref)]
@@ -370,7 +370,7 @@ class HexagonalLattice():
         activated_sites_x = [self.index_to_xy(i)[0] for i in activated_sites]
         if len(activated_sites) > 0:
             x_mean = np.mean(activated_sites_x)
-            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2) 
+            Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)) 
             return np.sqrt(Ham_dis), x_mean
         else:
             return 0, 0

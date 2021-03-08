@@ -119,7 +119,7 @@ def Hamming_distance(time_data):
     activated_sites_x = [index_to_xy(i)[0] for i in activated_sites]
     if len(activated_sites) > 0:
         x_mean = np.mean(activated_sites_x)
-        Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x)**2)
+        Ham_dis = np.sum((activated_sites_x-x_mean)**2)/(len(activated_sites_x))
         return np.sqrt(Ham_dis)
     else:
         return 0
@@ -152,27 +152,29 @@ def Ham_dis_pdf():
     '''
     offs = np.linspace(0.4,1,13)
     amps = np.linspace(0,0.5,11)
-    off_amp_pairs = [(off, amp) for off in offs for amp in amps if (off - amp) >= 0.4]
-    periodicity = [20]
-    runs = 60
+    multi = np.linspace(1,2,11)
+    off_amp_pairs = [(off, amp, mult) for off in offs for amp in amps for mult in multi if (off - amp) >= 0.4]
+    periodicity = [4]#0,1,2,3,4,5,10,20
+    runs = 6
     fib = []
     non_fib = []
     print(periodicity)
     for off_amp in off_amp_pairs:
         off = off_amp[0]
         amp = off_amp[1]
-        print(off,amp)
+        mult = off_amp[2]
+        print(off, amp, mult)
         for a in periodicity:
             for _ in range(runs):
-                lattice = InitialLattice(x = 1)
+                lattice = InitialLattice(x = mult)
                 lattice.CouplingMethod([a,amp,off])
                 run = lattice.RunIt()
                 #Some Hamming distance investigation:
                 fib1, non_fib1 = Ham_dis_inves_pdf(lattice, run)
                 fib.append(fib1)
                 non_fib.extend(non_fib1)
-    np.save('fib_data_{}'.format(a), fib)
-    np.save('non_fib_data_{}'.format(a), non_fib)
+    np.save('fib_data_multi_{}'.format(a), fib)
+    np.save('non_fib_data_multi_{}'.format(a), non_fib)
 
 def data_hist():
     '''
@@ -180,11 +182,12 @@ def data_hist():
     - If a simulation enters fibrillation at a hamming distance of 1, it would also enter at a Ham_dis of 2
     - If a simulation hasn't entered fibrillation with a hamming distance of 1, then it has passed through every other hamming distance between 0 and 1
     '''
-    colors = {0 : 'black', 1 : 'red', 3 : 'orange', 5 : 'green', 10 : 'blue', 20 : 'pink'}
+    colors = {0 : 'black', 1 : 'red', 2 : 'purple', 3 : 'orange', 4 : 'gray', 5 : 'green', 10 : 'blue', 20 : 'pink'}
     for i in list(colors.keys()):
-        fib_data = np.load('fib_data_{}.npy'.format(i))
+        fib_data = np.load('fib_data_multi_ref5_{}.npy'.format(i))
         fib_data = fib_data[fib_data != False]
-        non_fib_data = np.load('non_fib_data_{}.npy'.format(i))
+        non_fib_data = np.load('non_fib_data_multi_ref5_{}.npy'.format(i))
+        #non_fib_data = non_fib_data[abs(non_fib_data - np.mean(non_fib_data)) < 15 * np.std(non_fib_data)]
         bins = np.linspace(min(non_fib_data), max([max(fib_data)]), 100)
         prob = []
         for j in bins:
@@ -199,7 +202,7 @@ def data_hist():
     plt.ylabel('"Fibrillation proability"')
     plt.xlabel('Hamming Distance')
     plt.legend()
-    plt.savefig('Ham_dis_prob_all.png')
+    plt.savefig('Ham_dis_prob_all_ref5.png')
 
 def data_hist1():
     fib_data = np.load('fib_data_{}.npy'.format(0))
@@ -207,8 +210,57 @@ def data_hist1():
     plt.hist(fib_data)
     plt.savefig('FUNNNN.png')
 
+def data_hist2():
+    '''
+    Assumptions:
+    - If a simulation enters fibrillation at a hamming distance of 1, it would also enter at a Ham_dis of 2
+    - If a simulation hasn't entered fibrillation with a hamming distance of 1, then it has passed through every other hamming distance between 0 and 1
+    '''
+    colors = {0 : 'black', 1 : 'red', 3 : 'orange', 5 : 'green', 10 : 'blue', 20 : 'pink'}#, 2 : 'purple', 4 : 'gray'
+    for i in list(colors.keys()):
+        fib_data = np.load('fib_data_multi_{}.npy'.format(i))
+        fib_data = fib_data[fib_data != False]
+        non_fib_data = np.load('non_fib_data_multi_{}.npy'.format(i))
+        #non_fib_data = non_fib_data[abs(non_fib_data - np.mean(non_fib_data)) < 15 * np.std(non_fib_data)]
+        bins = np.linspace(min(non_fib_data), max([max(fib_data)]), 50)
+        diff = bins[1] - bins[0]
+        prob = []
+        for j in bins:
+            if len(np.where(j<non_fib_data)[0]) > 0:
+                prob.append(len(np.where((j<fib_data) & (j> fib_data - diff))[0])/(len(np.where(j<non_fib_data)[0]) + len(np.where((j<fib_data + diff) & (j> fib_data - diff))[0])))
+            else:
+                if len(np.where(j<fib_data)[0]) > 0:
+                    prob.append(1)
+                else:
+                    prob.append(1)
+        plt.plot(bins,prob, marker = 'x', ls = ' ', color = colors[i], label = 'A = {}'.format(i), markersize = 3)
+    plt.ylabel('"Fibrillation proability"')
+    plt.xlabel('Hamming Distance')
+    plt.legend()
+    plt.savefig('Ham_dis_prob_all_ref5_test.png')
+
+def chekcing_fib():
+    fname = 'fib_data_multi_1.npy'
+    data = np.load(fname)
+    offs = np.linspace(0.4,1,13)
+    amps = np.linspace(0,0.5,11)
+    multi = np.linspace(1,2,11)
+    off_amp_pairs = [(off, amp, mult) for off in offs for amp in amps for mult in multi if (off - amp) >= 0.4]
+
+    dict_ = {i : [] for i in off_amp_pairs}
+    k = 0
+    for j in dict_.items():
+        for z in range(6):
+            if data[k] > 4:
+                dict_[j[0]].append(data[k])
+            k += 1
+        if len(dict_[j[0]]) > 0:
+            print(j[0])
+            print(dict_[j[0]])
+    
+
 if __name__ == '__main__':
     t0 = time.time()
-    data_hist()
+    chekcing_fib()
     #main()
     print(time.time() - t0)
