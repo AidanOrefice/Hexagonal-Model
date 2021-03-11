@@ -216,18 +216,18 @@ def data_hist2():
     - If a simulation enters fibrillation at a hamming distance of 1, it would also enter at a Ham_dis of 2
     - If a simulation hasn't entered fibrillation with a hamming distance of 1, then it has passed through every other hamming distance between 0 and 1
     '''
-    colors = {0 : 'black', 1 : 'red', 3 : 'orange', 5 : 'green', 10 : 'blue', 20 : 'pink'}#, 2 : 'purple', 4 : 'gray'
+    colors = {0 : 'black', 1 : 'red', 2 : 'purple', 3 : 'orange', 4 : 'gray', 5 : 'green', 10 : 'blue', 20 : 'pink'}#, 2 : 'purple', 4 : 'gray'
     for i in list(colors.keys()):
-        fib_data = np.load('fib_data_multi_{}.npy'.format(i))
+        fib_data = np.load('fib_data_multi_ref5_{}.npy'.format(i))
         fib_data = fib_data[fib_data != False]
-        non_fib_data = np.load('non_fib_data_multi_{}.npy'.format(i))
+        non_fib_data = np.load('non_fib_data_multi_ref5_{}.npy'.format(i))
         #non_fib_data = non_fib_data[abs(non_fib_data - np.mean(non_fib_data)) < 15 * np.std(non_fib_data)]
         bins = np.linspace(min(non_fib_data), max([max(fib_data)]), 50)
         diff = bins[1] - bins[0]
         prob = []
         for j in bins:
             if len(np.where(j<non_fib_data)[0]) > 0:
-                prob.append(len(np.where((j<fib_data) & (j> fib_data - diff))[0])/(len(np.where(j<non_fib_data)[0]) + len(np.where((j<fib_data + diff) & (j> fib_data - diff))[0])))
+                prob.append(len(np.where((j<fib_data) & (j> fib_data - diff))[0])/(len(np.where(j<non_fib_data)[0]) + len(np.where((j<fib_data) & (j> fib_data - diff))[0])))
             else:
                 if len(np.where(j<fib_data)[0]) > 0:
                     prob.append(1)
@@ -237,7 +237,7 @@ def data_hist2():
     plt.ylabel('"Fibrillation proability"')
     plt.xlabel('Hamming Distance')
     plt.legend()
-    plt.savefig('Ham_dis_prob_all_ref5_test.png')
+    plt.savefig('Ham_dis_prob_all_ref5.png')
 
 def chekcing_fib():
     fname = 'fib_data_multi_1.npy'
@@ -261,6 +261,6 @@ def chekcing_fib():
 
 if __name__ == '__main__':
     t0 = time.time()
-    chekcing_fib()
+    data_hist2()
     #main()
     print(time.time() - t0)
