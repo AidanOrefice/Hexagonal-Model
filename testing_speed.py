@@ -7,7 +7,16 @@ from Animation import Animate
 from Hexagon import HexagonalLattice
 from matplotlib.lines import Line2D
 import math
-from matplotlib.lines import Line2D
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    'figure.figsize' : [16,9],
+    'xtick.labelsize' : 15,
+    'ytick.labelsize' : 15,
+    'axes.labelsize' : 25,
+    'legend.fontsize' : 17,
+    'savefig.bbox' : 'tight',
+})
 
 def plot_amp_offs_PS(fnames):
     f, ax = plt.subplots(1,3, sharey = True, figsize=(12,5))
@@ -141,7 +150,7 @@ def plot_mean_var_PS(fname):
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_mean_std_large_colourmap_{}'.format(A))
 
-def SigmoidPlot(fname):
+def MisfireSigmoidPlot(fname):
     Runs = pd.read_csv(fname)
     df = Runs[Runs['in AF?']]
     fun = np.unique(Runs['multiplier'])
@@ -363,7 +372,7 @@ def sigmoid_plot():
     plt.bar(values, bars, color = 'white', width = 0.0001, edgecolor = 'black')
     values1 = [r'$\frac{%i}{6}$'%(i) for i in range(7)]
     values1 = ['{}/6'.format(i) for i in range(7)]
-    plt.xticks(values, values1, fontsize = 10)
+    plt.xticks(values, values1)
     plt.plot(x,y, color = 'red')
     plt.xlim(-0.05,1.05)
     plt.ylim(0,1.19)
@@ -372,7 +381,7 @@ def sigmoid_plot():
     legend_elements = [Line2D([0], [0], ls='-', color='red', label='Charge activation function',  markersize=1),
                 Line2D([0], [0], ls='-', color='black', label='Discrete charge values', markersize=1)]
     plt.legend(handles = legend_elements)
-    plt.savefig('Poster_sigmoid')
+    plt.savefig('Test_sigmoid')
 
 #Ham_Dis_plot_per('Ham_dis_run_All_Data.csv')
 #Merge_data(['Ham_dis_run_fib_PS_{}.csv'.format(i) for i in [1,2,3,4,5,6]])
@@ -385,7 +394,10 @@ def sigmoid_plot():
 '''for i in ['FailureMultiplierData_0.8_20.csv']:
     SigmoidPlot(i)'''
 
+#print(mpl.rcParams.keys())
+
 sigmoid_plot()
+
 '''fname = ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv']
 plot_amp_offs_PS(fname)'''
 '''
