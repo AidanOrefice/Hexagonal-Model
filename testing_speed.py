@@ -7,6 +7,7 @@ from Animation import Animate
 from Hexagon import HexagonalLattice
 from matplotlib.lines import Line2D
 import math
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib as mpl
 
 mpl.rcParams.update({
@@ -19,52 +20,66 @@ mpl.rcParams.update({
 })
 
 def plot_amp_offs_PS(fnames):
-    f, ax = plt.subplots(1,3, sharey = True, figsize=(12,5))
+    f, ax = plt.subplots(3,2, sharey = True, sharex = True, figsize=(16,13.5))
+    print(ax)
+    print(ax[0])
     for t,fname in enumerate(fnames):
-        Runs = pd.read_csv(fname)
+        ax_num = (int(np.floor(t/2)),int(t%2))
         A = str(fname.split('_')[-1].split('.')[0])
+        print(A)
+        if A != '2':
+            Runs = pd.read_csv(fname)
+            for index, row in Runs.iterrows():
+                list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
+                Runs.loc[index, 'normal_beta'] = float(list_[2].strip())
+                Runs.loc[index, 'normal_alpha'] = float(list_[1].strip())
+            
+            Runs = Runs[Runs['normal_alpha'] < 0.51]
 
-        for index, row in Runs.iterrows():
-            list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
-            Runs.loc[index, 'normal_beta'] = float(list_[2].strip())
-            Runs.loc[index, 'normal_alpha'] = float(list_[1].strip())
-        
-        Runs = Runs[Runs['normal_alpha'] < 0.51]
+            map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
+            map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
 
-        map_alpha = {j:i for i,j in enumerate(sorted(np.unique(Runs['normal_alpha']), reverse = True))}
-        map_beta = {j:i for i,j in enumerate(np.unique(Runs['normal_beta']))}
-
-        tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
-        print(tot_count)
-        PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-        Per_percent = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-        #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
-        print(PS.shape)
-        for index, row in Runs.iterrows():
-            x = map_beta[row['normal_beta']]
-            y = map_alpha[row['normal_alpha']]
-            if row['in AF?']:
-                PS[y][x] += 1
-            Per_percent[y][x] += row['per_%']
-            #PS_time[y][x] += row['%time in AF']
-        PS_per = PS / tot_count
-        Per_percent = Per_percent / tot_count
-        #PS_time = PS_time / tot_count
-        df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
-        df.index = np.round(df.index*100)/100
-        df.columns = np.round(df.columns*100)/100
-        if int(A) < 9:
-            sns.heatmap(df, ax = ax[t], cbar = False)
-        else:
-            sns.heatmap(df, ax = ax[t])
-        ax[t].tick_params(axis='y', rotation=0)
-        CS = ax[t].contour([i for i in range(len(map_beta.keys()))],[i for i in range(len(map_alpha.keys()))], Per_percent, levels = [0,0.5,0.99], colors = 'blue', alpha = 1)
-        ax[t].clabel(CS, inline=1, fontsize=7.5)
-        ax[t].set_title('A = {}'.format(A))
-    ax[1].set_xlabel('Offset')
-    ax[0].set_ylabel('Amplitude')
+            tot_count = Runs['normal_alpha'].value_counts()[0]/len(map_beta.keys())
+            print(tot_count)
+            PS = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+            Per_percent = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+            #PS_time = np.zeros((len(map_alpha.keys()),len(map_beta.keys())))
+            print(PS.shape)
+            for index, row in Runs.iterrows():
+                x = map_beta[row['normal_beta']]
+                y = map_alpha[row['normal_alpha']]
+                if row['in AF?']:
+                    PS[y][x] += 1
+                Per_percent[y][x] += row['per_%']
+                #PS_time[y][x] += row['%time in AF']
+            PS_per = PS / tot_count
+            Per_percent = Per_percent / tot_count
+            #PS_time = PS_time / tot_count
+            df = pd.DataFrame(PS_per, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
+            df.index = np.round(df.index*100)/100
+            df.columns = np.round(df.columns*100)/100
+            if int(A) != 10:
+                im = ax[ax_num[0],ax_num[1]].imshow(df)
+            else:
+                im = ax[ax_num[0],ax_num[1]].imshow(df)
+            ax[ax_num[0],ax_num[1]].tick_params(axis='y', rotation=0)
+            CS = ax[ax_num[0],ax_num[1]].contour([i for i in range(len(map_beta.keys()))],[i for i in range(len(map_alpha.keys()))], Per_percent, levels = [0,0.5,0.99], colors = 'blue', alpha = 1)
+            ax[ax_num[0],ax_num[1]].clabel(CS, inline=1, fontsize=7.5)
+            ax[ax_num[0],ax_num[1]].set_title('A = {}'.format(A))
+    for ax1 in ax.flat:
+        ax1.set_yticks([0,2,4,6,8,10])
+        ax1.set_yticklabels([0.5,0.4,0.3,0.2,0.1,0])
+        ax1.set_xticks([2*i for i in range(11)])
+        ax1.set_xticklabels([i/10 for i in range(11)])
+    cbar_ax = f.add_axes([0.93, 0.15, 0.03, 0.7])
+    f.colorbar(im, cax=cbar_ax)
+    f.add_subplot(111, frameon=False)
+    # hide tick and tick label of the big axes
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.grid(False)
+    plt.xlabel('Offset')
+    plt.ylabel('Amplitude')
     #ax[2].set_xticklabels(ax[2].get_xticks(), rotation = 90)
-    plt.tight_layout()
     plt.savefig('PS_poster_1_5')
 
 def plot_per_percent_PS(fname):
@@ -150,7 +165,7 @@ def plot_mean_var_PS(fname):
     ax.set_title('Fraction of simulations that entered fibrillation')
     plt.savefig('PS_mean_std_large_colourmap_{}'.format(A))
 
-def MisfireSigmoidPlot(fname):
+def SigmoidPlot(fname):
     Runs = pd.read_csv(fname)
     df = Runs[Runs['in AF?']]
     fun = np.unique(Runs['multiplier'])
@@ -372,7 +387,7 @@ def sigmoid_plot():
     plt.bar(values, bars, color = 'white', width = 0.0001, edgecolor = 'black')
     values1 = [r'$\frac{%i}{6}$'%(i) for i in range(7)]
     values1 = ['{}/6'.format(i) for i in range(7)]
-    plt.xticks(values, values1)
+    plt.xticks(values, values1, fontsize = 10)
     plt.plot(x,y, color = 'red')
     plt.xlim(-0.05,1.05)
     plt.ylim(0,1.19)
@@ -381,7 +396,7 @@ def sigmoid_plot():
     legend_elements = [Line2D([0], [0], ls='-', color='red', label='Charge activation function',  markersize=1),
                 Line2D([0], [0], ls='-', color='black', label='Discrete charge values', markersize=1)]
     plt.legend(handles = legend_elements)
-    plt.savefig('Test_sigmoid')
+    plt.savefig('Poster_sigmoid')
 
 #Ham_Dis_plot_per('Ham_dis_run_All_Data.csv')
 #Merge_data(['Ham_dis_run_fib_PS_{}.csv'.format(i) for i in [1,2,3,4,5,6]])
@@ -394,12 +409,10 @@ def sigmoid_plot():
 '''for i in ['FailureMultiplierData_0.8_20.csv']:
     SigmoidPlot(i)'''
 
-#print(mpl.rcParams.keys())
+#sigmoid_plot()
+fname = ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_2.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv','Normal_Modes_Phase_Space_Ham_dis_3.csv','Normal_Modes_Phase_Space_Ham_dis_20.csv']
+plot_amp_offs_PS(fname)
 
-sigmoid_plot()
-
-'''fname = ['Normal_Modes_Phase_Space_Ham_dis_1.csv','Normal_Modes_Phase_Space_Ham_dis_5.csv','Normal_Modes_Phase_Space_Ham_dis_10.csv']
-plot_amp_offs_PS(fname)'''
 '''
 df = pd.DataFrame(PS_time, columns = list(map_beta.keys()), index = list(map_alpha.keys()))
 df.index = np.round(df.index*100)/100
