@@ -299,7 +299,7 @@ def Toy_Anim():
     lattice = InitialLattice()
     lattice.CouplingMethod([A,amp,off])
     run = lattice.RunIt()
-    Animate(str(run[-1]), 'full', 0, 0, 0, '[%s, %s, %s]' % (str(A), str(amp), str(off)), True)
+    #Animate(str(run[-1]), 'full', 0, 0, 0, '[%s, %s, %s]' % (str(A), str(amp), str(off)), True)
 
 def Ham_dis_Max():
     a = 10
@@ -377,8 +377,17 @@ def Ham_dis_Max1():
                     plt.close()
 
 
+
+
 def main():
-    df = Ham_dis_Max1()
+    dat = pd.read_csv('FailureMultiplierData_0.7_full.csv')
+    dat = dat[dat['in AF?']]
+    dat = dat[dat['location_err']]
+    times = sorted([(int(i.split(',')[1].split(')')[0]) - 100)%200 for i in dat['AF_time']])
+    med_t, mean_t = np.median(times), np.mean(times)
+    print('Median:', med_t)
+    print('Mean:', mean_t)
+    #df = Toy_Anim
     '''for i in range(len(df)):
         Animate(str(df['title'][i]),str(df['FullStateSave'][i]), df['location_2'][i], df['location_3'][i], df['location_4'][i], df['normal_modes_config'][i])'''
 
