@@ -125,21 +125,32 @@ def Hamming_distance(time_data):
         return 0
 
 def Ham_dis_inves_pdf(lattice, run):
-    non_fib = []
     fib = False
     if lattice.kill:
         AF_beat = int(np.floor((lattice.AF_time[1]-100) / lattice.pacing_period))
-        fib = run[19]
+        if lattice.Location_Check(lattice.re_sites[2],lattice.re_sites[3],lattice.re_sites[4]):
+            fib = run[19]
     else:
         AF_beat = 50
+    
+    non_fib = [[] for i in range(AF_beat)]
     for i in range(AF_beat):
         ham_dis_beat = []
         if lattice.AF_bool[i][1] == False:
             for j in range(200):
                 time = i*200 + j
                 beat_data = lattice.RefHistory[int(time*10000):int((time+1)*10000)]
-                ham_dis_beat.append(Hamming_distance(beat_data))
-            non_fib.append(max(ham_dis_beat))
+                ham_dis_this = Hamming_distance(beat_data)
+                ham_dis_beat.append(ham_dis_this)
+                if j == 49:
+                    non_fib[i].append(ham_dis_this)
+                elif j == 74:
+                    non_fib[i].append(ham_dis_this)
+                elif j == 97:
+                    non_fib[i].append(ham_dis_this)
+                elif j == 99:
+                    non_fib[i].append(ham_dis_this)
+            non_fib[i].append(max(ham_dis_beat))
     return fib, non_fib
 
 def Ham_dis_pdf():
@@ -150,12 +161,12 @@ def Ham_dis_pdf():
     We will get some form of a cumulative PDF
     Only want to cycle through areas with (mean-amp > percolation_threshold) to avoid trouble
     '''
-    offs = np.linspace(0.4,1,13)
-    amps = np.linspace(0,0.5,11)
-    multi = np.linspace(1,2,11)
+    offs = np.linspace(0.7,0.7,1)
+    amps = np.linspace(0.2,0.2,1)
+    multi = np.linspace(0.8,0.8,1)
     off_amp_pairs = [(off, amp, mult) for off in offs for amp in amps for mult in multi if (off - amp) >= 0.4]
-    periodicity = [4]#0,1,2,3,4,5,10,20
-    runs = 6
+    periodicity = [1]#0,1,2,3,4,5,10,20
+    runs = 8200
     fib = []
     non_fib = []
     print(periodicity)
@@ -166,6 +177,8 @@ def Ham_dis_pdf():
         print(off, amp, mult)
         for a in periodicity:
             for _ in range(runs):
+                if _ %10 == 0:
+                    print(_)
                 lattice = InitialLattice(x = mult)
                 lattice.CouplingMethod([a,amp,off])
                 run = lattice.RunIt()
@@ -173,8 +186,8 @@ def Ham_dis_pdf():
                 fib1, non_fib1 = Ham_dis_inves_pdf(lattice, run)
                 fib.append(fib1)
                 non_fib.extend(non_fib1)
-    np.save('fib_data_multi_{}'.format(a), fib)
-    np.save('non_fib_data_multi_{}'.format(a), non_fib)
+    np.save('fib_data_0.7_0.2_5', fib)
+    np.save('non_fib_data_0.7_0.2_5', non_fib)
 
 def data_hist():
     '''
@@ -239,6 +252,44 @@ def data_hist2():
     plt.legend()
     plt.savefig('Ham_dis_prob_all_ref5.png')
 
+def data_hist_single():
+    '''
+    Assumptions:
+    - If a simulation enters fibrillation at a hamming distance of 1, it would also enter at a Ham_dis of 2
+    - If a simulation hasn't entered fibrillation with a hamming distance of 1, then it has passed through every other hamming distance between 0 and 1
+    '''
+    fib_data = []
+    non_fib_data = []
+    for i in range(1,6):
+        fib  = np.load('fib_data_0.7_0.2_{}.npy'.format(i), allow_pickle = True)
+        non_fib = np.load('non_fib_data_0.7_0.2_{}.npy'.format(i), allow_pickle = True)
+        fib_data.extend(fib)
+        non_fib_data.extend(non_fib)
+    #fib_data = fib_data[fib_data != False]
+    #non_fib_data goes 50,75,98,100,max
+    non_fib_data_50 = np.asarray([i[0] for i in non_fib_data if len(i) == 5])
+    non_fib_data_75 = np.asarray([i[1] for i in non_fib_data if len(i) == 5])
+    non_fib_data_98 = np.asarray([i[2] for i in non_fib_data if len(i) == 5])
+    non_fib_data_100 = np.asarray([i[3] for i in non_fib_data if len(i) == 5])
+    non_fib_data_max = np.asarray([i[4] for i in non_fib_data if len(i) == 5])
+    non_fib_data_98 = non_fib_data_98[non_fib_data_98 != 0]
+    non_fib_data_98 = non_fib_data_98[abs(non_fib_data_98 - np.mean(non_fib_data_98)) < 5 * np.std(non_fib_data_98)]
+    bins = np.linspace(min(non_fib_data_98), max([max(fib_data)]), 50)
+    diff = bins[1] - bins[0]
+    prob = []
+    for j in bins:
+        if len(np.where(j < non_fib_data_98)[0]) > 0:
+            prob.append(len(np.where((j < fib_data) & (j > fib_data - diff))[0])/(len(np.where(j < non_fib_data_98)[0]) + len(np.where((j < fib_data) & (j > fib_data - diff))[0])))
+        else:
+            if len(np.where(j < fib_data)[0]) > 0:
+                prob.append(1)
+            else:
+                prob.append(1)
+    plt.plot(bins, prob, marker='x', ls=' ', color='red')
+    plt.ylabel('"Fibrillation proability"')
+    plt.xlabel('Hamming Distance')
+    plt.savefig('Ham_dis_0.7_0.2.png')
+
 def chekcing_fib():
     fname = 'fib_data_multi_1.npy'
     data = np.load(fname)
@@ -261,6 +312,6 @@ def chekcing_fib():
 
 if __name__ == '__main__':
     t0 = time.time()
-    data_hist2()
+    data_hist_single()
     #main()
     print(time.time() - t0)

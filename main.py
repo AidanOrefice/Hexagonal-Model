@@ -59,10 +59,10 @@ def InitialDF_Ham():
 def NormalModesPS():
     df = InitialDF()
     amps = np.linspace(0,0.5,11)
-    amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
+    #amps = np.append(amps, [0.75,1,2,5,10,25,50,100,1000,10000,100000])
     offs = np.linspace(0,1,21)  #Same width in each direction.
-    A = 20
-    runs = 15
+    A = 2
+    runs = 25
     print(A)
     for o in offs:
         print('Offset:', o)
@@ -396,7 +396,7 @@ def main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    main()
+    NormalModesPS()
     t1 = time.time()
     print(t1-t0)
 

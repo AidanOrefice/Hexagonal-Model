@@ -27,7 +27,7 @@ def plot_amp_offs_PS(fnames):
         ax_num = (int(np.floor(t/2)),int(t%2))
         A = str(fname.split('_')[-1].split('.')[0])
         print(A)
-        if A != '2':
+        if A != '756':
             Runs = pd.read_csv(fname)
             for index, row in Runs.iterrows():
                 list_ = str(row['normal_modes_config']).split('[')[1].split(']')[0].split(',')
@@ -384,10 +384,10 @@ def sigmoid_plot():
     bars = [SigmoidDist(i) for i in values]
     print(bars)
     print(values)
-    plt.bar(values, bars, color = 'white', width = 0.0001, edgecolor = 'black')
+    plt.bar(values, bars, color = 'white', width = 0.00001, edgecolor = 'black')
     values1 = [r'$\frac{%i}{6}$'%(i) for i in range(7)]
     values1 = ['{}/6'.format(i) for i in range(7)]
-    plt.xticks(values, values1, fontsize = 10)
+    plt.xticks(values, values1)
     plt.plot(x,y, color = 'red')
     plt.xlim(-0.05,1.05)
     plt.ylim(0,1.19)
