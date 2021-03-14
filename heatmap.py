@@ -6,6 +6,16 @@ from scipy.spatial.distance import euclidean
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from collections import Counter
 import time
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    'figure.figsize' : [12,9],
+    'xtick.labelsize' : 15,
+    'ytick.labelsize' : 15,
+    'axes.labelsize' : 25,
+    'legend.fontsize' : 17,
+    'savefig.bbox' : 'tight',
+})
 
 def sinusoid2D(x, y, A,  amp, mean):
     #Amplitude - directly sets the amplitude of the function
@@ -52,7 +62,7 @@ def value_counts(df,n):
 
     return np.array(locs_[0])
 
-def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
+def plot_heat_map(fname, fig, ax, convolve = False, presave = True, contour = False):
     runs = pd.read_csv(fname + '.csv')
     #Fix problem of trues in location 4, set to location 3 value
     runs.loc[runs['location_4'] == 'True', 'location_4'] = runs.loc[runs['location_4'] == 'True']['location_3']
@@ -65,10 +75,9 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
     #runs = runs[runs['location_err']] Taken out to do earlier data
 
     if contour:
-        fig,ax1 = plt.subplots()
+        ax1 = ax[0]
     else:
-        fig,(ax1,ax2) = plt.subplots(1,2)
-        fig.set_size_inches(16,8)
+        ax1, ax2 = ax[0], ax[1]
 
     hex_centers, ax1 = create_hex_grid(nx=100, ny=100, do_plot=True, align_to_origin = False, h_ax = ax1)
     x = [i[0] for i in hex_centers]
@@ -138,15 +147,15 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
 
     else:
         loc_plot = ax1.scatter(x,y,marker = 'h', s=17, c = locs, cmap = 'gnuplot2') # gist_gray, gnuplot
-        ax1.tick_params(axis = 'both', labelsize = 16)
+        ax1.tick_params(axis = 'both')
 
         divider = make_axes_locatable(ax1)
         cax1 = divider.append_axes("right", size="3%", pad=0.1)
-        cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 0.6, ticks = [min(locs), max(locs)])
-        cbar.ax.set_yticklabels(['RARE', 'COMMON'], fontsize = 16)  # vertically oriented colorbar
+        cbar = fig.colorbar(loc_plot, cax = cax1, shrink = 1, ticks = [0,0.0003,0.0005]) #[round(min(locs),4),round(max(locs)/2,4), round(,4)*0.95]
+        #cbar.ax.set_yticklabels([str(round(min(locs),4)),str(round(max(locs)/2,4)), str(round(max(locs),4))], fontsize = 16)  # vertically oriented colorbar
 
 
-        sin_z = [sinusoid2D(x[i], y[i], A, 0.1, 1) for i in range(len(x))]
+        sin_z = [sinusoid2D(x[i], y[i], A, 0.2, 0.5) for i in range(len(x))]
         _, ax2 = create_hex_grid(nx=100,ny=100, do_plot=True, align_to_origin = False, h_ax = ax2)
         ax2.axes.yaxis.set_ticklabels([])
         ax2.tick_params(axis = 'both', labelsize = 16)
@@ -155,17 +164,17 @@ def plot_heat_map(fname, convolve = False, presave = True, contour = False,):
 
         divider = make_axes_locatable(ax2)
         cax2 = divider.append_axes("right", size="3%", pad=0.1)
-        cbar = fig.colorbar(couple_plot, cax = cax2, shrink = 0.6, ticks = [min(sin_z), max(sin_z)])
-        cbar.ax.set_yticklabels(['LOW', 'HIGH'], fontsize = 16)  # vertically oriented colorbar
+        cbar = fig.colorbar(couple_plot, cax = cax2, shrink = 1, ticks = [min(sin_z),(max(sin_z)+min(sin_z))/2, max(sin_z)], pad = 0)
+        #cbar.ax.set_yticklabels(['LOW', 'HIGH'], fontsize = 16)  # vertically oriented colorbar
 
         name = 'poster_heatmap_{}_'.format(off) + str(A) +'.png'
-        fig.suptitle('A = {}'.format(str(A)), fontsize =20, x  = 0.09, y = 0.91)
+        #fig.suptitle('A = {}'.format(str(A)), fontsize =20, x  = 0.09, y = 0.91)
         
-    plt.tight_layout()
+    #plt.tight_layout()
     if convolve:
         name = 'varkern_convolved_' + name
-    plt.savefig(name)
-    plt.close()
+    #plt.savefig(name)
+    #plt.close()
     
 def Convolve(c,l,theta):
     #for a given index - calculate all indexs that should for convolve with it
@@ -244,14 +253,34 @@ def UnitCellGenerate(fname):
     plt.close()
 
 
+def ReportFig():
+    fig,(axi,axis) = plt.subplots(2,2)
+    ax1, ax2 = axi[0], axi[1]
+    ax3, ax4 = axis[0], axis[1]
+    plot_heat_map('FailureMultiplierData_1', fig, [ax1,ax2], 1,1,0)
+    plot_heat_map('FailureMultiplierData_3', fig, [ax3,ax4], 1,1,0)
+    #plt.subplots_adjust(wspace=0, hspace=0)
+    #plt.tight_layout()
 
+    fig.add_subplot(211, frameon=False)
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.title('A = 1:', fontsize = 16, loc = 'left')
+
+    fig.add_subplot(212, frameon=False)
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.title('A = 3:', fontsize = 16, loc = 'left')
+
+    plt.savefig('testie.png')
+
+    #A=1 
+    #A=3
 
 
 
 
 if __name__ == '__main__':
     t0 = time.time()
-    UnitCellGenerate('FailureMultiplierData_20')
+    ReportFig()
     t1 = time.time()
     print(t1-t0)
 

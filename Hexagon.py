@@ -15,6 +15,17 @@ from itertools import groupby
 from operator import itemgetter
 from matplotlib.lines import Line2D
 from scipy.spatial.distance import euclidean
+from hexalattice.hexalattice import *
+import matplotlib as mpl
+
+mpl.rcParams.update({
+    'figure.figsize' : [16,9],
+    'xtick.labelsize' : 15,
+    'ytick.labelsize' : 15,
+    'axes.labelsize' : 25,
+    'legend.fontsize' : 17,
+    'savefig.bbox' : 'tight',
+})
 
 def choose_numbers(list1, prob):
     new_list = []
@@ -222,18 +233,37 @@ class HexagonalLattice():
         self.mean, self.var = np.mean(self.coupling_samp), np.var(self.coupling_samp)
 
     def Coupling_Sample(self, A, amp, offs):
-        fig,ax = plt.subplots()
-        #print(mean)
-        #print(amp)
-        x = [self.index_to_xy(i)[0] for i in range(self.width*self.height)]
-        y = [self.index_to_xy(i)[1] for i in range(self.width*self.height)]
-        plt.scatter(x,y,marker = 'h', s=15, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
-        cbar = plt.colorbar(ticks=np.arange(1/14,17/14,1/7), shrink = 1)
+        fig,(ax1,ax2) = plt.subplots(1,2)
+
+
+        hex_centers, ax1 = create_hex_grid(nx=self.width,ny=self.height, do_plot=True, align_to_origin = False, h_ax = ax1)
+        x = [i[0] for i in hex_centers]
+        y = [i[1] for i in hex_centers] 
+
+        sin_z = [self.sinusoid2D(x[i], y[i], A, amp, offs) for i in range(len(x))]
+        a = ax1.scatter(x,y,marker = 'h', s=15, c = sin_z) #s=17
+        plt.colorbar(a, ax = ax1, shrink=0.6)
+
+        ax2.yaxis.set_tick_params(labelsize=0)
+        hex_centers, ax2 = create_hex_grid(nx=self.width,ny=self.height, do_plot=True, align_to_origin = False, h_ax = ax2)
+        x = [i[0] for i in hex_centers]
+        y = [i[1] for i in hex_centers] 
+        b = ax2.scatter(x,y,marker = 'h', s=15, c = self.coupling_samp, cmap=plt.cm.get_cmap('viridis', 7))
+        cbar = plt.colorbar(b,ax = ax2, ticks=np.arange(1/14,17/14,1/7), shrink = 0.6)
         cbar.set_ticklabels(["0", "1/6", "1/3", "1/2", "2/3", "5/6", "1"])
-        plt.clim(0,1)
+        #plt.clim(0,1)
+
+
+        #Adding common X and Y axis labels
+        '''fig.add_subplot(111, frameon=False)
+        plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+        plt.xlabel("X position")
+        plt.ylabel("Y position")'''
+
+        plt.tight_layout()
         
         
-        label_offs = 'Offset = ' + str(offs)
+        """label_offs = 'Offset = ' + str(offs)
         label_amp = 'Amplitude = ' + str(amp)
         label_a = r'$A$ = ' + str(A)
         label_mean = 'Mean = ' + str(round(self.mean,3))
@@ -250,8 +280,8 @@ class HexagonalLattice():
         fig.set_size_inches(16,9)
         plt.legend(handles = legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), ncol=3, fontsize = 14)
         plt.axis('scaled')
-        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(A\frac{2\pi x}{length}) + \sin(A\frac{2\pi y}{height}) \right) + Offset$", fontsize = 20)
-        plt.savefig('SampleViz_%i,%i,%i,%i.png' %(amp*100,offs*100,A,self.seed))
+        plt.title(r"Sample of $\frac{Amplitude}{2} \times \left( \sin(A\frac{2\pi x}{length}) + \sin(A\frac{2\pi y}{height}) \right) + Offset$", fontsize = 20)"""
+        plt.savefig('SpaceViz_%i,%i,%i,%i.png' %(amp*100,offs*100,A,self.seed))
         plt.close()
     
     def Initialise(self):
